@@ -18,7 +18,7 @@ spec:
           - --validating-webhook=:8443
           - --validating-webhook-certificate=/usr/local/certificates/cert
           - --validating-webhook-key=/usr/local/certificates/key
-          - --enable-metrics-per-host=false
+          - --metrics-per-host=false
         ports:
         - name: http
           containerPort: 80

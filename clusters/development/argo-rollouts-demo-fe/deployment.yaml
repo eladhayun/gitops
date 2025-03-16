@@ -19,7 +19,6 @@ spec:
       containers:
         - name: argo-rollouts-demo-fe
           image: playgroundacr1234.azurecr.io/argo-rollouts-demo-fe:latest
-          imagePullPolicy: Always
           ports:
             - containerPort: 80
           resources:

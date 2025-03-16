@@ -1,0 +1,52 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: argo-rollouts-demo-be
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argo-rollouts-demo-be
+  template:
+    metadata:
+      labels:
+        app: argo-rollouts-demo-be
+    spec:
+      containers:
+        - name: argo-rollouts-demo-be
+          image: playgroundacr1234.azurecr.io/argo-rollouts-demo-be:v2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {duration: 30s}
+      - setWeight: 40
+      - pause: {duration: 30s}
+      - setWeight: 60
+      - pause: {duration: 30s}
+      - setWeight: 80
+      - pause: {duration: 30s}

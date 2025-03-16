@@ -1,0 +1,18 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: error-rate-check
+  namespace: demo
+spec:
+  metrics:
+  - name: error-rate
+    interval: 30s
+    count: 10
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus-server.monitoring.svc.cluster.local:9090
+        query: |
+          sum(rate(http_requests_total{status_code=~"4..",service="{{args.service-name}}"}[5m])) / sum(rate(http_requests_total{service="{{args.service-name}}"}[5m])) * 100 > 50
+    successCondition: result == 0 

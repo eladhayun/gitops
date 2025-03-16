@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/gitops.git  # Replace with your repository URL
+    repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
     path: apps/app-of-apps/applications
   destination:

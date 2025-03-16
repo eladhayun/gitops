@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-rollouts-demo-fe
+  namespace: demo
+  labels:
+    app: argo-rollouts-demo-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argo-rollouts-demo-fe
+  template:
+    metadata:
+      labels:
+        app: argo-rollouts-demo-fe
+    spec:
+      containers:
+        - name: argo-rollouts-demo-fe
+          image: playgroundacr1234.azurecr.io/argo-rollouts-demo-fe:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "250m"
+              memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5

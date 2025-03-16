@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: application-name  # Replace with your application name
+  name: argo-rollouts-demo-fe
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/gitops.git  # Replace with your repository URL
+    repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
-    path: clusters/development/application-name  # Replace with your application path
+    path: clusters/development/argo-rollouts-demo-fe
   destination:
     server: https://kubernetes.default.svc
-    namespace: application-namespace  # Replace with your target namespace
+    namespace: argo-rollouts-demo-fe
   syncPolicy:
     automated:
       prune: true

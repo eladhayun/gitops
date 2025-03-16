@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingress-nginx-controller
+  namespace: demo
+spec:
+  template:
+    spec:
+      containers:
+      - name: controller
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        - name: webhook
+          containerPort: 8443
+          protocol: TCP
+        - name: metrics
+          containerPort: 10254
+          protocol: TCP 

@@ -16,3 +16,7 @@ patches:
     target:
       kind: Service
       name: ingress-nginx-controller
+  - path: deployment-patch.yaml
+    target:
+      kind: Deployment
+      name: ingress-nginx-controller

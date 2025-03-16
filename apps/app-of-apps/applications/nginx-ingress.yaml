@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
-    path: apps/nginx-ingress
+    path: clusters/development/nginx-ingress
   destination:
     server: https://kubernetes.default.svc
     namespace: demo

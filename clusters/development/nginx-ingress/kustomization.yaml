@@ -6,3 +6,7 @@ resources:
   - service-monitor.yaml
 
 namespace: demo
+
+patchesStrategicMerge:
+  - nginx-config-patch.yaml
+  - service-patch.yaml

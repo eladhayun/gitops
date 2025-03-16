@@ -3,8 +3,5 @@ kind: Kustomization
 
 resources:
   - rollout.yaml
-  - services.yaml
+  - service.yaml
   - analysis-template.yaml
-commonLabels:
-  app.kubernetes.io/managed-by: argocd
-  app.kubernetes.io/part-of: demo 

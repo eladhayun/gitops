@@ -12,7 +12,4 @@ data:
   prometheus-port: "10254"
   enable-vts-status: "true"
   enable-opentelemetry: "true"
-  metrics-per-host: "true"
-  controller-class: "nginx"
-  prometheus-metrics-enabled: "true"
-  prometheus-metrics-labels: "app,namespace,ingress,service,status_code,status,method,path" 
+  metrics-per-host: "false"

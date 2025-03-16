@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-autoscaler
+  namespace: kube-system
+  labels:
+    app: cluster-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cluster-autoscaler
+  template:
+    metadata:
+      labels:
+        app: cluster-autoscaler
+    spec:
+      serviceAccountName: cluster-autoscaler
+      containers:
+        - image: mcr.microsoft.com/oss/kubernetes/autoscaler/cluster-autoscaler:v1.27.3
+          name: cluster-autoscaler
+          resources:
+            limits:
+              cpu: 100m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 300Mi
+          command:
+            - ./cluster-autoscaler
+            - --cloud-provider=azure
+            - --namespace=kube-system
+            - --node-group-auto-discovery=label:kubernetes.io/role=agent
+            - --scale-down-delay-after-failure=3m
+            - --scale-down-unneeded-time=10m
+            - --unremovable-node-recheck-timeout=5m
+            - --v=4
+          env:
+            - name: ARM_SUBSCRIPTION_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-autoscaler-azure
+                  key: subscription-id
+            - name: ARM_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-autoscaler-azure
+                  key: tenant-id
+            - name: ARM_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-autoscaler-azure
+                  key: client-id
+            - name: ARM_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cluster-autoscaler-azure
+                  key: client-secret
+          volumeMounts:
+            - name: ssl-certs
+              mountPath: /etc/ssl/certs/ca-certificates.crt
+              readOnly: true
+      volumes:
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs/ca-certificates.crt 

@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: argo-rollouts-demo-fe-service-external
-  namespace: ingress-nginx
-spec:
-  type: ExternalName
-  externalName: argo-rollouts-demo-fe-service.demo.svc.cluster.local 

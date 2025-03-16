@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - service.yaml
+  - services.yaml
+  - ingress.yaml
 
 commonLabels:
   app.kubernetes.io/managed-by: argocd

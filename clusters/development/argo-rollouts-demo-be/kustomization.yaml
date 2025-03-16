@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - rollout.yaml
-  - service.yaml
+  - services.yaml
   - analysis-template.yaml
 commonLabels:
   app.kubernetes.io/managed-by: argocd

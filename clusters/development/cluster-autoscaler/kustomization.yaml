@@ -3,6 +3,6 @@ kind: Kustomization
 
 resources:
   - rbac.yaml
-  - deployment.yaml
+  # - deployment.yaml
 
 namespace: kube-system 

@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: argo-rollouts-demo-ingress
-  namespace: ingress-nginx
+  namespace: demo
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:

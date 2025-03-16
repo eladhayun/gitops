@@ -2,7 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ingress-nginx-controller
-  namespace: demo
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
 spec:
   ports:
     - name: metrics

@@ -7,6 +7,12 @@ resources:
 
 namespace: demo
 
-patchesStrategicMerge:
-  - nginx-config-patch.yaml
-  - service-patch.yaml
+patches:
+  - path: nginx-config-patch.yaml
+    target:
+      kind: ConfigMap
+      name: ingress-nginx-controller
+  - path: service-patch.yaml
+    target:
+      kind: Service
+      name: ingress-nginx-controller

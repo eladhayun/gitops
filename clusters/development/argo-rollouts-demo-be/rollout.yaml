@@ -38,18 +38,18 @@ spec:
               port: 8080
             initialDelaySeconds: 3
             periodSeconds: 5
-  strategy:
-    canary:
-      analysis:
-        templates:
-        - templateName: error-rate-check
-        startingStep: 1
-      steps:
-      - setWeight: 20
-      - pause: {duration: 30s}
-      - setWeight: 40
-      - pause: {duration: 30s}
-      - setWeight: 60
-      - pause: {duration: 30s}
-      - setWeight: 80
-      - pause: {duration: 30s}
+  # strategy:
+  #   canary:
+  #     analysis:
+  #       templates:
+  #       - templateName: error-rate-check
+  #       startingStep: 1
+  #     steps:
+  #     - setWeight: 20
+  #     - pause: {duration: 30s}
+  #     - setWeight: 40
+  #     - pause: {duration: 30s}
+  #     - setWeight: 60
+  #     - pause: {duration: 30s}
+  #     - setWeight: 80
+  #     - pause: {duration: 30s}

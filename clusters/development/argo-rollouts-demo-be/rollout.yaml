@@ -42,7 +42,7 @@ spec:
     canary:
       analysis:
         templates:
-        - templateName: success-rate
+        - templateName: error-rate-check
         startingStep: 1
       steps:
       - setWeight: 20

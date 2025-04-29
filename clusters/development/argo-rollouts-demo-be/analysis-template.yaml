@@ -8,12 +8,12 @@ spec:
   metrics:
   - name: error-rate
     interval: 30s
-    count: 10
-    failureLimit: 2
+    count: 6
+    failureLimit: 1
     provider:
       prometheus:
         address: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
         query: |
-          sum(nginx_ingress_controller_requests{status=~"4..",exported_service="argo-rollouts-demo-fe-service"}) / 
-          sum(nginx_ingress_controller_requests{exported_service="argo-rollouts-demo-fe-service"}) * 100
+          sum(rate(nginx_ingress_controller_requests{status=~"4..",exported_service="argo-rollouts-demo-fe-service"}[30s])) / 
+          sum(rate(nginx_ingress_controller_requests{exported_service="argo-rollouts-demo-fe-service"}[30s])) * 100
     successCondition: result[0] < 50

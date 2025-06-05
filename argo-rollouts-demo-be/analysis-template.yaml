@@ -13,5 +13,8 @@ spec:
     provider:
       web:
         url: http://argo-rollouts-demo-be-service.demo.svc.cluster.local:80/api/metrics
-        jsonPath: "{$.http_requests_total['/api/check']['500'] / ($.http_requests_total['/api/check']['200'] + $.http_requests_total['/api/check']['500']) * 100}"
+        # Calculate error rate as percentage: (500 errors / total requests) * 100
+        # If no 500 errors exist, return 0% instead of division by zero
+        # Example: if 2 errors out of 10 requests, returns 20%
+        jsonPath: "{$.http_requests_total['/api/check']['500'] ? ($.http_requests_total['/api/check']['500'] / ($.http_requests_total['/api/check']['200'] + $.http_requests_total['/api/check']['500']) * 100) : 0}"
     successCondition: result[0] < 50

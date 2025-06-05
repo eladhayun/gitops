@@ -2,5 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - linux-shell.yaml
   - argo-rollouts-demo-be.yaml
   - argo-rollouts-demo-fe.yaml

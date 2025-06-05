@@ -14,6 +14,6 @@ spec:
       prometheus:
         address: http://argo-rollouts-demo-be-service.demo.svc.cluster.local/api/metrics
         query: |
-          sum(rate(http_requests_total{endpoint="/api/check",status_code="400"}[30s])) / 
+          sum(rate(http_requests_total{endpoint="/api/check",status_code!="200"}[30s])) / 
           sum(rate(http_requests_total{endpoint="/api/check"}[30s])) * 100
     successCondition: result[0] < 50

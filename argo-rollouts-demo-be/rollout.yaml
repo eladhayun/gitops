@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: argo-rollouts-demo-be
-          image: playgroundacr1234.azurecr.io/argo-rollouts-demo-be:66acb4a3e43243dc2b5cbc5a5aa3c663f84d06cf
+          image: playgroundacr1234.azurecr.io/argo-rollouts-demo-be:be839697137aaf40b656bd4af8068624c252d2a1
           ports:
             - containerPort: 8080
           resources:

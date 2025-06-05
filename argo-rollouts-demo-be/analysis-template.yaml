@@ -11,9 +11,7 @@ spec:
     count: 6
     failureLimit: 1
     provider:
-      prometheus:
-        address: http://argo-rollouts-demo-be-service.demo.svc.cluster.local:80/api/metrics
-        query: |
-          sum(rate(http_requests_total{endpoint="/api/check",status_code!="200"}[30s])) / 
-          sum(rate(http_requests_total{endpoint="/api/check"}[30s])) * 100
+      web:
+        url: http://argo-rollouts-demo-be-service.demo.svc.cluster.local:80/api/metrics
+        jsonPath: "$.data.result[0].value[1]"
     successCondition: result[0] < 50

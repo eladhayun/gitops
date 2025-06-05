@@ -1,22 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argo-rollouts-demo-be
+  name: argo-rollouts-demo-fe
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
+  
   source:
     repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
-    path: clusters/development/argo-rollouts-demo-be
+    path: argo-rollouts-demo-fe
+  
   destination:
     server: https://kubernetes.default.svc
-    namespace: argo-rollouts-demo-be
+    namespace: demo
+  
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
-      - CreateNamespace=true 
+      - CreateNamespace=true
+
+    automated:
+      selfHeal: true
+      prune: true

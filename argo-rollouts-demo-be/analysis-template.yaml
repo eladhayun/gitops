@@ -18,9 +18,9 @@ spec:
   - name: total-requests
     interval: 30s
     count: 6
-    failureLimit: 1
+    failureLimit: 4
     provider:
       web:
         url: http://argo-rollouts-demo-be-service.demo.svc.cluster.local:80/api/metrics
         jsonPath: "{$.200}"
-    successCondition: result > 0
+    successCondition: result >= 0

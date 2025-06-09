@@ -39,6 +39,9 @@ spec:
               port: 8080
             initialDelaySeconds: 3
             periodSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: argo-rollouts-demo-be-config
   strategy:
     canary:
       analysis:

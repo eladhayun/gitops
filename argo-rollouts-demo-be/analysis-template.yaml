@@ -7,8 +7,8 @@ metadata:
 spec:
   metrics:
   - name: error-rate
-    interval: 30s
-    count: 6
+    interval: 10s
+    count: 10
     failureLimit: 1
     provider:
       web:
@@ -16,8 +16,8 @@ spec:
         jsonPath: "{$.500}"
     successCondition: result < 1
   - name: total-requests
-    interval: 30s
-    count: 6
+    interval: 10s
+    count: 10
     failureLimit: 4
     provider:
       web:

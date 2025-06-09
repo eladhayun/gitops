@@ -50,10 +50,10 @@ spec:
         startingStep: 1
       steps:
       - setWeight: 20
-      - pause: {duration: 1m}
+      - pause: {duration: 10s}
       - setWeight: 40
-      - pause: {duration: 1m}
+      - pause: {duration: 10s}
       - setWeight: 60
-      - pause: {duration: 1m}
+      - pause: {duration: 10s}
       - setWeight: 80
-      - pause: {duration: 1m}
+      - pause: {duration: 10s}

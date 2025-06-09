@@ -13,8 +13,8 @@ spec:
     provider:
       web:
         url: http://argo-rollouts-demo-be-service.demo.svc.cluster.local:80/api/metrics
-        jsonPath: "{$.http_requests_total['/api/check']['500']}"
-    successCondition: result == 0
+        jsonPath: "{$.http_requests_total['/api/check']}"
+    successCondition: result['500'] == null
   - name: total-requests
     interval: 30s
     count: 6

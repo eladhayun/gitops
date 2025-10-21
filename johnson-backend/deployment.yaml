@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: johnson-backend
-        image: yourregistry.azurecr.io/johnson-backend:latest
+        image: prodacr1234.azurecr.io/johnson-backend:latest
         ports:
         - containerPort: 8000
         envFrom:

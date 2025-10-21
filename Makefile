@@ -1,4 +1,4 @@
-.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add
+.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token
 
 CONTEXT := jshipster
 NAMESPACE := argocd
@@ -62,3 +62,21 @@ argocd-uninstall:
 		--context $(CONTEXT)
 	@echo "✅ ArgoCD uninstalled successfully!"
 
+get-argo-cd-token:
+	@echo "Getting ArgoCD token..."
+	@echo "Starting temporary port forward..."
+	@kubectl port-forward service/argocd-server \
+		-n $(NAMESPACE) \
+		8080:443 \
+		--context $(CONTEXT) > /dev/null 2>&1 & \
+	PF_PID=$$!; \
+	sleep 2; \
+	PASSWORD=$$(kubectl -n $(NAMESPACE) get secret argocd-initial-admin-secret \
+		-o jsonpath="{.data.password}" \
+		--context $(CONTEXT) | base64 -d); \
+	TOKEN=$$(curl -s https://localhost:8080/api/v1/session \
+		-d '{"username":"admin","password":"'"$$PASSWORD"'"}' \
+		-H "Content-Type: application/json" \
+		-k | jq -r '.token'); \
+	kill $$PF_PID 2>/dev/null || true; \
+	echo "ArgoCD token: $$TOKEN"

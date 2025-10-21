@@ -1,52 +1,21 @@
-# Kubernetes secrets and sensitive files
-*.secret
-*.key
-*.pem
-*.crt
-*.csr
-*.kubeconfig
-kubeconfig
+# Local development secrets
+**/secrets.yaml
+**/secrets-local.yaml
+**/secrets.local.yaml
 .env
-.env.*
+.env.local
 
-# Helm chart dependencies
-charts/*/charts/
-charts/*/requirements.lock
+# Backup files
+*.bak
+*.backup
 
-# Terraform files
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-.terraformrc
-terraform.rc
-
-# IDE and editor files
-.idea/
+# Editor files
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 
-# OS-specific files
+# OS files
 .DS_Store
 Thumbs.db
-desktop.ini
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.backup
-
-# Local development files
-*.log
-logs/
-tmp/
-temp/
-
-# Argo CD specific
-.argocd/
-argocd-applications/
-
-**/secrets.yaml

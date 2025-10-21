@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: johnson-backend-config
+  labels:
+    app: johnson-backend
+data:
+  JOHNSON_ALLOWED_ORIGINS: "https://frontend-app-3iwa9.ondigitalocean.app"
+  WHATSAPP_TWILIO_FROM_NUMBER: "whatsapp:+972545918782"
+  WHATSAPP_DEV_OVERRIDE_RECIPIENT: "+972545918782"
+  JOHNSON_JWT_EXPIRATION_SECONDS: "2592000"
+

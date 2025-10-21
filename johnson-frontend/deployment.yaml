@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: johnson-frontend
+  labels:
+    app: johnson-frontend
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: johnson-frontend
+  template:
+    metadata:
+      labels:
+        app: johnson-frontend
+    spec:
+      containers:
+      - name: johnson-frontend
+        image: yourregistry.azurecr.io/johnson-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+

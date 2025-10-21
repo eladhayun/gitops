@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Always use the jshipster context for kubernetes, when using MCP server or when running kubectl commands

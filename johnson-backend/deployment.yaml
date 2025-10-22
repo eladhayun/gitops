@@ -17,9 +17,12 @@ spec:
     spec:
       containers:
       - name: johnson-backend
-        image: prodacr1234.azurecr.io/johnson-backend:248f37eb713a4da326e879422c36054f1ea0ac9c
+        image: prodacr1234.azurecr.io/johnson-backend:8c4af81
         ports:
         - containerPort: 8000
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
         envFrom:
         - configMapRef:
             name: johnson-backend-config

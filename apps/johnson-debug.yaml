@@ -3,19 +3,25 @@ kind: Application
 metadata:
   name: johnson-debug
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
+
   source:
-    repoURL: https://github.com/jshipster/gitops.git
+    repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
     path: johnson-debug
+
   destination:
     server: https://kubernetes.default.svc
     namespace: johnson
+
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
+
+    automated:
+      selfHeal: true
+      prune: true
 

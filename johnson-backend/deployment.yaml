@@ -15,6 +15,15 @@ spec:
       labels:
         app: johnson-backend
     spec:
+      initContainers:
+      - name: johnson-backend-migrations
+        image: prodacr1234.azurecr.io/johnson-backend-migrations:be8243d241934b25bb8fc835d465ba41da402124
+        env:
+        - name: JOHNSON_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: johnson-backend-secrets
+              key: JOHNSON_DATABASE_URL
       containers:
       - name: johnson-backend
         image: prodacr1234.azurecr.io/johnson-backend:3b9730915704559e44aaf97f0d587f4641465f75

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: johnson-backend
-        image: prodacr1234.azurecr.io/johnson-backend:a09412e38444b95a91a78fe47b71e42d849ca81b
+        image: prodacr1234.azurecr.io/johnson-backend:8ca76e2bb488451e52ca7016dcfb1e74224abf5a
         ports:
         - containerPort: 8000
         env:

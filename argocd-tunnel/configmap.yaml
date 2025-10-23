@@ -12,7 +12,7 @@ data:
     
     ingress:
       # Route for ArgoCD UI
-      - hostname: argocd.yourdomain.com
+      - hostname: argocd.jshipster.io
         service: https://argocd-server:443
         originRequest:
           noTLSVerify: true

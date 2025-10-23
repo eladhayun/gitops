@@ -17,7 +17,7 @@ spec:
     spec:
       initContainers:
       - name: johnson-backend-migrations
-        image: prodacr1234.azurecr.io/johnson-backend-migrations:5b7b743912336181ab98f240f93cdd69b43013d9
+        image: prodacr1234.azurecr.io/johnson-backend-migrations:cff2f8ef2719bc5eef23e0ef555eac3a1128173e
         env:
         - name: JOHNSON_DATABASE_URL
           valueFrom:
@@ -26,7 +26,7 @@ spec:
               key: JOHNSON_DATABASE_URL
       containers:
       - name: johnson-backend
-        image: prodacr1234.azurecr.io/johnson-backend:5b7b743912336181ab98f240f93cdd69b43013d9
+        image: prodacr1234.azurecr.io/johnson-backend:cff2f8ef2719bc5eef23e0ef555eac3a1128173e
         ports:
         - containerPort: 8000
         env:

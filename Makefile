@@ -1,4 +1,4 @@
-.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token
+.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status
 
 CONTEXT := jshipster
 NAMESPACE := argocd
@@ -80,3 +80,73 @@ get-argo-cd-token:
 		-k | jq -r '.token'); \
 	kill $$PF_PID 2>/dev/null || true; \
 	echo "ArgoCD token: $$TOKEN"
+
+# Cloudflare Tunnel Setup Commands
+
+# Setup Cloudflare Tunnel for ArgoCD
+tunnel-setup:
+	@echo "=========================================="
+	@echo "Cloudflare Tunnel Setup for ArgoCD"
+	@echo "=========================================="
+	@echo ""
+	@echo "Prerequisites:"
+	@echo "  1. Cloudflare account with a domain"
+	@echo "  2. cloudflared CLI installed (brew install cloudflare/cloudflare/cloudflared)"
+	@echo ""
+	@echo "Run these commands:"
+	@echo ""
+	@echo "  # 1. Authenticate with Cloudflare"
+	@echo "  cloudflared tunnel login"
+	@echo ""
+	@echo "  # 2. Create a tunnel"
+	@echo "  cloudflared tunnel create argocd-tunnel"
+	@echo ""
+	@echo "  # 3. Create Kubernetes secret with credentials"
+	@echo "  kubectl create secret generic tunnel-credentials \\"
+	@echo "    --from-file=credentials.json=~/.cloudflared/<TUNNEL_ID>.json \\"
+	@echo "    -n $(NAMESPACE) \\"
+	@echo "    --context $(CONTEXT)"
+	@echo ""
+	@echo "  # 4. Update argocd-tunnel/configmap.yaml with your tunnel ID and domain"
+	@echo ""
+	@echo "  # 5. Configure DNS"
+	@echo "  cloudflared tunnel route dns argocd-tunnel argocd.yourdomain.com"
+	@echo ""
+	@echo "  # 6. Apply the tunnel (after updating configmap)"
+	@echo "  make tunnel-deploy"
+	@echo ""
+	@echo "For detailed instructions, see: docs/argocd-cloudflare-tunnel.md"
+	@echo ""
+
+# Create tunnel credentials secret
+tunnel-credentials:
+	@echo "Creating tunnel credentials secret..."
+	@read -p "Enter path to credentials.json file: " CREDS_PATH; \
+	kubectl create secret generic tunnel-credentials \
+		--from-file=credentials.json=$$CREDS_PATH \
+		-n $(NAMESPACE) \
+		--context $(CONTEXT)
+	@echo "✅ Tunnel credentials secret created!"
+
+# Deploy the tunnel via ArgoCD
+tunnel-deploy:
+	@echo "Deploying Cloudflare Tunnel for ArgoCD..."
+	kubectl apply -f apps/argocd-tunnel.yaml --context $(CONTEXT)
+	@echo "✅ Tunnel application created in ArgoCD"
+	@echo ""
+	@echo "Check status with: make tunnel-status"
+
+# Check tunnel status
+tunnel-status:
+	@echo "=========================================="
+	@echo "Cloudflare Tunnel Status"
+	@echo "=========================================="
+	@echo ""
+	@echo "ArgoCD Application:"
+	@kubectl get application argocd-tunnel -n $(NAMESPACE) --context $(CONTEXT) || echo "Application not found"
+	@echo ""
+	@echo "Pods:"
+	@kubectl get pods -n $(NAMESPACE) -l app=cloudflared --context $(CONTEXT) || echo "No pods found"
+	@echo ""
+	@echo "Recent logs:"
+	@kubectl logs -n $(NAMESPACE) -l app=cloudflared --tail=20 --context $(CONTEXT) 2>/dev/null || echo "No logs available"

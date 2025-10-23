@@ -6,3 +6,4 @@ resources:
   - johnson-frontend.yaml
   - johnson-backend.yaml
   - johnson-debug.yaml
+  - argocd-tunnel.yaml

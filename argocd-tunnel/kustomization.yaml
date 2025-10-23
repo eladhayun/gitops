@@ -6,7 +6,7 @@ namespace: argocd
 resources:
   - deployment.yaml
   - configmap.yaml
-  # Note: tunnel-credentials-secret.yaml is NOT included
+  # Note: secrets.yaml is NOT included
   # Create the secret manually with actual credentials
 
 commonLabels:

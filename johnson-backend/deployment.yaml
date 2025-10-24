@@ -17,7 +17,7 @@ spec:
     spec:
       initContainers:
       - name: johnson-backend-migrations
-        image: prodacr1234.azurecr.io/johnson-backend-migrations:c0cb299bf4fa8a13c5ea8888e121860831cb9192
+        image: prodacr1234.azurecr.io/johnson-backend-migrations:03fbc49d454aa048c781dff1924de9ef033ae4ce
         env:
         - name: JOHNSON_DATABASE_URL
           valueFrom:

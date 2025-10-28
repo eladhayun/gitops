@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ids-backend
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ids-backend.jshipster.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ids-backend
+            port:
+              number: 8080

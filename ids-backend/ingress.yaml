@@ -2,6 +2,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ids-backend
+  annotations:
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/compute-full-forwarded-for: "true"
 spec:
   ingressClassName: nginx
   rules:

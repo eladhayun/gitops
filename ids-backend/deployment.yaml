@@ -73,7 +73,7 @@ spec:
             cpu: "50m"
       # Main application container
       - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:main-dd90657
+        image: prodacr1234.azurecr.io/ids-backend:main-53f0922
         ports:
         - containerPort: 8080
         env:

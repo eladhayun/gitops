@@ -148,7 +148,7 @@ spec:
           periodSeconds: 5
       # Main application container
       - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:main-199298c
+        image: prodacr1234.azurecr.io/ids-backend:main-6ad91de
         ports:
         - containerPort: 8080
         env:

@@ -180,13 +180,13 @@ spec:
           failureThreshold: 60
         livenessProbe:
           httpGet:
-            path: /healthz
+            path: /api/healthz
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /healthz
+            path: /api/healthz
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5

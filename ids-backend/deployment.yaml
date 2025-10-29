@@ -149,7 +149,7 @@ spec:
       # Main application container
       # Using 'latest' tag with Always pull policy to ensure latest frontend changes
       - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:latest
+        image: prodacr1234.azurecr.io/ids-backend:main-734df48
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

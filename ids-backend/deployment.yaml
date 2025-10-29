@@ -147,8 +147,10 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
       # Main application container
+      # Using 'latest' tag with Always pull policy to ensure latest frontend changes
       - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:main-9773372
+        image: prodacr1234.azurecr.io/ids-backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:

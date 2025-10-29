@@ -7,6 +7,8 @@ metadata:
 data:
   VERSION: "1.0.0"
   LOG_LEVEL: "info"
+  # Tunnel configuration
+  WAIT_FOR_TUNNEL: "true"
   # SSH tunnel configuration
   SSH_HOST: "50.28.87.147"
   SSH_PORT: "522"

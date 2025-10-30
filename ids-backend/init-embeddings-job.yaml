@@ -11,6 +11,128 @@ spec:
       labels:
         app: ids-init-embeddings
     spec:
+      initContainers:
+      - name: ssh-connectivity-check
+        image: alpine/socat:latest
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Installing SSH client and netcat..."
+          apk add --no-cache openssh-client netcat-openbsd &&
+          mkdir -p /root/.ssh &&
+          cp /etc/ssh-key/ssh-private-key /root/.ssh/id_rsa &&
+          chmod 600 /root/.ssh/id_rsa &&
+          echo "StrictHostKeyChecking no" > /root/.ssh/config &&
+          echo "Testing SSH connectivity to ${SSH_HOST}:${SSH_PORT}..." &&
+          ssh -o ConnectTimeout=10 -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} "echo 'SSH connection successful'" &&
+          echo "SSH connectivity verified successfully"
+        env:
+        - name: SSH_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: SSH_HOST
+        - name: SSH_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: SSH_PORT
+        - name: SSH_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: SSH_USER
+        volumeMounts:
+        - name: ssh-key
+          mountPath: /etc/ssh-key
+          readOnly: true
+        - name: shared-data
+          mountPath: /shared
+        resources:
+          limits:
+            cpu: "50m"
+            memory: "64Mi"
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+      - name: ssh-tunnel
+        image: alpine/socat:latest
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          apk add --no-cache openssh-client netcat-openbsd &&
+          mkdir -p /root/.ssh &&
+          cp /etc/ssh-key/ssh-private-key /root/.ssh/id_rsa &&
+          chmod 600 /root/.ssh/id_rsa &&
+          echo "StrictHostKeyChecking no" > /root/.ssh/config &&
+          echo "Starting SSH tunnel..." &&
+          ssh -N -L ${LOCAL_PORT}:${REMOTE_HOST}:${REMOTE_PORT} -p ${SSH_PORT} ${SSH_USER}@${SSH_HOST} &
+          SSH_PID=$! &&
+          echo "SSH tunnel started with PID $SSH_PID" &&
+          echo "Waiting for tunnel to be ready..." &&
+          for i in $(seq 1 30); do
+            if nc -z localhost ${LOCAL_PORT}; then
+              echo "SSH tunnel is ready!" &&
+              touch /shared/tunnel-ready &&
+              break
+            fi
+            echo "Attempt $i/30: Tunnel not ready yet, waiting..." &&
+            sleep 1
+          done &&
+          if [ ! -f /shared/tunnel-ready ]; then
+            echo "ERROR: SSH tunnel failed to become ready after 30 seconds" &&
+            exit 1
+          fi &&
+          echo "SSH tunnel established successfully, keeping it alive..." &&
+          wait $SSH_PID
+        env:
+        - name: SSH_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: SSH_HOST
+        - name: SSH_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: SSH_PORT
+        - name: SSH_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: SSH_USER
+        - name: LOCAL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: LOCAL_PORT
+        - name: REMOTE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: REMOTE_HOST
+        - name: REMOTE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: REMOTE_PORT
+        volumeMounts:
+        - name: ssh-key
+          mountPath: /etc/ssh-key
+          readOnly: true
+        - name: shared-data
+          mountPath: /shared
+        resources:
+          limits:
+            cpu: "50m"
+            memory: "64Mi"
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
       containers:
       - name: init-embeddings
         image: prodacr1234.azurecr.io/ids-backend:main-65f1528
@@ -28,6 +150,11 @@ spec:
               key: OPENAI_API_KEY
         - name: LOG_LEVEL
           value: "info"
+        - name: WAIT_FOR_TUNNEL
+          value: "true"
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared
         resources:
           requests:
             memory: "512Mi"
@@ -35,4 +162,14 @@ spec:
           limits:
             memory: "2Gi"
             cpu: "1000m"
+      volumes:
+      - name: ssh-key
+        secret:
+          secretName: ids-backend-secrets
+          items:
+          - key: SSH_PRIVATE_KEY
+            path: ssh-private-key
+          defaultMode: 384
+      - name: shared-data
+        emptyDir: {}
       restartPolicy: Never

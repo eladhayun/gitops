@@ -64,7 +64,7 @@ spec:
       - name: init-embeddings
         image: prodacr1234.azurecr.io/ids-backend:main-65f1528
         imagePullPolicy: Always
-        command: ["/app/init-embeddings-write"]
+        command: ["/home/appuser/init-embeddings-write"]
         env:
         - name: DATABASE_URL
           valueFrom:
@@ -75,7 +75,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: ids-backend-secrets
-              key: openai-api-key
+              key: OPENAI_API_KEY
         - name: LOG_LEVEL
           value: "info"
         - name: WAIT_FOR_TUNNEL

@@ -148,7 +148,7 @@ spec:
           periodSeconds: 5
       # Main application container
       - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:main-dbb6aed
+        image: prodacr1234.azurecr.io/ids-backend:main-2790700
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -193,7 +193,7 @@ spec:
           periodSeconds: 5
       # Init embeddings sidecar container
       - name: init-embeddings
-        image: prodacr1234.azurecr.io/ids-backend:main-dd9b929
+        image: prodacr1234.azurecr.io/ids-backend:main-2790700
         command: ["/home/appuser/init-embeddings-write"]
         envFrom:
         - configMapRef:

@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ids-embeddings-update
+  namespace: default
+  labels:
+    app: ids-embeddings-update
+spec:
+  schedule: "0 2 * * *"  # Run daily at 2 AM
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: ids-embeddings-update
+        spec:
+          initContainers:
+          - name: wait-for-tunnel
+            image: busybox:1.35
+            command: ['sh', '-c']
+            args:
+            - |
+              echo "Waiting for SSH tunnel to be ready..."
+              while [ ! -f /shared/tunnel-ready ]; do
+                echo "Tunnel not ready, waiting..."
+                sleep 5
+              done
+              echo "SSH tunnel is ready!"
+            volumeMounts:
+            - name: shared-volume
+              mountPath: /shared
+          containers:
+          - name: update-embeddings
+            image: ids-backend:latest
+            command: ["/app/update-embeddings"]
+            env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: ids-backend-config
+                  key: database-url
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ids-backend-secrets
+                  key: openai-api-key
+            - name: LOG_LEVEL
+              value: "info"
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "250m"
+              limits:
+                memory: "2Gi"
+                cpu: "1000m"
+            volumeMounts:
+            - name: shared-volume
+              mountPath: /shared
+          volumes:
+          - name: shared-volume
+            emptyDir: {}
+          restartPolicy: Never

@@ -15,7 +15,7 @@ spec:
       labels:
         app: ids-backend
     spec:
-      # Init container to verify SSH connectivity and setup
+      # Init containers
       initContainers:
       - name: ssh-connectivity-check
         image: alpine/socat:latest
@@ -61,6 +61,35 @@ spec:
           limits:
             memory: "64Mi"
             cpu: "50m"
+      - name: init-embeddings
+        image: prodacr1234.azurecr.io/ids-backend:main-4cadcf1
+        imagePullPolicy: Always
+        command: ["/app/init-embeddings-write"]
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: ids-backend-config
+              key: database-url
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ids-backend-secrets
+              key: openai-api-key
+        - name: LOG_LEVEL
+          value: "info"
+        - name: WAIT_FOR_TUNNEL
+          value: "true"
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
       containers:
       # SSH tunnel sidecar container
       - name: ssh-tunnel

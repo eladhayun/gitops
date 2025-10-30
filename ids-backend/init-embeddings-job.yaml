@@ -1,15 +1,11 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: ids-init-embeddings
   namespace: default
   labels:
     app: ids-init-embeddings
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ids-init-embeddings
   template:
     metadata:
       labels:

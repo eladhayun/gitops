@@ -62,7 +62,7 @@ spec:
             memory: "64Mi"
             cpu: "50m"
       - name: init-embeddings
-        image: prodacr1234.azurecr.io/ids-backend:main-4cadcf1
+        image: prodacr1234.azurecr.io/ids-backend:main-a734412
         imagePullPolicy: Always
         command: ["/app/init-embeddings-write"]
         env:
@@ -178,7 +178,7 @@ spec:
       # Main application container
       # Using 'latest' tag with Always pull policy to ensure latest frontend changes
       - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:main-4824a24
+        image: prodacr1234.azurecr.io/ids-backend:main-a734412
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

@@ -7,6 +7,8 @@ metadata:
 data:
   VERSION: "1.0.0"
   LOG_LEVEL: "info"
+  # Database configuration
+  database-url: "isrealde_wp654:isrealde_wp654@tcp(localhost:3306)/isrealde_wp654"
   # Tunnel configuration
   WAIT_FOR_TUNNEL: "true"
   # SSH tunnel configuration

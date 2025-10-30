@@ -14,7 +14,7 @@ spec:
       containers:
       - name: init-embeddings
         image: prodacr1234.azurecr.io/ids-backend:main-65f1528
-        command: ["/app/init-embeddings-write"]
+        command: ["/home/appuser/init-embeddings-write"]
         env:
         - name: DATABASE_URL
           valueFrom:

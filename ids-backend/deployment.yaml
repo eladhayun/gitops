@@ -61,6 +61,24 @@ spec:
           limits:
             memory: "64Mi"
             cpu: "50m"
+      - name: init-embeddings
+        image: prodacr1234.azurecr.io/ids-backend:main-65f1528
+        command: ["/home/appuser/init-embeddings-write"]
+        envFrom:
+        - configMapRef:
+            name: ids-backend-config
+        - secretRef:
+            name: ids-backend-secrets
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
       containers:
       # SSH tunnel sidecar container
       - name: ssh-tunnel
@@ -192,34 +210,6 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
-      # Init embeddings sidecar container
-      - name: init-embeddings
-        image: prodacr1234.azurecr.io/ids-backend:main-65f1528
-        command: ["/home/appuser/init-embeddings-write"]
-        envFrom:
-        - configMapRef:
-            name: ids-backend-config
-        - secretRef:
-            name: ids-backend-secrets
-        volumeMounts:
-        - name: shared-data
-          mountPath: /shared
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
-        startupProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - "test -f /shared/tunnel-ready"
-          initialDelaySeconds: 2
-          periodSeconds: 2
-          failureThreshold: 60
       volumes:
       - name: ssh-key
         secret:

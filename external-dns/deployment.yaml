@@ -26,16 +26,11 @@ spec:
         - --log-format=text
         - --log-level=info
         env:
-        - name: CF_API_TOKEN_FILE
-          value: /var/secrets/cloudflare/api-token
-        volumeMounts:
-        - name: cloudflare-api-token
-          mountPath: /var/secrets/cloudflare
-          readOnly: true
-      volumes:
-      - name: cloudflare-api-token
-        secret:
-          secretName: cloudflare-api-token
+        - name: CF_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: cloudflare-api-token
+              key: api-token
       securityContext:
         fsGroup: 65534
         runAsNonRoot: true

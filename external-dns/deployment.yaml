@@ -22,7 +22,6 @@ spec:
         - --source=ingress
         - --domain-filter=jshipster.io  # Only manage DNS records for this domain
         - --provider=cloudflare
-        - --cloudflare-api-token-file=/var/secrets/cloudflare/api-token
         - --txt-owner-id=jshipster-cluster
         - --log-format=text
         - --log-level=info

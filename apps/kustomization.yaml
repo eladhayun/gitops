@@ -8,3 +8,4 @@ resources:
   - johnson-debug.yaml
   - argocd-tunnel.yaml
   - ids-backend.yaml
+  - external-dns.yaml

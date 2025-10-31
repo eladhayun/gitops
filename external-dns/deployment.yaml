@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: external-dns
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      containers:
+      - name: external-dns
+        image: registry.k8s.io/external-dns/external-dns:v0.14.0
+        args:
+        - --source=ingress
+        - --domain-filter=jshipster.io  # Only manage DNS records for this domain
+        - --provider=cloudflare
+        - --cloudflare-proxied=false
+        - --cloudflare-dns-records-per-request=100
+        - --cloudflare-api-token-file=/var/secrets/cloudflare/api-token
+        - --txt-owner-id=jshipster-cluster
+        - --log-format=text
+        - --log-level=info
+        env:
+        - name: CF_API_TOKEN_FILE
+          value: /var/secrets/cloudflare/api-token
+        volumeMounts:
+        - name: cloudflare-api-token
+          mountPath: /var/secrets/cloudflare
+          readOnly: true
+      volumes:
+      - name: cloudflare-api-token
+        secret:
+          secretName: cloudflare-api-token
+      securityContext:
+        fsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534

@@ -5,7 +5,7 @@ resources:
   - nginx-ingress-controller.yaml
   - johnson-frontend.yaml
   - johnson-backend.yaml
-  - johnson-debug.yaml
+  - debug-server.yaml
   - argocd-tunnel.yaml
   - ids-backend.yaml
   - external-dns.yaml

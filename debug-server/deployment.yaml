@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: debug-server
+  labels:
+    app: debug-server
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: debug-server
+  template:
+    metadata:
+      labels:
+        app: debug-server
+    spec:
+      containers:
+      - name: debug-server
+        image: alpine:latest
+        command: ["/bin/sh"]
+        args: ["-c", "apk update && apk add --no-cache postgresql-client mysql-client mariadb-client curl netcat-openbsd bash && sleep infinity"]
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: johnson-debug
+  name: debug-server
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -11,11 +11,11 @@ spec:
   source:
     repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
-    path: johnson-debug
+    path: debug-server
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: johnson
+    namespace: default
 
   syncPolicy:
     syncOptions:

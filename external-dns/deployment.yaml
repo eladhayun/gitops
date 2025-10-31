@@ -20,6 +20,7 @@ spec:
         image: registry.k8s.io/external-dns/external-dns:v0.14.0
         args:
         - --source=ingress
+        - --source=service
         - --domain-filter=jshipster.io  # Only manage DNS records for this domain
         - --provider=cloudflare
         - --txt-owner-id=jshipster-cluster

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: debug-server
+  labels:
+    app: debug-server
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: debug.jshipster.io
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 22
+    targetPort: 22
+    protocol: TCP
+    name: ssh
+  selector:
+    app: debug-server
+

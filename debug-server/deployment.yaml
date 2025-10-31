@@ -19,7 +19,7 @@ spec:
       - name: debug-server
         image: alpine:latest
         command: ["/bin/sh"]
-        args: ["-c", "apk update && apk add --no-cache postgresql-client mysql-client mariadb-client curl netcat-openbsd bash && sleep infinity"]
+        args: ["-c", "apk update && apk add --no-cache postgresql-client mysql-client mariadb-client curl netcat-openbsd bash openssh openssh-keygen && mkdir -p /root/.ssh && ssh-keygen -A && echo 'root:debug' | chpasswd && /usr/sbin/sshd -D"]
         resources:
           requests:
             memory: "128Mi"

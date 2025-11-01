@@ -28,11 +28,11 @@ spec:
             name: slack-notifications-secrets
         resources:
           requests:
-            memory: "128Mi"
+            memory: "32Mi"
             cpu: "50m"
           limits:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: "64Mi"
+            cpu: "100m"
         livenessProbe:
           httpGet:
             path: /healthz

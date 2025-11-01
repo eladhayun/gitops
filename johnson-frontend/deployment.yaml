@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: johnson-frontend
-        image: prodacr1234.azurecr.io/johnson-frontend:main-e7389a9
+        image: prodacr1234.azurecr.io/johnson-frontend:main-653d84e
         ports:
         - containerPort: 8080
         resources:

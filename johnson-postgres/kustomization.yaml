@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
   - statefulset.yaml
   - service.yaml
-  - secrets.yaml
+  # secrets.yaml is created separately via make postgres-setup and is gitignored
 

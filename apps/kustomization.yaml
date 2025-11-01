@@ -10,3 +10,4 @@ resources:
   - argocd-tunnel.yaml
   - ids-backend.yaml
   - external-dns.yaml
+  - slack-notifications.yaml

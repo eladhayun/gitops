@@ -1,7 +1,8 @@
-.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status
+.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password
 
 CONTEXT := jshipster
 NAMESPACE := argocd
+POSTGRES_NAMESPACE := johnson
 
 # Add ArgoCD Helm repository
 argocd-repo-add:
@@ -150,3 +151,66 @@ tunnel-status:
 	@echo ""
 	@echo "Recent logs:"
 	@kubectl logs -n $(NAMESPACE) -l app=cloudflared --tail=20 --context $(CONTEXT) 2>/dev/null || echo "No logs available"
+
+# PostgreSQL Setup Commands
+
+# Generate a secure PostgreSQL password
+postgres-password:
+	@echo "Generating secure PostgreSQL password..."
+	@openssl rand -base64 32
+	@echo ""
+	@echo "Copy this password and update:"
+	@echo "  1. johnson-postgres/secrets.yaml (postgres-password field)"
+	@echo "  2. johnson-backend-secrets secret in namespace $(POSTGRES_NAMESPACE) (JOHNSON_DATABASE_URL field)"
+
+# Setup PostgreSQL secret with password and database URL
+postgres-setup:
+	@echo "=========================================="
+	@echo "PostgreSQL Setup for Johnson Backend"
+	@echo "=========================================="
+	@echo ""
+	@echo "Generating secure PostgreSQL password..."
+	@POSTGRES_PASSWORD=$$(openssl rand -base64 32); \
+	echo "Generated password: $$POSTGRES_PASSWORD"; \
+	echo ""; \
+	echo "Creating/updating PostgreSQL secret..."; \
+	kubectl create secret generic johnson-postgres-secret \
+		--from-literal=postgres-user=postgres \
+		--from-literal=postgres-password="$$POSTGRES_PASSWORD" \
+		-n $(POSTGRES_NAMESPACE) \
+		--context $(CONTEXT) \
+		--dry-run=client -o yaml | kubectl apply -f - --context $(CONTEXT); \
+	echo ""; \
+	echo "Creating/updating Johnson Backend secret with database URL..."; \
+	POSTGRES_HOST=johnson-postgres.johnson.svc.cluster.local; \
+	POSTGRES_PORT=5432; \
+	POSTGRES_DB=johnson; \
+	POSTGRES_USER=postgres; \
+	DATABASE_URL="postgresql://$$POSTGRES_USER:$$POSTGRES_PASSWORD@$$POSTGRES_HOST:$$POSTGRES_PORT/$$POSTGRES_DB"; \
+	if kubectl get secret johnson-backend-secrets -n $(POSTGRES_NAMESPACE) --context $(CONTEXT) &>/dev/null; then \
+		echo "Secret exists - patching JOHNSON_DATABASE_URL field..."; \
+		kubectl patch secret johnson-backend-secrets \
+			-n $(POSTGRES_NAMESPACE) \
+			--context $(CONTEXT) \
+			--type='json' \
+			-p='[{"op": "replace", "path": "/data/JOHNSON_DATABASE_URL", "value": "'$$(echo -n $$DATABASE_URL | base64)'"}]'; \
+	else \
+		echo "Secret does not exist - creating with database URL..."; \
+		kubectl create secret generic johnson-backend-secrets \
+			--from-literal=JOHNSON_DATABASE_URL="$$DATABASE_URL" \
+			-n $(POSTGRES_NAMESPACE) \
+			--context $(CONTEXT); \
+		echo "⚠️  Note: You may need to add other required fields:"; \
+		echo "   - JOHNSON_AUTH_SECRET"; \
+		echo "   - JOHNSON_RESET_SECRET"; \
+		echo "   - WHATSAPP_TWILIO_ACCOUNT_SID"; \
+		echo "   - WHATSAPP_TWILIO_AUTH_TOKEN"; \
+	fi; \
+	echo ""; \
+	echo "✅ PostgreSQL setup completed!"; \
+	echo ""; \
+	echo "IMPORTANT: Update johnson-postgres/secrets.yaml with the password:"; \
+	echo "  postgres-password: \"$$POSTGRES_PASSWORD\""; \
+	echo ""; \
+	echo "Database URL format:"; \
+	echo "  $$DATABASE_URL"

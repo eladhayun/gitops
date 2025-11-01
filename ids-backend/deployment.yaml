@@ -149,7 +149,6 @@ spec:
       # Main application container
       - name: ids-backend
         image: prodacr1234.azurecr.io/ids-backend:main-0080e83
-        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:

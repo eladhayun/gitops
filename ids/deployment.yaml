@@ -148,7 +148,7 @@ spec:
           periodSeconds: 5
       # Main application container
       - name: ids
-        image: prodacr1234.azurecr.io/ids:main-0080e83
+        image: prodacr1234.azurecr.io/ids:main-ab2c966
         ports:
         - containerPort: 8080
         env:
@@ -192,7 +192,7 @@ spec:
           periodSeconds: 5
       # Init embeddings sidecar container
       - name: init-embeddings
-        image: prodacr1234.azurecr.io/ids:main-0080e83
+        image: prodacr1234.azurecr.io/ids:main-ab2c966
         command: ["/home/appuser/init-embeddings-write"]
         envFrom:
         - configMapRef:

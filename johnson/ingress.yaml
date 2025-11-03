@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: johnson-backend
+  name: johnson
   annotations:
     external-dns.alpha.kubernetes.io/hostname: johnson.jshipster.io
 spec:
@@ -10,11 +10,12 @@ spec:
   - host: johnson.jshipster.io
     http:
       paths:
-      - path: /api
+      # Serve all routes through the unified app (API and frontend SPA)
+      - path: /
         pathType: Prefix
         backend:
           service:
-            name: johnson-backend
+            name: johnson
             port:
               number: 8000
 

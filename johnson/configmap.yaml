@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: johnson-backend-config
+  name: johnson-config
   labels:
-    app: johnson-backend
+    app: johnson
 data:
   JOHNSON_ALLOWED_ORIGINS: "https://johnson.jshipster.io"
   WHATSAPP_TWILIO_FROM_NUMBER: "whatsapp:+972545918782"

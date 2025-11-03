@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: johnson-backend
+  name: johnson
   labels:
-    app: johnson-backend
+    app: johnson
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: johnson-backend
+      app: johnson
   template:
     metadata:
       labels:
-        app: johnson-backend
+        app: johnson
     spec:
       initContainers:
-      - name: johnson-backend-migrations
+      - name: johnson-migrations
         image: prodacr1234.azurecr.io/johnson-backend-migrations:main-4df7c44
         env:
         - name: JOHNSON_DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: johnson-backend-secrets
+              name: johnson-secrets
               key: JOHNSON_DATABASE_URL
       containers:
-      - name: johnson-backend
+      - name: johnson
         image: prodacr1234.azurecr.io/johnson-backend:main-4df7c44
         ports:
         - containerPort: 8000
@@ -34,15 +34,15 @@ spec:
           value: "1"
         envFrom:
         - configMapRef:
-            name: johnson-backend-config
+            name: johnson-config
         - secretRef:
-            name: johnson-backend-secrets
+            name: johnson-secrets
         resources:
           requests:
             memory: "128Mi"
             cpu: "100m"
           limits:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "500m"
         livenessProbe:
           httpGet:

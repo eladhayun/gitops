@@ -3,11 +3,10 @@ kind: Kustomization
 
 resources:
   - nginx-ingress-controller.yaml
-  - johnson-frontend.yaml
-  - johnson-backend.yaml
+  - johnson.yaml
   - johnson-postgres.yaml
   - debug-server.yaml
   - argocd-tunnel.yaml
-  - ids-backend.yaml
+  - ids.yaml
   - external-dns.yaml
   - slack-notifications.yaml

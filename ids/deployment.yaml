@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ids-backend
+  name: ids
   labels:
-    app: ids-backend
+    app: ids
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: ids-backend
+      app: ids
   template:
     metadata:
       labels:
-        app: ids-backend
+        app: ids
     spec:
       # Init containers
       initContainers:
@@ -36,17 +36,17 @@ spec:
         - name: SSH_HOST
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: SSH_HOST
         - name: SSH_PORT
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: SSH_PORT
         - name: SSH_USER
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: SSH_USER
         volumeMounts:
         - name: ssh-key
@@ -98,32 +98,32 @@ spec:
         - name: SSH_HOST
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: SSH_HOST
         - name: SSH_PORT
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: SSH_PORT
         - name: SSH_USER
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: SSH_USER
         - name: LOCAL_PORT
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: LOCAL_PORT
         - name: REMOTE_HOST
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: REMOTE_HOST
         - name: REMOTE_PORT
           valueFrom:
             configMapKeyRef:
-              name: ids-backend-config
+              name: ids-config
               key: REMOTE_PORT
         volumeMounts:
         - name: ssh-key
@@ -147,8 +147,8 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
       # Main application container
-      - name: ids-backend
-        image: prodacr1234.azurecr.io/ids-backend:main-0080e83
+      - name: ids
+        image: prodacr1234.azurecr.io/ids:main-0080e83
         ports:
         - containerPort: 8080
         env:
@@ -156,9 +156,9 @@ spec:
           value: "8080"
         envFrom:
         - configMapRef:
-            name: ids-backend-config
+            name: ids-config
         - secretRef:
-            name: ids-backend-secrets
+            name: ids-secrets
         volumeMounts:
         - name: shared-data
           mountPath: /shared
@@ -192,13 +192,13 @@ spec:
           periodSeconds: 5
       # Init embeddings sidecar container
       - name: init-embeddings
-        image: prodacr1234.azurecr.io/ids-backend:main-0080e83
+        image: prodacr1234.azurecr.io/ids:main-0080e83
         command: ["/home/appuser/init-embeddings-write"]
         envFrom:
         - configMapRef:
-            name: ids-backend-config
+            name: ids-config
         - secretRef:
-            name: ids-backend-secrets
+            name: ids-secrets
         volumeMounts:
         - name: shared-data
           mountPath: /shared
@@ -221,7 +221,7 @@ spec:
       volumes:
       - name: ssh-key
         secret:
-          secretName: ids-backend-secrets
+          secretName: ids-secrets
           items:
           - key: SSH_PRIVATE_KEY
             path: ssh-private-key

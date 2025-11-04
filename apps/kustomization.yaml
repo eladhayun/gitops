@@ -12,3 +12,4 @@ resources:
   - slack-notifications.yaml
   - argo-rollouts-demo-fe.yaml
   - argo-rollouts-demo-be.yaml
+  - argo-rollouts.yaml

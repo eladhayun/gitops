@@ -10,3 +10,4 @@ resources:
   - ids.yaml
   - external-dns.yaml
   - slack-notifications.yaml
+  - argo-rollouts.yaml

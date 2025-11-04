@@ -145,7 +145,9 @@ spec:
             - -c
             - "test -f /shared/tunnel-ready"
           initialDelaySeconds: 5
-          periodSeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 2
+          failureThreshold: 2
       # Main application container
       - name: ids
         image: prodacr1234.azurecr.io/ids:main-904ec6f
@@ -176,20 +178,25 @@ spec:
             - -c
             - "test -f /shared/tunnel-ready"
           initialDelaySeconds: 2
-          periodSeconds: 2
-          failureThreshold: 60
+          periodSeconds: 5
+          failureThreshold: 30
+          timeoutSeconds: 2
         livenessProbe:
           httpGet:
             path: /api/healthz
             port: 8080
           initialDelaySeconds: 30
-          periodSeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /api/healthz
             port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 3
+          failureThreshold: 2
       # Init embeddings sidecar container
       - name: init-embeddings
         image: prodacr1234.azurecr.io/ids:main-904ec6f
@@ -216,8 +223,9 @@ spec:
             - -c
             - "test -f /shared/tunnel-ready"
           initialDelaySeconds: 10
-          periodSeconds: 2
-          failureThreshold: 30
+          periodSeconds: 5
+          failureThreshold: 20
+          timeoutSeconds: 2
       volumes:
       - name: ssh-key
         secret:

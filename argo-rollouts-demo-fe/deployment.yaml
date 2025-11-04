@@ -31,11 +31,11 @@ spec:
             - name: VITE_API_BASE_URL
               value: "http://argo-rollouts-demo-be-service"
           resources:
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
             requests:
-              cpu: "250m"
+              cpu: "10m"
+              memory: "32Mi"
+            limits:
+              cpu: "200m"
               memory: "128Mi"
           livenessProbe:
             httpGet:

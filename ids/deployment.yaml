@@ -133,11 +133,11 @@ spec:
           mountPath: /shared
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "10m"
+            memory: "16Mi"
+            cpu: "5m"
           limits:
-            memory: "64Mi"
-            cpu: "50m"
+            memory: "32Mi"
+            cpu: "20m"
         readinessProbe:
           exec:
             command:
@@ -166,11 +166,11 @@ spec:
           mountPath: /shared
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "50m"
+            memory: "48Mi"
+            cpu: "5m"
           limits:
             memory: "128Mi"
-            cpu: "200m"
+            cpu: "100m"
         startupProbe:
           exec:
             command:
@@ -211,11 +211,11 @@ spec:
           mountPath: /shared
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "64Mi"
+            cpu: "10m"
           limits:
-            memory: "2Gi"
-            cpu: "1000m"
+            memory: "512Mi"
+            cpu: "200m"
         startupProbe:
           exec:
             command:

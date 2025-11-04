@@ -4,6 +4,7 @@ metadata:
   name: johnson
   annotations:
     external-dns.alpha.kubernetes.io/hostname: johnson.jshipster.io
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
 spec:
   ingressClassName: nginx
   rules:

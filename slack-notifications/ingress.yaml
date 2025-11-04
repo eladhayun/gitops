@@ -4,6 +4,7 @@ metadata:
   name: slack-notifications
   annotations:
     external-dns.alpha.kubernetes.io/hostname: slack-notifications.jshipster.io
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
     nginx.ingress.kubernetes.io/compute-full-forwarded-for: "true"
 spec:

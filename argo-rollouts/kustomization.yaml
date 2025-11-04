@@ -4,5 +4,5 @@ kind: Kustomization
 namespace: argo-rollouts
 
 resources:
-  # Official Argo Rollouts installation manifest
-  - https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+  # Official Argo Rollouts installation manifest - pinned to v1.8.3
+  - https://github.com/argoproj/argo-rollouts/releases/download/v1.8.3/install.yaml

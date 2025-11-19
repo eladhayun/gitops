@@ -150,7 +150,7 @@ spec:
           failureThreshold: 2
       # Main application container
       - name: ids
-        image: prodacr1234.azurecr.io/ids:main-1c09c3b
+        image: prodacr1234.azurecr.io/ids:main-33f9718
         ports:
         - containerPort: 8080
         env:
@@ -199,7 +199,7 @@ spec:
           failureThreshold: 2
       # Init embeddings sidecar container
       - name: init-embeddings
-        image: prodacr1234.azurecr.io/ids:main-1c09c3b
+        image: prodacr1234.azurecr.io/ids:main-33f9718
         command: ["/home/appuser/init-embeddings-write"]
         envFrom:
         - configMapRef:

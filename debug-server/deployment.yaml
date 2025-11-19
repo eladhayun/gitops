@@ -27,10 +27,10 @@ spec:
         startupProbe:
           tcpSocket:
             port: 22
-          initialDelaySeconds: 10
-          periodSeconds: 5
+          initialDelaySeconds: 30
+          periodSeconds: 10
           failureThreshold: 30
-          timeoutSeconds: 3
+          timeoutSeconds: 5
         readinessProbe:
           tcpSocket:
             port: 22

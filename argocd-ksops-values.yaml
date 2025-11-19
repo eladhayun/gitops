@@ -23,24 +23,23 @@ repoServer:
       command: ["/bin/sh", "-c"]
       args:
         - |
-          echo "Installing KSOPS and kustomize..."
-          cp /usr/local/bin/ksops /custom-tools/
-          cp /usr/local/bin/kustomize /custom-tools/
-          chmod +x /custom-tools/ksops
-          chmod +x /custom-tools/kustomize
-          echo "KSOPS installation complete!"
+          echo "Installing KSOPS plugin..."
+          # Create the plugin directory structure that kustomize expects
+          mkdir -p /custom-tools/plugin/viaduct.ai/v1/ksops
+          # Copy ksops binary to the plugin directory
+          cp /usr/local/bin/ksops /custom-tools/plugin/viaduct.ai/v1/ksops/ksops
+          chmod +x /custom-tools/plugin/viaduct.ai/v1/ksops/ksops
+          echo "KSOPS plugin installation complete!"
+          ls -la /custom-tools/plugin/viaduct.ai/v1/ksops/
       volumeMounts:
         - mountPath: /custom-tools
           name: custom-tools
   
   # Mount custom tools and SOPS key in the main container
   volumeMounts:
-    - mountPath: /usr/local/bin/ksops
+    - mountPath: /home/argocd/.config/kustomize/plugin
       name: custom-tools
-      subPath: ksops
-    - mountPath: /usr/local/bin/kustomize
-      name: custom-tools
-      subPath: kustomize
+      subPath: plugin
     - mountPath: /.config/sops/age
       name: sops-age
       readOnly: true
@@ -52,7 +51,7 @@ repoServer:
     - name: SOPS_AGE_KEY_FILE
       value: /.config/sops/age/keys.txt
     - name: KUSTOMIZE_PLUGIN_HOME
-      value: /usr/local/bin/kustomize/plugin
+      value: /home/argocd/.config/kustomize/plugin
 
 # Enable exec for kustomize (required for KSOPS)
 configs:

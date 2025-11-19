@@ -1,8 +1,12 @@
-.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password
+.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password sops-encrypt sops-decrypt sops-encrypt-all sops-decrypt-all sops-edit sops-setup-argocd
 
 CONTEXT := jshipster
 NAMESPACE := argocd
 POSTGRES_NAMESPACE := johnson
+
+# SOPS Configuration
+SOPS_KEY := keys.txt
+SOPS_AGE_KEY_FILE := $(SOPS_KEY)
 
 # Add ArgoCD Helm repository
 argocd-repo-add:
@@ -214,3 +218,137 @@ postgres-setup:
 	echo ""; \
 	echo "Database URL format:"; \
 	echo "  $$DATABASE_URL"
+
+# ==========================================
+# SOPS Secret Management Commands
+# ==========================================
+
+# Encrypt a specific secrets file
+# Usage: make sops-encrypt FILE=ids/secrets.yaml
+sops-encrypt:
+	@if [ -z "$(FILE)" ]; then \
+		echo "❌ Error: FILE parameter is required"; \
+		echo "Usage: make sops-encrypt FILE=ids/secrets.yaml"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		echo "Generate it with: age-keygen -o $(SOPS_AGE_KEY_FILE)"; \
+		exit 1; \
+	fi; \
+	echo "🔒 Encrypting $(FILE) with key $(SOPS_AGE_KEY_FILE)..."; \
+	SOPS_AGE_KEY_FILE=$(SOPS_AGE_KEY_FILE) sops -e -i $(FILE); \
+	echo "✅ $(FILE) encrypted successfully!"
+
+# Decrypt a specific secrets file (for editing/viewing)
+# Usage: make sops-decrypt FILE=ids/secrets.yaml
+sops-decrypt:
+	@if [ -z "$(FILE)" ]; then \
+		echo "❌ Error: FILE parameter is required"; \
+		echo "Usage: make sops-decrypt FILE=ids/secrets.yaml"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		exit 1; \
+	fi; \
+	echo "🔓 Decrypting $(FILE) with key $(SOPS_AGE_KEY_FILE)..."; \
+	SOPS_AGE_KEY_FILE=$(SOPS_AGE_KEY_FILE) sops -d -i $(FILE); \
+	echo "✅ $(FILE) decrypted successfully!"
+
+# Edit an encrypted secrets file (decrypts, opens editor, re-encrypts)
+# Usage: make sops-edit FILE=ids/secrets.yaml
+sops-edit:
+	@if [ -z "$(FILE)" ]; then \
+		echo "❌ Error: FILE parameter is required"; \
+		echo "Usage: make sops-edit FILE=ids/secrets.yaml"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		exit 1; \
+	fi; \
+	echo "✏️  Editing $(FILE) with SOPS..."; \
+	SOPS_AGE_KEY_FILE=$(SOPS_AGE_KEY_FILE) sops $(FILE)
+
+# Encrypt all secrets.yaml files in the repository
+sops-encrypt-all:
+	@if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		echo "Generate it with: age-keygen -o $(SOPS_AGE_KEY_FILE)"; \
+		exit 1; \
+	fi; \
+	echo "🔒 Encrypting all secrets.yaml files with key $(SOPS_AGE_KEY_FILE)..."; \
+	echo ""; \
+	for file in $$(find . -name "secrets.yaml" -not -path "./.git/*"); do \
+		echo "  - Encrypting $$file..."; \
+		SOPS_AGE_KEY_FILE=$(SOPS_AGE_KEY_FILE) sops -e -i $$file || echo "    ⚠️  Failed or already encrypted"; \
+	done; \
+	echo ""; \
+	echo "✅ All secrets encrypted!"
+
+# Decrypt all secrets.yaml files in the repository
+sops-decrypt-all:
+	@if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		exit 1; \
+	fi; \
+	echo "🔓 Decrypting all secrets.yaml files with key $(SOPS_AGE_KEY_FILE)..."; \
+	echo ""; \
+	for file in $$(find . -name "secrets.yaml" -not -path "./.git/*"); do \
+		echo "  - Decrypting $$file..."; \
+		SOPS_AGE_KEY_FILE=$(SOPS_AGE_KEY_FILE) sops -d -i $$file || echo "    ⚠️  Failed or already decrypted"; \
+	done; \
+	echo ""; \
+	echo "✅ All secrets decrypted!"
+
+# Display SOPS help and key information
+sops-help:
+	@echo "=========================================="
+	@echo "SOPS Secret Management - jshipster"
+	@echo "=========================================="
+	@echo ""
+	@echo "Key File: $(SOPS_AGE_KEY_FILE)"
+	@echo ""
+	@if [ -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "✅ Key file exists"; \
+		echo "Public Key: $$(grep 'public key:' $(SOPS_AGE_KEY_FILE) | awk '{print $$4}')"; \
+	else \
+		echo "❌ Key file not found!"; \
+		echo "Generate with: age-keygen -o $(SOPS_AGE_KEY_FILE)"; \
+	fi
+	@echo ""
+	@echo "Available Commands:"
+	@echo "  make sops-encrypt FILE=path/to/secrets.yaml  - Encrypt a single file"
+	@echo "  make sops-decrypt FILE=path/to/secrets.yaml  - Decrypt a single file"
+	@echo "  make sops-edit FILE=path/to/secrets.yaml     - Edit encrypted file"
+	@echo "  make sops-encrypt-all                        - Encrypt all secrets"
+	@echo "  make sops-decrypt-all                        - Decrypt all secrets"
+	@echo "  make sops-help                               - Show this help"
+	@echo ""
+	@echo "⚠️  IMPORTANT:"
+	@echo "  - NEVER commit $(SOPS_AGE_KEY_FILE) to git!"
+	@echo "  - Store the key securely (password manager, etc.)"
+	@echo "  - Share the key securely with team members"
+	@echo "  - Backup the key file!"
+	@echo ""
+	@echo "For ArgoCD integration:"
+	@echo "  make sops-setup-argocd    # Add key to cluster for ArgoCD"
+	@echo ""
+
+# Setup SOPS in ArgoCD (add encryption key to cluster)
+sops-setup-argocd:
+	@if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		exit 1; \
+	fi
+	@echo "🔐 Adding SOPS age key to ArgoCD namespace..."
+	@kubectl create secret generic sops-age \
+		--from-file=keys.txt=$(SOPS_AGE_KEY_FILE) \
+		-n $(NAMESPACE) \
+		--context $(CONTEXT) \
+		--dry-run=client -o yaml | kubectl apply --context $(CONTEXT) -f -
+	@echo "✅ SOPS key added to cluster!"
+	@echo ""
+	@echo "ArgoCD will now automatically decrypt secrets during deployment"
+	@echo ""

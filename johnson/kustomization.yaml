@@ -7,3 +7,6 @@ resources:
   - service.yaml
   - ingress.yaml
 
+generators:
+  - secrets-generator.yaml
+

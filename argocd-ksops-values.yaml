@@ -1,0 +1,61 @@
+# ArgoCD Helm values for KSOPS (SOPS decryption) support
+# This configuration adds KSOPS plugin to ArgoCD repo-server
+# allowing automatic decryption of SOPS-encrypted secrets
+# 
+# Versions:
+# - ArgoCD: v3.2.0 (Helm chart 9.1.3)
+# - KSOPS: v4.3.2 (v4.4.0 is distroless without shell tools)
+
+repoServer:
+  # Add volumes for custom tools and SOPS age key
+  volumes:
+    - name: custom-tools
+      emptyDir: {}
+    - name: sops-age
+      secret:
+        secretName: sops-age
+  
+  # Add init container to install KSOPS
+  # Using KSOPS v4.3.2 which has shell tools (v4.4.0 is distroless)
+  initContainers:
+    - name: install-ksops
+      image: viaductoss/ksops:v4.3.2
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Installing KSOPS and kustomize..."
+          cp /usr/local/bin/ksops /custom-tools/
+          cp /usr/local/bin/kustomize /custom-tools/
+          chmod +x /custom-tools/ksops
+          chmod +x /custom-tools/kustomize
+          echo "KSOPS installation complete!"
+      volumeMounts:
+        - mountPath: /custom-tools
+          name: custom-tools
+  
+  # Mount custom tools and SOPS key in the main container
+  volumeMounts:
+    - mountPath: /usr/local/bin/ksops
+      name: custom-tools
+      subPath: ksops
+    - mountPath: /usr/local/bin/kustomize
+      name: custom-tools
+      subPath: kustomize
+    - mountPath: /.config/sops/age
+      name: sops-age
+      readOnly: true
+  
+  # Environment variables for SOPS
+  env:
+    - name: XDG_CONFIG_HOME
+      value: /.config
+    - name: SOPS_AGE_KEY_FILE
+      value: /.config/sops/age/keys.txt
+    - name: KUSTOMIZE_PLUGIN_HOME
+      value: /usr/local/bin/kustomize/plugin
+
+# Enable exec for kustomize (required for KSOPS)
+configs:
+  cm:
+    kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
+

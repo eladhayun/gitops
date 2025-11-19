@@ -1,0 +1,8 @@
+# SOPS Configuration for jshipster GitOps
+# This file defines encryption rules for secrets in this repository
+
+creation_rules:
+  # Encrypt all secrets.yaml files with age encryption
+  - path_regex: secrets\.yaml$
+    age: age103wy5wh49l0ptpscalt4ywxezd2nqykd29jru0fvgen7aweffp2s99kne9
+

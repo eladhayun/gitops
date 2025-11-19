@@ -1,9 +1,16 @@
 # Local development secrets
-**/secrets.yaml
+# NOTE: secrets.yaml files are now encrypted with SOPS and CAN be committed
+# **/secrets.yaml  # Commented out - we now commit encrypted secrets
 **/secrets-local.yaml
 **/secrets.local.yaml
 .env
 .env.local
+
+# SOPS encryption keys (NEVER commit these!)
+keys.txt
+*-keys.txt
+*.key
+age-key.txt
 
 # Backup files
 *.bak

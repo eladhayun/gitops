@@ -6,3 +6,6 @@ resources:
   - clusterrole.yaml
   - clusterrolebinding.yaml
   - deployment.yaml
+
+generators:
+  - secrets-generator.yaml

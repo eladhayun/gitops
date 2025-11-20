@@ -13,3 +13,4 @@ resources:
   - argo-rollouts-demo-fe.yaml
   - argo-rollouts-demo-be.yaml
   - argo-rollouts-demo-redis.yaml
+  - blutag-website.yaml

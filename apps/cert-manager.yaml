@@ -35,11 +35,10 @@ spec:
     kind: ValidatingWebhookConfiguration
     name: cert-manager-webhook
     jsonPointers:
-    - /webhooks/0/clientConfig/caBundle
-    - /webhooks/0/failurePolicy
+    - /webhooks
   - group: admissionregistration.k8s.io
     kind: MutatingWebhookConfiguration
     name: cert-manager-webhook
     jsonPointers:
-    - /webhooks/0/clientConfig/caBundle
+    - /webhooks
 

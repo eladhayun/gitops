@@ -11,9 +11,20 @@ spec:
   tls:
   - hosts:
     - blutag.jshipster.io
+    - blutag.argmaxml.com
     secretName: blutag-website-tls
   rules:
   - host: blutag.jshipster.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: blutag-website
+            port:
+              number: 80
+  - host: blutag.argmaxml.com
     http:
       paths:
       - path: /

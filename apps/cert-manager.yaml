@@ -31,4 +31,15 @@ spec:
     kind: CustomResourceDefinition
     jsonPointers:
     - /status
+  - group: admissionregistration.k8s.io
+    kind: ValidatingWebhookConfiguration
+    name: cert-manager-webhook
+    jsonPointers:
+    - /webhooks/0/clientConfig/caBundle
+    - /webhooks/0/failurePolicy
+  - group: admissionregistration.k8s.io
+    kind: MutatingWebhookConfiguration
+    name: cert-manager-webhook
+    jsonPointers:
+    - /webhooks/0/clientConfig/caBundle
 

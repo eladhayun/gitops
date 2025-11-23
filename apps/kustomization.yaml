@@ -3,12 +3,13 @@ kind: Kustomization
 
 resources:
   - nginx-ingress-controller.yaml
+  - cert-manager.yaml
+  - external-dns.yaml
   - johnson.yaml
   - johnson-postgres.yaml
   - debug-server.yaml
   - argocd-tunnel.yaml
   - ids.yaml
-  - external-dns.yaml
   - slack-notifications.yaml
   - argo-rollouts-demo-fe.yaml
   - argo-rollouts-demo-be.yaml

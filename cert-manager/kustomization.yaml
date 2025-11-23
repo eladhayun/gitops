@@ -8,6 +8,7 @@ resources:
   - cluster-issuer.yaml
 
 patches:
+  # cert-manager controller - reduce resources
   - target:
       kind: Deployment
       name: cert-manager
@@ -18,4 +19,52 @@ patches:
       - op: add
         path: /spec/template/spec/containers/0/args/-
         value: --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
+      - op: add
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+  
+  # cert-manager webhook - reduce resources
+  - target:
+      kind: Deployment
+      name: cert-manager-webhook
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 5m
+            memory: 32Mi
+          limits:
+            cpu: 50m
+            memory: 64Mi
+  
+  # cert-manager cainjector - reduce resources
+  - target:
+      kind: Deployment
+      name: cert-manager-cainjector
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: 5m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+  
+  # Disable webhook validation initially to allow cert generation
+  - target:
+      kind: ValidatingWebhookConfiguration
+      name: cert-manager-webhook
+    patch: |-
+      - op: replace
+        path: /webhooks/0/failurePolicy
+        value: Ignore
 

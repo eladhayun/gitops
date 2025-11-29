@@ -8,10 +8,13 @@ spec:
   source:
     chart: mariadb
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 19.1.0
+    targetRevision: 18.2.4
     helm:
       releaseName: mariadb
       values: |
+        image:
+          tag: 11.4.2-debian-12-r4
+        
         auth:
           rootPassword: ids-mariadb-root-password
           database: ids_embeddings

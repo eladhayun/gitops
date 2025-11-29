@@ -29,54 +29,36 @@ spec:
           - -c
           - |
             set -e
-            echo "=========================================="
-            echo "   EMAIL DOWNLOAD FROM AZURE BLOB"
-            echo "=========================================="
-            echo "Storage Account: ${AZURE_STORAGE_ACCOUNT}"
+            echo ""
+            echo "==========================================="
+            echo "  EMAIL DOWNLOAD FROM AZURE BLOB STORAGE"
+            echo "==========================================="
+            echo "Storage: ${AZURE_STORAGE_ACCOUNT}"
             echo "Container: ${AZURE_CONTAINER_NAME}"
-            echo "Start Time: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
             echo ""
             
             # Create download directory
             mkdir -p /emails
-            
-            # Record start time
             START_TIME=$(date +%s)
             
-            # List all files to download first
-            echo "📋 Listing files to download..."
+            # List files to download
+            echo "Listing files..."
             FILE_LIST=$(az storage blob list \
               --account-name ${AZURE_STORAGE_ACCOUNT} \
               --account-key ${AZURE_STORAGE_KEY} \
               --container-name ${AZURE_CONTAINER_NAME} \
-              --query "[].{name:name, size:properties.contentLength}" \
-              --output json)
+              --output json 2>/dev/null)
             
-            TOTAL_FILES=$(echo "$FILE_LIST" | jq '. | length')
-            TOTAL_BYTES=$(echo "$FILE_LIST" | jq '[.[].size] | add // 0')
-            TOTAL_SIZE_MB=$(echo "scale=2; $TOTAL_BYTES / 1024 / 1024" | bc)
-            TOTAL_SIZE_GB=$(echo "scale=2; $TOTAL_BYTES / 1024 / 1024 / 1024" | bc)
-            
+            TOTAL_FILES=$(echo "$FILE_LIST" | jq -r '. | length')
             echo "Found $TOTAL_FILES file(s) to download"
-            if [ $(echo "$TOTAL_SIZE_GB > 1" | bc) -eq 1 ]; then
-              echo "Total size: ${TOTAL_SIZE_GB} GB"
-            else
-              echo "Total size: ${TOTAL_SIZE_MB} MB"
-            fi
             echo ""
             
-            # Download files one by one with progress
+            # Download files with simple progress
             CURRENT=0
-            echo "$FILE_LIST" | jq -r '.[] | "\(.name)|\(.size)"' | while IFS='|' read -r filename filesize; do
+            echo "$FILE_LIST" | jq -r '.[].name' | while read -r filename; do
               CURRENT=$((CURRENT + 1))
-              SIZE_MB=$(echo "scale=2; $filesize / 1024 / 1024" | bc)
-              
-              echo "----------------------------------------"
-              echo "📥 [$CURRENT/$TOTAL_FILES] Downloading: $filename"
-              echo "   Size: ${SIZE_MB} MB"
-              echo "   Progress: $(echo "scale=1; $CURRENT * 100 / $TOTAL_FILES" | bc)%"
-              
-              FILE_START=$(date +%s)
+              echo "[$CURRENT/$TOTAL_FILES] Downloading: $filename"
               
               az storage blob download \
                 --account-name ${AZURE_STORAGE_ACCOUNT} \
@@ -85,48 +67,34 @@ spec:
                 --name "$filename" \
                 --file "/emails/$filename" \
                 --no-progress \
-                --output none 2>&1
+                --output none 2>&1 || echo "  WARNING: Failed to download $filename"
               
-              FILE_END=$(date +%s)
-              FILE_DURATION=$((FILE_END - FILE_START))
-              
-              if [ -f "/emails/$filename" ]; then
-                if [ $FILE_DURATION -gt 0 ]; then
-                  RATE=$(echo "scale=2; $SIZE_MB / $FILE_DURATION" | bc)
-                  echo "   ✅ Downloaded in ${FILE_DURATION}s (${RATE} MB/s)"
-                else
-                  echo "   ✅ Downloaded"
-                fi
-              else
-                echo "   ❌ Failed"
-              fi
+              # Show current total size
+              CURRENT_SIZE=$(du -hs /emails 2>/dev/null | cut -f1)
+              echo "  -> Total downloaded so far: $CURRENT_SIZE"
+              echo ""
             done
             
-            # Calculate download time and stats
+            # Summary
             END_TIME=$(date +%s)
             DURATION=$((END_TIME - START_TIME))
             MINUTES=$((DURATION / 60))
             SECONDS=$((DURATION % 60))
             
-            DOWNLOADED_SIZE=$(du -sh /emails 2>/dev/null | cut -f1 || echo "0")
-            DOWNLOADED_COUNT=$(find /emails -type f 2>/dev/null | wc -l | tr -d ' ')
+            FINAL_SIZE=$(du -hs /emails 2>/dev/null | cut -f1)
+            FILE_COUNT=$(find /emails -type f 2>/dev/null | wc -l | tr -d ' ')
             
-            echo ""
-            echo "=========================================="
-            echo "   DOWNLOAD COMPLETE"
-            echo "=========================================="
-            echo "End Time: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "==========================================="
+            echo "  DOWNLOAD COMPLETE"
+            echo "==========================================="
+            echo "Finished: $(date '+%Y-%m-%d %H:%M:%S')"
             echo "Duration: ${MINUTES}m ${SECONDS}s"
-            echo "Downloaded: ${DOWNLOADED_COUNT} file(s)"
-            echo "Total Size: ${DOWNLOADED_SIZE}"
-            if [ $DURATION -gt 0 ]; then
-              AVG_RATE=$(echo "scale=2; $TOTAL_SIZE_MB / $DURATION" | bc)
-              echo "Avg Speed: ${AVG_RATE} MB/s"
-            fi
+            echo "Files: $FILE_COUNT"
+            echo "Total Size: $FINAL_SIZE"
             echo ""
-            echo "📁 Downloaded files:"
-            ls -lh /emails | tail -n +2 | awk '{printf "   %s  %-50s  %s\n", $5, $9, ""}'
-            echo "=========================================="
+            echo "Files downloaded:"
+            ls -lh /emails 2>/dev/null | tail -n +2 | awk '{print "  " $9 " - " $5}'
+            echo "==========================================="
         env:
         - name: AZURE_STORAGE_ACCOUNT
           valueFrom:

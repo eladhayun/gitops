@@ -40,7 +40,7 @@ spec:
             # Record start time
             START_TIME=$(date +%s)
             
-            # Download all .eml files with progress
+            # Download all .eml files
             echo "Downloading .eml files..."
             az storage blob download-batch \
               --account-name ${AZURE_STORAGE_ACCOUNT} \
@@ -48,14 +48,9 @@ spec:
               --source ${AZURE_CONTAINER_NAME} \
               --destination /emails \
               --pattern "*.eml" \
-              --output json 2>&1 | while IFS= read -r line; do
-                echo "$line"
-                if echo "$line" | grep -q "Finished"; then
-                  echo "[PROGRESS] EML download: $line"
-                fi
-              done || true
+              --output table || echo "No .eml files found or download completed"
             
-            # Download all .mbox files with progress
+            # Download all .mbox files
             echo ""
             echo "Downloading .mbox files..."
             az storage blob download-batch \
@@ -64,12 +59,7 @@ spec:
               --source ${AZURE_CONTAINER_NAME} \
               --destination /emails \
               --pattern "*.mbox" \
-              --output json 2>&1 | while IFS= read -r line; do
-                echo "$line"
-                if echo "$line" | grep -q "Finished"; then
-                  echo "[PROGRESS] MBOX download: $line"
-                fi
-              done || true
+              --output table || echo "No .mbox files found or download completed"
             
             # Calculate download time and stats
             END_TIME=$(date +%s)

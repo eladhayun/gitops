@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: email-import
-  namespace: default
+  namespace: ids
   labels:
     app: email-import
     job-type: data-import
@@ -30,28 +30,60 @@ spec:
           - |
             set -e
             echo "===== Downloading emails from Azure Blob Storage ====="
+            echo "Storage Account: ${AZURE_STORAGE_ACCOUNT}"
+            echo "Container: ${AZURE_CONTAINER_NAME}"
+            echo ""
             
             # Create download directory
             mkdir -p /emails
             
-            # Download all .eml and .mbox files from the email-imports container
+            # Record start time
+            START_TIME=$(date +%s)
+            
+            # Download all .eml files with progress
+            echo "Downloading .eml files..."
             az storage blob download-batch \
               --account-name ${AZURE_STORAGE_ACCOUNT} \
               --account-key ${AZURE_STORAGE_KEY} \
               --source ${AZURE_CONTAINER_NAME} \
               --destination /emails \
               --pattern "*.eml" \
-              --output table
+              --output json 2>&1 | while IFS= read -r line; do
+                echo "$line"
+                if echo "$line" | grep -q "Finished"; then
+                  echo "[PROGRESS] EML download: $line"
+                fi
+              done || true
             
+            # Download all .mbox files with progress
+            echo ""
+            echo "Downloading .mbox files..."
             az storage blob download-batch \
               --account-name ${AZURE_STORAGE_ACCOUNT} \
               --account-key ${AZURE_STORAGE_KEY} \
               --source ${AZURE_CONTAINER_NAME} \
               --destination /emails \
               --pattern "*.mbox" \
-              --output table
+              --output json 2>&1 | while IFS= read -r line; do
+                echo "$line"
+                if echo "$line" | grep -q "Finished"; then
+                  echo "[PROGRESS] MBOX download: $line"
+                fi
+              done || true
             
-            echo "===== Download complete ====="
+            # Calculate download time and stats
+            END_TIME=$(date +%s)
+            DURATION=$((END_TIME - START_TIME))
+            TOTAL_SIZE=$(du -sh /emails | cut -f1)
+            FILE_COUNT=$(find /emails -type f | wc -l)
+            
+            echo ""
+            echo "===== Download Complete ====="
+            echo "Duration: ${DURATION} seconds"
+            echo "Total Size: ${TOTAL_SIZE}"
+            echo "Total Files: ${FILE_COUNT}"
+            echo ""
+            echo "Downloaded files:"
             ls -lh /emails
         env:
         - name: AZURE_STORAGE_ACCOUNT

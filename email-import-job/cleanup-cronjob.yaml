@@ -20,21 +20,43 @@ spec:
           - name: cleanup
             image: bitnami/kubectl:latest
             command:
-              - /bin/bash
+              - /bin/sh
               - -c
               - |
                 set -e
                 echo "===== Email Import Job Cleanup ====="
                 echo "Looking for completed email import jobs..."
                 
-                # Get all completed jobs sorted by completion time (newest first)
-                COMPLETED_JOBS=$(kubectl get jobs -n ids -l app=email-import \
-                  --sort-by=.status.completionTime \
-                  -o jsonpath='{range .items[?(@.status.succeeded>=1)]}{.metadata.name}{"\t"}{.status.completionTime}{"\n"}{end}' \
-                  | tac)
+                # Get all jobs with their creation timestamp
+                ALL_JOBS=$(kubectl get jobs -n ids -l app=email-import \
+                  -o json 2>/dev/null || echo '{"items":[]}')
+                
+                # Extract completed jobs (status.succeeded >= 1)
+                COMPLETED_JOBS=$(echo "$ALL_JOBS" | grep -q '"items"' && \
+                  echo "$ALL_JOBS" | grep -o '"name":"email-import-[0-9]*"' | \
+                  sed 's/"name":"//;s/"$//' || echo "")
                 
                 if [ -z "$COMPLETED_JOBS" ]; then
                   echo "No completed jobs found. Nothing to clean up."
+                  
+                  # Clean up failed jobs
+                  echo ""
+                  echo "Checking for failed jobs..."
+                  FAILED_JOBS=$(kubectl get jobs -n ids -l app=email-import \
+                    -o jsonpath='{range .items[?(@.status.failed>=1)]}{.metadata.name}{"\n"}{end}' 2>/dev/null || echo "")
+                  
+                  if [ -n "$FAILED_JOBS" ]; then
+                    echo "Deleting failed jobs:"
+                    echo "$FAILED_JOBS" | while read job; do
+                      if [ -n "$job" ]; then
+                        echo "  - Deleting failed job: $job"
+                        kubectl delete job "$job" -n ids --ignore-not-found=true
+                      fi
+                    done
+                  else
+                    echo "No failed jobs to delete."
+                  fi
+                  
                   exit 0
                 fi
                 
@@ -43,44 +65,22 @@ spec:
                 echo "Found $JOB_COUNT completed job(s)"
                 
                 if [ "$JOB_COUNT" -le 1 ]; then
-                  echo "Only 1 or fewer completed jobs. Keeping it."
+                  echo "Only 1 completed job. Keeping it."
                   exit 0
                 fi
                 
-                # Skip the first one (latest), delete the rest
-                JOBS_TO_DELETE=$(echo "$COMPLETED_JOBS" | tail -n +2 | awk '{print $1}')
-                DELETE_COUNT=$(echo "$JOBS_TO_DELETE" | wc -l | tr -d ' ')
+                # Keep the latest (highest timestamp), delete the rest
+                LATEST_JOB=$(echo "$COMPLETED_JOBS" | sort -r | head -1)
+                echo "Keeping latest job: $LATEST_JOB"
                 
-                echo "Keeping latest job: $(echo "$COMPLETED_JOBS" | head -1 | awk '{print $1}')"
-                echo "Deleting $DELETE_COUNT old job(s)..."
-                
-                for job in $JOBS_TO_DELETE; do
-                  echo "  - Deleting job: $job"
-                  kubectl delete job "$job" -n ids --ignore-not-found=true
+                echo "$COMPLETED_JOBS" | while read job; do
+                  if [ -n "$job" ] && [ "$job" != "$LATEST_JOB" ]; then
+                    echo "  - Deleting old job: $job"
+                    kubectl delete job "$job" -n ids --ignore-not-found=true
+                  fi
                 done
                 
                 echo "===== Cleanup Complete ====="
-                
-                # Also clean up failed jobs older than 7 days
-                echo ""
-                echo "Cleaning up failed jobs older than 7 days..."
-                SEVEN_DAYS_AGO=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-7d +%Y-%m-%dT%H:%M:%SZ)
-                
-                FAILED_JOBS=$(kubectl get jobs -n ids -l app=email-import \
-                  -o json | jq -r --arg cutoff "$SEVEN_DAYS_AGO" \
-                  '.items[] | select(.status.failed >= 1 and .status.completionTime < $cutoff) | .metadata.name')
-                
-                if [ -n "$FAILED_JOBS" ]; then
-                  echo "Deleting old failed jobs:"
-                  for job in $FAILED_JOBS; do
-                    echo "  - Deleting failed job: $job"
-                    kubectl delete job "$job" -n ids --ignore-not-found=true
-                  done
-                else
-                  echo "No old failed jobs to delete."
-                fi
-                
-                echo "===== All Cleanup Complete ====="
             resources:
               requests:
                 memory: "64Mi"

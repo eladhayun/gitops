@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ids-backend
+  namespace: ids
+  labels:
+    app: ids-backend
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ids-backend-role
+  namespace: ids
+rules:
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["create", "get", "list", "watch", "delete"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ids-backend-rolebinding
+  namespace: ids
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ids-backend-role
+subjects:
+- kind: ServiceAccount
+  name: ids-backend
+  namespace: ids
+

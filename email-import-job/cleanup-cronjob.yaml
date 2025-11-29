@@ -1,0 +1,91 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: email-import-job-cleanup
+  namespace: ids
+  labels:
+    app: email-import-cleanup
+spec:
+  # Run every hour
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: email-import-cleanup-sa
+          restartPolicy: OnFailure
+          containers:
+          - name: cleanup
+            image: bitnami/kubectl:latest
+            command:
+              - /bin/bash
+              - -c
+              - |
+                set -e
+                echo "===== Email Import Job Cleanup ====="
+                echo "Looking for completed email import jobs..."
+                
+                # Get all completed jobs sorted by completion time (newest first)
+                COMPLETED_JOBS=$(kubectl get jobs -n ids -l app=email-import \
+                  --sort-by=.status.completionTime \
+                  -o jsonpath='{range .items[?(@.status.succeeded>=1)]}{.metadata.name}{"\t"}{.status.completionTime}{"\n"}{end}' \
+                  | tac)
+                
+                if [ -z "$COMPLETED_JOBS" ]; then
+                  echo "No completed jobs found. Nothing to clean up."
+                  exit 0
+                fi
+                
+                # Count completed jobs
+                JOB_COUNT=$(echo "$COMPLETED_JOBS" | wc -l | tr -d ' ')
+                echo "Found $JOB_COUNT completed job(s)"
+                
+                if [ "$JOB_COUNT" -le 1 ]; then
+                  echo "Only 1 or fewer completed jobs. Keeping it."
+                  exit 0
+                fi
+                
+                # Skip the first one (latest), delete the rest
+                JOBS_TO_DELETE=$(echo "$COMPLETED_JOBS" | tail -n +2 | awk '{print $1}')
+                DELETE_COUNT=$(echo "$JOBS_TO_DELETE" | wc -l | tr -d ' ')
+                
+                echo "Keeping latest job: $(echo "$COMPLETED_JOBS" | head -1 | awk '{print $1}')"
+                echo "Deleting $DELETE_COUNT old job(s)..."
+                
+                for job in $JOBS_TO_DELETE; do
+                  echo "  - Deleting job: $job"
+                  kubectl delete job "$job" -n ids --ignore-not-found=true
+                done
+                
+                echo "===== Cleanup Complete ====="
+                
+                # Also clean up failed jobs older than 7 days
+                echo ""
+                echo "Cleaning up failed jobs older than 7 days..."
+                SEVEN_DAYS_AGO=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-7d +%Y-%m-%dT%H:%M:%SZ)
+                
+                FAILED_JOBS=$(kubectl get jobs -n ids -l app=email-import \
+                  -o json | jq -r --arg cutoff "$SEVEN_DAYS_AGO" \
+                  '.items[] | select(.status.failed >= 1 and .status.completionTime < $cutoff) | .metadata.name')
+                
+                if [ -n "$FAILED_JOBS" ]; then
+                  echo "Deleting old failed jobs:"
+                  for job in $FAILED_JOBS; do
+                    echo "  - Deleting failed job: $job"
+                    kubectl delete job "$job" -n ids --ignore-not-found=true
+                  done
+                else
+                  echo "No old failed jobs to delete."
+                fi
+                
+                echo "===== All Cleanup Complete ====="
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "50m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+

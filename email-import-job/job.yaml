@@ -9,8 +9,8 @@ metadata:
 spec:
   # Set backoffLimit to avoid infinite retries on failure
   backoffLimit: 3
-  # Clean up completed jobs after 24 hours
-  ttlSecondsAfterFinished: 86400
+  # Don't auto-delete - cleanup CronJob will keep only the latest completed job
+  # ttlSecondsAfterFinished: 86400
   template:
     metadata:
       labels:

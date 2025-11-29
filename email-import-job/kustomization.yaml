@@ -6,6 +6,8 @@ namespace: ids
 resources:
   - serviceaccount.yaml
   - job.yaml
+  - cleanup-serviceaccount.yaml
+  - cleanup-cronjob.yaml
 
 generators:
   - secrets-generator.yaml

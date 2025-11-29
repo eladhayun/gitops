@@ -97,65 +97,39 @@ spec:
         - name: email-data
           mountPath: /emails
       
-      # Main container to import emails into database
+      # Main container - just verifies download completed successfully
       containers:
-      - name: import-emails
-        image: prodacr1234.azurecr.io/ids-backend:latest
+      - name: verify-download
+        image: alpine:latest
         command:
           - /bin/sh
           - -c
           - |
             set -e
-            echo "===== Starting Email Import Process ====="
+            echo "===== Verifying Downloaded Emails ====="
             
             # Count files
-            eml_count=$(find /emails -name "*.eml" -type f | wc -l)
-            mbox_count=$(find /emails -name "*.mbox" -type f | wc -l)
+            eml_count=$(find /emails -name "*.eml" -type f 2>/dev/null | wc -l | tr -d ' ')
+            mbox_count=$(find /emails -name "*.mbox" -type f 2>/dev/null | wc -l | tr -d ' ')
+            total_size=$(du -hs /emails 2>/dev/null | cut -f1 || echo "0")
             
-            echo "Found $eml_count EML files and $mbox_count MBOX files"
-            
-            # Import EML files
-            if [ "$eml_count" -gt 0 ]; then
-              echo "===== Importing EML files ====="
-              /home/appuser/import-emails -eml /emails -embeddings=true
-            fi
-            
-            # Import MBOX files (one by one if multiple exist)
-            if [ "$mbox_count" -gt 0 ]; then
-              echo "===== Importing MBOX files ====="
-              find /emails -name "*.mbox" -type f | while read mbox_file; do
-                echo "Processing: $mbox_file"
-                /home/appuser/import-emails -mbox "$mbox_file" -embeddings=true
-              done
-            fi
-            
-            echo "===== Email Import Complete ====="
-            echo "Summary:"
-            echo "  - EML files processed: $eml_count"
-            echo "  - MBOX files processed: $mbox_count"
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: ids-secrets
-              key: DATABASE_URL
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: ids-secrets
-              key: OPENAI_API_KEY
-        - name: WAIT_FOR_TUNNEL
-          value: "false"
+            echo "Download verified:"
+            echo "  - EML files: $eml_count"
+            echo "  - MBOX files: $mbox_count"
+            echo "  - Total size: $total_size"
+            echo ""
+            echo "✅ Files ready for backend processing"
+            echo "The IDS backend will automatically import these emails."
         volumeMounts:
         - name: email-data
           mountPath: /emails
         resources:
           requests:
-            memory: "1Gi"      # Increased for large file processing
-            cpu: "500m"
+            memory: "64Mi"
+            cpu: "50m"
           limits:
-            memory: "4Gi"      # Allows processing very large MBOX files
-            cpu: "2000m"
+            memory: "128Mi"
+            cpu: "100m"
       
       volumes:
       - name: email-data

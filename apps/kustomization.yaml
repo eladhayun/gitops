@@ -10,6 +10,7 @@ resources:
   - debug-server.yaml
   - argocd-tunnel.yaml
   - ids.yaml
+  - mariadb.yaml
   - slack-notifications.yaml
   - argo-rollouts-demo-fe.yaml
   - argo-rollouts-demo-be.yaml

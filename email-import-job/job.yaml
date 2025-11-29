@@ -156,14 +156,14 @@ spec:
           mountPath: /emails
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "1Gi"      # Increased for large file processing
+            cpu: "500m"
           limits:
-            memory: "2Gi"
-            cpu: "1000m"
+            memory: "4Gi"      # Allows processing very large MBOX files
+            cpu: "2000m"
       
       volumes:
       - name: email-data
         emptyDir:
-          sizeLimit: 5Gi
+          sizeLimit: 75Gi  # Increased for 70GB+ email imports (uses FREE node ephemeral storage)
 

@@ -168,8 +168,6 @@ spec:
             name: ids-config
         - secretRef:
             name: ids-secrets
-        - secretRef:
-            name: ids-postgres-secret
         volumeMounts:
         - name: shared-data
           mountPath: /shared

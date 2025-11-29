@@ -117,7 +117,7 @@ spec:
             # Import EML files
             if [ "$eml_count" -gt 0 ]; then
               echo "===== Importing EML files ====="
-              /app/bin/import-emails -eml /emails -embeddings=true
+              /home/appuser/import-emails -eml /emails -embeddings=true
             fi
             
             # Import MBOX files (one by one if multiple exist)
@@ -125,7 +125,7 @@ spec:
               echo "===== Importing MBOX files ====="
               find /emails -name "*.mbox" -type f | while read mbox_file; do
                 echo "Processing: $mbox_file"
-                /app/bin/import-emails -mbox "$mbox_file" -embeddings=true
+                /home/appuser/import-emails -mbox "$mbox_file" -embeddings=true
               done
             fi
             

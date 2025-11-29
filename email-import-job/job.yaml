@@ -1,0 +1,137 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: email-import
+  namespace: default
+  labels:
+    app: email-import
+    job-type: data-import
+spec:
+  # Set backoffLimit to avoid infinite retries on failure
+  backoffLimit: 3
+  # Clean up completed jobs after 24 hours
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: email-import
+        job-type: data-import
+    spec:
+      restartPolicy: Never
+      serviceAccountName: email-import-sa
+      
+      # Init container to download files from Azure Blob Storage
+      initContainers:
+      - name: download-emails
+        image: mcr.microsoft.com/azure-cli:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            set -e
+            echo "===== Downloading emails from Azure Blob Storage ====="
+            
+            # Create download directory
+            mkdir -p /emails
+            
+            # Download all .eml and .mbox files from the email-imports container
+            az storage blob download-batch \
+              --account-name ${AZURE_STORAGE_ACCOUNT} \
+              --account-key ${AZURE_STORAGE_KEY} \
+              --source ${AZURE_CONTAINER_NAME} \
+              --destination /emails \
+              --pattern "*.eml" \
+              --output table
+            
+            az storage blob download-batch \
+              --account-name ${AZURE_STORAGE_ACCOUNT} \
+              --account-key ${AZURE_STORAGE_KEY} \
+              --source ${AZURE_CONTAINER_NAME} \
+              --destination /emails \
+              --pattern "*.mbox" \
+              --output table
+            
+            echo "===== Download complete ====="
+            ls -lh /emails
+        env:
+        - name: AZURE_STORAGE_ACCOUNT
+          valueFrom:
+            secretKeyRef:
+              name: azure-storage-secret
+              key: storage-account-name
+        - name: AZURE_STORAGE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: azure-storage-secret
+              key: storage-account-key
+        - name: AZURE_CONTAINER_NAME
+          value: "email-imports"
+        volumeMounts:
+        - name: email-data
+          mountPath: /emails
+      
+      # Main container to import emails into database
+      containers:
+      - name: import-emails
+        image: prodacr1234.azurecr.io/ids-backend:latest
+        command:
+          - /bin/sh
+          - -c
+          - |
+            set -e
+            echo "===== Starting Email Import Process ====="
+            
+            # Count files
+            eml_count=$(find /emails -name "*.eml" -type f | wc -l)
+            mbox_count=$(find /emails -name "*.mbox" -type f | wc -l)
+            
+            echo "Found $eml_count EML files and $mbox_count MBOX files"
+            
+            # Import EML files
+            if [ "$eml_count" -gt 0 ]; then
+              echo "===== Importing EML files ====="
+              /app/bin/import-emails -eml /emails -embeddings=true
+            fi
+            
+            # Import MBOX files (one by one if multiple exist)
+            if [ "$mbox_count" -gt 0 ]; then
+              echo "===== Importing MBOX files ====="
+              find /emails -name "*.mbox" -type f | while read mbox_file; do
+                echo "Processing: $mbox_file"
+                /app/bin/import-emails -mbox "$mbox_file" -embeddings=true
+              done
+            fi
+            
+            echo "===== Email Import Complete ====="
+            echo "Summary:"
+            echo "  - EML files processed: $eml_count"
+            echo "  - MBOX files processed: $mbox_count"
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ids-secrets
+              key: database-url
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ids-secrets
+              key: openai-api-key
+        - name: WAIT_FOR_TUNNEL
+          value: "false"
+        volumeMounts:
+        - name: email-data
+          mountPath: /emails
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      
+      volumes:
+      - name: email-data
+        emptyDir:
+          sizeLimit: 5Gi
+

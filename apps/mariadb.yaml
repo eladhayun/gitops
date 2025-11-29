@@ -21,7 +21,7 @@ spec:
         primary:
           persistence:
             enabled: true
-            size: 100Gi
+            size: 50Gi
             storageClass: managed-csi
           
           resources:

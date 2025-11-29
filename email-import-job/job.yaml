@@ -138,12 +138,12 @@ spec:
           valueFrom:
             secretKeyRef:
               name: ids-secrets
-              key: database-url
+              key: DATABASE_URL
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
               name: ids-secrets
-              key: openai-api-key
+              key: OPENAI_API_KEY
         - name: WAIT_FOR_TUNNEL
           value: "false"
         volumeMounts:

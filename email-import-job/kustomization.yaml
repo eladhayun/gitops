@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: ids
 
 resources:
+  - pvc.yaml
   - serviceaccount.yaml
   - job.yaml
   - cleanup-serviceaccount.yaml

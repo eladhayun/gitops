@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: azure-billing-report
+  labels:
+    app: azure-billing-report
+spec:
+  # Run every Monday at 9:00 AM
+  schedule: "0 9 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: azure-billing-report
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: azure-billing-reporter
+          containers:
+          - name: billing-reporter
+            image: prodacr1234.azurecr.io/slack-notifications:main-b9d2a8b
+            command: ["/root/slack-notifications"]
+            args: ["billing-report"]
+            env:
+            - name: AZURE_SUBSCRIPTION_ID
+              value: "b76ecd16-669b-4ca9-b797-b7786eb1b334"
+            - name: AZURE_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: AZURE_TENANT_ID
+            - name: AZURE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: AZURE_CLIENT_ID
+            - name: AZURE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: AZURE_CLIENT_SECRET
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            - name: SLACK_REPORT_CHANNEL
+              value: "#billing"
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"

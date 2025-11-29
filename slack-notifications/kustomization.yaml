@@ -5,6 +5,8 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - cronjob.yaml
+  - serviceaccount.yaml
 
 generators:
   - secrets-generator.yaml

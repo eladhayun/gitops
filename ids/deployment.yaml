@@ -173,11 +173,11 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "48Mi"
-            cpu: "5m"
-          limits:
-            memory: "128Mi"
+            memory: "512Mi"  # Increased for email processing
             cpu: "100m"
+          limits:
+            memory: "4Gi"    # Allow up to 4GB for large MBOX files
+            cpu: "2000m"
         startupProbe:
           exec:
             command:

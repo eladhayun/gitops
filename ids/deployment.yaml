@@ -164,7 +164,7 @@ spec:
         - secretRef:
             name: ids-secrets
         - secretRef:
-            name: ids-mariadb-secret
+            name: ids-postgres-secret
         volumeMounts:
         - name: shared-data
           mountPath: /shared

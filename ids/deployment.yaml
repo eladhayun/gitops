@@ -156,8 +156,6 @@ spec:
         env:
         - name: PORT
           value: "8080"
-        - name: EMAIL_IMPORT_PATH
-          value: "/emails"
         - name: ENABLE_EMAIL_CONTEXT
           value: "true"  # Toggle email history in chat responses (true/false)
         - name: EMBEDDINGS_DATABASE_URL
@@ -173,9 +171,6 @@ spec:
         volumeMounts:
         - name: shared-data
           mountPath: /shared
-        - name: email-data
-          mountPath: /emails
-          readOnly: true
         resources:
           requests:
             memory: "512Mi"  # Increased for email processing
@@ -254,7 +249,4 @@ spec:
           defaultMode: 0600
       - name: shared-data
         emptyDir: {}
-      - name: email-data
-        persistentVolumeClaim:
-          claimName: email-data-pvc
 

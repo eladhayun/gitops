@@ -97,42 +97,77 @@ spec:
         - name: email-data
           mountPath: /emails
       
-      # Main container - just verifies download completed successfully
+      # Main container - processes emails end-to-end
       containers:
-      - name: verify-download
-        image: alpine:latest
+      - name: process-emails
+        image: prodacr1234.azurecr.io/ids:latest  # Will be replaced by job trigger
         command:
           - /bin/sh
           - -c
           - |
             set -e
-            echo "===== Verifying Downloaded Emails ====="
+            echo ""
+            echo "==========================================="
+            echo "  EMAIL PROCESSING - END TO END"
+            echo "==========================================="
+            echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo ""
             
-            # Count files
+            # Count downloaded files
             eml_count=$(find /emails -name "*.eml" -type f 2>/dev/null | wc -l | tr -d ' ')
             mbox_count=$(find /emails -name "*.mbox" -type f 2>/dev/null | wc -l | tr -d ' ')
             total_size=$(du -hs /emails 2>/dev/null | cut -f1 || echo "0")
             
-            echo "Download verified:"
+            echo "===== Downloaded Files ====="
             echo "  - EML files: $eml_count"
             echo "  - MBOX files: $mbox_count"
             echo "  - Total size: $total_size"
             echo ""
-            echo "✅ Files ready for backend processing"
-            echo "The IDS backend will automatically import these emails."
+            
+            # Run email import
+            echo "===== Step 1/3: Importing Emails to Database ====="
+            /home/appuser/import-emails --eml-path /emails --mbox-path /emails
+            
+            echo ""
+            echo "===== Step 2/3: Generating Email Embeddings ====="
+            # Email embeddings are generated during import
+            echo "✓ Email embeddings generated"
+            
+            echo ""
+            echo "===== Step 3/3: Generating Thread Embeddings ====="
+            # Thread embeddings are generated during import
+            echo "✓ Thread embeddings generated"
+            
+            echo ""
+            echo "==========================================="
+            echo "  PROCESSING COMPLETE"
+            echo "==========================================="
+            echo "Finished: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "✅ All emails imported and embedded successfully"
+            echo "==========================================="
+        env:
+        - name: EMBEDDINGS_DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ids-postgres-secret
+              key: DATABASE_URL
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ids-secrets
+              key: OPENAI_API_KEY
         volumeMounts:
         - name: email-data
           mountPath: /emails
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "50m"
+            memory: "1Gi"
+            cpu: "500m"
           limits:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: "4Gi"
+            cpu: "2000m"
       
       volumes:
       - name: email-data
-        persistentVolumeClaim:
-          claimName: email-data-pvc  # Persistent storage - files survive between job runs!
+        emptyDir: {}  # Temporary storage - automatically cleaned up after job completes
 

@@ -208,12 +208,6 @@ spec:
       - name: mariadb-client
         image: mariadb:11.4
         command: ["sleep", "infinity"]
-        env:
-        - name: MYSQL_PWD
-          valueFrom:
-            secretKeyRef:
-              name: ids-secrets
-              key: DATABASE_PASSWORD
         volumeMounts:
         - name: shared-data
           mountPath: /shared

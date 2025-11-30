@@ -6,8 +6,8 @@ metadata:
   labels:
     app: email-import-cleanup
 spec:
-  # Run every hour
-  schedule: "0 * * * *"
+  # Run every 6 hours (cost optimized)
+  schedule: "0 */6 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:

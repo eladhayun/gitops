@@ -5,14 +5,14 @@ resources:
   - nginx-ingress-controller.yaml
   - cert-manager.yaml
   - external-dns.yaml
-  - johnson.yaml
-  - johnson-postgres.yaml
+  # - johnson.yaml
+  # - johnson-postgres.yaml
   - debug-server.yaml
   - argocd-tunnel.yaml
   - ids.yaml
   - ids-postgres.yaml
   - slack-notifications.yaml
-  - argo-rollouts-demo-fe.yaml
-  - argo-rollouts-demo-be.yaml
-  - argo-rollouts-demo-redis.yaml
-  - blutag-website.yaml
+  # - argo-rollouts-demo-fe.yaml
+  # - argo-rollouts-demo-be.yaml
+  # - argo-rollouts-demo-redis.yaml
+  # - blutag-website.yaml

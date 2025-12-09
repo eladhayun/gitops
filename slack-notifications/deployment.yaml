@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: slack-notifications
-        image: prodacr1234.azurecr.io/slack-notifications:main-6ac95d2
+        image: prodacr1234.azurecr.io/slack-notifications:main-001ea2e
         ports:
         - containerPort: 8080
         env:

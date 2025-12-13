@@ -1,21 +1,25 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: ids
+  name: ids-init-embeddings
   labels:
     app: ids
+    component: init-embeddings
 spec:
-  replicas: 1
-  revisionHistoryLimit: 3
-  selector:
-    matchLabels:
-      app: ids
+  # Allow the job to be manually triggered and retried
+  completions: 1
+  parallelism: 1
+  # Don't automatically delete completed jobs - keep for debugging
+  ttlSecondsAfterFinished: 86400  # Keep for 24 hours
+  backoffLimit: 3  # Retry up to 3 times on failure
   template:
     metadata:
       labels:
         app: ids
+        component: init-embeddings
     spec:
-      # Init containers
+      serviceAccountName: ids-backend
+      restartPolicy: OnFailure  # Allow retries on failure
       initContainers:
       - name: ssh-connectivity-check
         image: alpine/socat:latest
@@ -138,26 +142,13 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "50m"
-        readinessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - "test -f /shared/tunnel-ready"
-          initialDelaySeconds: 5
-          periodSeconds: 15
-          timeoutSeconds: 2
-          failureThreshold: 2
-      # Main application container
-      - name: ids
+      # Init embeddings container - runs once and exits
+      - name: init-embeddings
         image: prodacr1234.azurecr.io/ids:main-f964066
-        ports:
-        - containerPort: 8080
+        command: ["/home/appuser/init-embeddings-write", "--once"]
         env:
-        - name: PORT
-          value: "8080"
-        - name: ENABLE_EMAIL_CONTEXT
-          value: "true"  # Toggle email history in chat responses (true/false)
+        - name: WAIT_FOR_TUNNEL
+          value: "true"
         - name: EMBEDDINGS_DATABASE_URL
           valueFrom:
             secretKeyRef:
@@ -173,37 +164,11 @@ spec:
           mountPath: /shared
         resources:
           requests:
-            memory: "128Mi"  # Optimized based on actual usage
-            cpu: "50m"
+            memory: "64Mi"
+            cpu: "10m"
           limits:
-            memory: "1Gi"    # Allow up to 1GB for processing
-            cpu: "500m"
-        startupProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - "test -f /shared/tunnel-ready"
-          initialDelaySeconds: 2
-          periodSeconds: 5
-          failureThreshold: 30
-          timeoutSeconds: 2
-        livenessProbe:
-          httpGet:
-            path: /api/healthz
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /api/healthz
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 15
-          timeoutSeconds: 3
-          failureThreshold: 2
+            memory: "512Mi"
+            cpu: "200m"
       volumes:
       - name: ssh-key
         secret:
@@ -214,4 +179,3 @@ spec:
           defaultMode: 0600
       - name: shared-data
         emptyDir: {}
-

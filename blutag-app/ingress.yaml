@@ -10,10 +10,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - app.blutag.jshipster.io
+    - blutag-app.jshipster.io
     secretName: blutag-app-tls
   rules:
-  - host: app.blutag.jshipster.io
+  - host: blutag-app.jshipster.io
     http:
       paths:
       - path: /

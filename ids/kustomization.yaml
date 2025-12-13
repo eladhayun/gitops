@@ -7,7 +7,6 @@ resources:
   - service.yaml
   - ingress.yaml
   - backend-rbac.yaml
-  - init-embeddings-job.yaml
   - init-embeddings-cronjob.yaml
 
 generators:

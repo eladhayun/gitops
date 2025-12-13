@@ -11,7 +11,7 @@ spec:
     path: blutag-app
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: blutag
   syncPolicy:
     automated:
       prune: true

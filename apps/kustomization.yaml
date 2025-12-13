@@ -17,3 +17,4 @@ resources:
   # - argo-rollouts-demo-redis.yaml
   # - blutag-website.yaml
   - blutag-app.yaml
+  - blutag-postgres.yaml

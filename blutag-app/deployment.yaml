@@ -25,6 +25,11 @@ spec:
           value: production
         - name: SERVER_ADDRESS
           value: ":8080"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: blutag-postgres-secret
+              key: database-url
         resources:
           requests:
             cpu: 100m

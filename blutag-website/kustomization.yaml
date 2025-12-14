@@ -6,7 +6,7 @@ resources:
   - service.yaml
   - ingress.yaml
 
-namespace: default
+namespace: blutag
 
 commonLabels:
   app: blutag-website

@@ -29,7 +29,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: blutag-postgres-secret
-              key: database-url
+              key: DATABASE_URL
         resources:
           requests:
             cpu: 100m

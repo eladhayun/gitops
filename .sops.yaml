@@ -3,6 +3,6 @@
 
 creation_rules:
   # Encrypt all secrets.yaml files with age encryption
-  - path_regex: secrets\.yaml$
+  - path_regex: (secrets?|secret-.*)\.yaml$
     age: age103wy5wh49l0ptpscalt4ywxezd2nqykd29jru0fvgen7aweffp2s99kne9
 

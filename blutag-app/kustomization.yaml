@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - secret-gemini.yaml
 
 namespace: blutag
 

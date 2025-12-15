@@ -18,3 +18,6 @@ data:
   REMOTE_PORT: "3306"
   # Embedding generation schedule (in hours, default: 168 = 1 week)
   EMBEDDING_SCHEDULE_INTERVAL_HOURS: "168"
+  # Azure OpenAI deployment names (endpoint and key are in secrets)
+  AZURE_OPENAI_GPT_DEPLOYMENT: "gpt-4o-mini"
+  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-small"

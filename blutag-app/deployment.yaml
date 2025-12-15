@@ -35,6 +35,17 @@ spec:
             secretKeyRef:
               name: blutag-gemini-secret
               key: GEMINI_API_KEY
+        # Azure OpenAI configuration (primary AI provider)
+        - name: AZURE_OPENAI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: blutag-openai-secret
+              key: AZURE_OPENAI_ENDPOINT
+        - name: AZURE_OPENAI_KEY
+          valueFrom:
+            secretKeyRef:
+              name: blutag-openai-secret
+              key: AZURE_OPENAI_KEY
         # Twilio SMS configuration (optional)
         - name: TWILIO_ACCOUNT_SID
           valueFrom:

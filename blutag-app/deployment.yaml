@@ -35,6 +35,31 @@ spec:
             secretKeyRef:
               name: blutag-gemini-secret
               key: GEMINI_API_KEY
+        # Twilio SMS configuration (optional)
+        - name: TWILIO_ACCOUNT_SID
+          valueFrom:
+            secretKeyRef:
+              name: blutag-twilio-secret
+              key: TWILIO_ACCOUNT_SID
+              optional: true
+        - name: TWILIO_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: blutag-twilio-secret
+              key: TWILIO_AUTH_TOKEN
+              optional: true
+        - name: TWILIO_FROM_NUMBER
+          valueFrom:
+            secretKeyRef:
+              name: blutag-twilio-secret
+              key: TWILIO_FROM_NUMBER
+              optional: true
+        - name: TWILIO_TO_NUMBER
+          valueFrom:
+            secretKeyRef:
+              name: blutag-twilio-secret
+              key: TWILIO_TO_NUMBER
+              optional: true
         resources:
           requests:
             cpu: 10m

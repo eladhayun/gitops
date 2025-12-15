@@ -8,6 +8,10 @@ resources:
   - cronjob.yaml
   - ids-analytics-cronjob.yaml
   - serviceaccount.yaml
+  # GCP Billing
+  - gcp-billing-cronjob.yaml
+  - gcp-serviceaccount.yaml
 
 generators:
   - secrets-generator.yaml
+  - gcp-secrets-generator.yaml

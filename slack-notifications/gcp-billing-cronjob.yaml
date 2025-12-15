@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gcp-billing-report
+  labels:
+    app: gcp-billing-report
+spec:
+  # Run every day at 9:30 AM (30 mins after Azure report)
+  schedule: "30 9 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: gcp-billing-report
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: gcp-billing-reporter
+          containers:
+          - name: billing-reporter
+            image: prodacr1234.azurecr.io/slack-notifications:main-ed239e2
+            command: ["/root/slack-notifications"]
+            args: ["gcp-billing-report"]
+            env:
+            # GCP Configuration
+            - name: GCP_PROJECT_ID
+              value: "jshipster"
+            - name: GCP_BILLING_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gcp-credentials-secret
+                  key: GCP_BILLING_ACCOUNT_ID
+            - name: GCP_BIGQUERY_DATASET
+              value: "billing_export"
+            - name: GCP_BIGQUERY_TABLE
+              value: "gcp_billing_export_v1"
+            # Point to mounted service account key
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/var/secrets/google/service-account.json"
+            # Slack Configuration
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            - name: SLACK_REPORT_CHANNEL
+              value: "#billing"
+            volumeMounts:
+            - name: gcp-sa-key
+              mountPath: /var/secrets/google
+              readOnly: true
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+          volumes:
+          - name: gcp-sa-key
+            secret:
+              secretName: gcp-credentials-secret
+              items:
+              - key: GCP_SERVICE_ACCOUNT_KEY
+                path: service-account.json
+

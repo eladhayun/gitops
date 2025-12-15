@@ -6,6 +6,7 @@ resources:
   - service.yaml
   - ingress.yaml
   - cronjob.yaml
+  - ids-analytics-cronjob.yaml
   - serviceaccount.yaml
 
 generators:

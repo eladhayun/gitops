@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ids-analytics-report
+  labels:
+    app: ids-analytics-report
+spec:
+  # Run every day at 8:00 AM UTC
+  schedule: "0 8 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: ids-analytics-report
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: ids-analytics-reporter
+            image: prodacr1234.azurecr.io/slack-notifications:main-17fad54
+            command: ["/root/slack-notifications"]
+            args: ["ids-analytics-report"]
+            env:
+            - name: IDS_ANALYTICS_URL
+              value: "https://ids.jshipster.io/api/analytics/daily-report"
+            - name: IDS_REPORT_CHANNEL
+              value: "C09P9CPGAN9"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "64Mi"
+                cpu: "50m"
+

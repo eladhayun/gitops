@@ -54,11 +54,12 @@ spec:
               name: blutag-twilio-secret
               key: TWILIO_FROM_NUMBER
               optional: true
-        - name: TWILIO_TO_NUMBER
+        # Comma-separated list of recipient phone numbers
+        - name: TWILIO_TO_NUMBERS
           valueFrom:
             secretKeyRef:
               name: blutag-twilio-secret
-              key: TWILIO_TO_NUMBER
+              key: TWILIO_TO_NUMBERS
               optional: true
         resources:
           requests:

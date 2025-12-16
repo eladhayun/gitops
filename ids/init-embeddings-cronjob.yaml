@@ -102,8 +102,16 @@ spec:
                 echo "ERROR: SSH tunnel failed to become ready after 30 seconds" &&
                 exit 1
               fi &&
-              echo "SSH tunnel established successfully, keeping it alive..." &&
-              wait $SSH_PID
+              echo "SSH tunnel established successfully, monitoring for job completion..." &&
+              while kill -0 $SSH_PID 2>/dev/null; do
+                if [ -f /shared/job-done ]; then
+                  echo "Job completed signal received, shutting down SSH tunnel..." &&
+                  kill $SSH_PID 2>/dev/null &&
+                  exit 0
+                fi
+                sleep 2
+              done &&
+              echo "SSH tunnel process ended"
             env:
             - name: SSH_HOST
               valueFrom:
@@ -151,7 +159,14 @@ spec:
           # Init embeddings container - runs once and exits
           - name: init-embeddings
             image: prodacr1234.azurecr.io/ids:main-f964066
-            command: ["/home/appuser/init-embeddings-write", "--once"]
+            command:
+            - /bin/sh
+            - -c
+            - |
+              /home/appuser/init-embeddings-write --once
+              EXIT_CODE=$?
+              touch /shared/job-done
+              exit $EXIT_CODE
             env:
             - name: WAIT_FOR_TUNNEL
               value: "true"

@@ -34,7 +34,7 @@ spec:
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
               value: "gpt-4o" # or whatever model is available
             - name: POSTGRES_HOST
-              value: dirtbike-postgres.dirtbike-postgres.svc.cluster.local
+              value: dirtbike-postgres
             - name: POSTGRES_DB
               value: dirtbike
             - name: POSTGRES_USER

@@ -13,7 +13,7 @@ spec:
     path: dirtbike-specialist
   destination:
     server: https://kubernetes.default.svc
-    namespace: dirtbike-specialist
+    namespace: dirtbike
   syncPolicy:
     automated:
       prune: true

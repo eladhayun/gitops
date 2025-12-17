@@ -13,7 +13,7 @@ spec:
     path: dirtbike-postgres
   destination:
     server: https://kubernetes.default.svc
-    namespace: dirtbike-postgres
+    namespace: dirtbike
   syncPolicy:
     automated:
       prune: true

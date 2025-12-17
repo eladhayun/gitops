@@ -19,3 +19,5 @@ resources:
   - blutag-app.yaml
   - blutag-postgres.yaml
   - trips.yaml
+  - dirtbike-specialist.yaml
+  

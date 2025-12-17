@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dirtbike-specialist
-          image: prodacr1234.azurecr.io/dirtbike-specialist:main-f22f6cd
+          image: prodacr1234.azurecr.io/dirtbike-specialist:main-903d5ec
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -33,6 +33,8 @@ spec:
                   key: AZURE_OPENAI_ENDPOINT
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
               value: "gpt-4o" # or whatever model is available
+            - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
+              value: "text-embedding-3-small"
             - name: POSTGRES_HOST
               value: dirtbike-postgres
             - name: POSTGRES_DB

@@ -18,7 +18,7 @@ spec:
       containers:
       - name: trips
         # Placeholder image, will be updated by CI
-        image: prodacr1234.azurecr.io/trips:main-9a0e29d
+        image: prodacr1234.azurecr.io/trips:main-078f7a8
         ports:
         - containerPort: 8080
         env:

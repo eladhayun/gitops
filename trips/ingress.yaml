@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trips
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: trips.jshipster.io
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/compute-full-forwarded-for: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: trips.jshipster.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: trips
+            port:
+              number: 8080

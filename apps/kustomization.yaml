@@ -20,4 +20,5 @@ resources:
   - blutag-postgres.yaml
   - trips.yaml
   - dirtbike-specialist.yaml
+  - dirtbike-postgres.yaml
   

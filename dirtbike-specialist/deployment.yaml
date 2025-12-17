@@ -6,6 +6,7 @@ metadata:
     app: dirtbike-specialist
 spec:
   replicas: 1
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: dirtbike-specialist

@@ -32,7 +32,7 @@ spec:
                   name: azure-openai-secrets
                   key: AZURE_OPENAI_ENDPOINT
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
-              value: "gpt-4o" # or whatever model is available
+              value: "gpt-4o-mini" # match the working deployment in this resource
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
               value: "text-embedding-3-small"
             - name: PDF_EXTRACTOR_URL

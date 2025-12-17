@@ -25,12 +25,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: azure-openai-secrets
-                  key: api-key
+                  key: AZURE_OPENAI_API_KEY
             - name: AZURE_OPENAI_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: azure-openai-secrets
-                  key: endpoint
+                  key: AZURE_OPENAI_ENDPOINT
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
               value: "gpt-4o" # or whatever model is available
             - name: POSTGRES_HOST

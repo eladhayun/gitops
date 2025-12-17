@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dirtbike-specialist
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: dirtbike.eladhayun.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dirtbike-specialist
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - dirtbike.eladhayun.com
+      secretName: dirtbike-tls

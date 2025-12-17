@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dirtbike-specialist
+  labels:
+    app: dirtbike-specialist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dirtbike-specialist
+  template:
+    metadata:
+      labels:
+        app: dirtbike-specialist
+    spec:
+      containers:
+        - name: dirtbike-specialist
+          image: ghcr.io/eladhayun/dirtbike-specialist:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AZURE_OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: api-key
+            - name: AZURE_OPENAI_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: endpoint
+            - name: AZURE_OPENAI_DEPLOYMENT_NAME
+              value: "gpt-4o" # or whatever model is available
+            - name: POSTGRES_HOST
+              value: dirtbike-postgres.dirtbike-postgres.svc.cluster.local
+            - name: POSTGRES_DB
+              value: dirtbike
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dirtbike-postgres-secret
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dirtbike-postgres-secret
+                  key: postgres-password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

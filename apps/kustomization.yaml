@@ -18,3 +18,4 @@ resources:
   - blutag-website.yaml
   - blutag-app.yaml
   - blutag-postgres.yaml
+  - trips.yaml

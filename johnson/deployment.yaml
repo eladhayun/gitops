@@ -39,11 +39,11 @@ spec:
             name: johnson-secrets
         resources:
           requests:
-            memory: "96Mi"
+            memory: "64Mi"
             cpu: "10m"
           limits:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: "128Mi"
+            cpu: "100m"
         livenessProbe:
           httpGet:
             path: /healthz

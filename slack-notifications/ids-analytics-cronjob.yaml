@@ -41,9 +41,9 @@ spec:
                   key: SLACK_WEBHOOK_URL
             resources:
               requests:
-                memory: "32Mi"
-                cpu: "10m"
+                memory: "16Mi"
+                cpu: "5m"
               limits:
-                memory: "64Mi"
+                memory: "32Mi"
                 cpu: "50m"
 

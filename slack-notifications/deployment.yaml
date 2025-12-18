@@ -28,10 +28,10 @@ spec:
             name: slack-notifications-secrets
         resources:
           requests:
-            memory: "16Mi"
+            memory: "12Mi"
             cpu: "5m"
           limits:
-            memory: "64Mi"
+            memory: "32Mi"
             cpu: "50m"
         livenessProbe:
           httpGet:

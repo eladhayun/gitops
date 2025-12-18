@@ -32,11 +32,11 @@ spec:
               value: "http://argo-rollouts-demo-be-service"
           resources:
             requests:
-              cpu: "10m"
-              memory: "32Mi"
+              cpu: "5m"
+              memory: "8Mi"
             limits:
-              cpu: "200m"
-              memory: "128Mi"
+              cpu: "50m"
+              memory: "64Mi"
           livenessProbe:
             httpGet:
               path: /

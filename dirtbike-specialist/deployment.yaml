@@ -64,10 +64,10 @@ spec:
                   key: BASIC_AUTH_PASSWORD
           resources:
             requests:
-              cpu: 20m
-              memory: 64Mi
+              cpu: 10m
+              memory: 128Mi
             limits:
-              cpu: 200m
+              cpu: 100m
               memory: 256Mi
         - name: pdf-extractor
           image: prodacr1234.azurecr.io/pdf-extractor:main-796935f
@@ -80,4 +80,4 @@ spec:
               memory: 128Mi
             limits:
               cpu: 100m
-              memory: 512Mi
+              memory: 256Mi

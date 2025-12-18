@@ -24,6 +24,7 @@ spec:
       initContainers:
       - name: download-emails
         image: mcr.microsoft.com/azure-cli:latest
+        imagePullPolicy: Always
         command:
           - /bin/sh
           - -c
@@ -101,6 +102,7 @@ spec:
       containers:
       - name: process-emails
         image: prodacr1234.azurecr.io/ids:latest  # Will be replaced by job trigger
+        imagePullPolicy: Always
         command:
           - /bin/sh
           - -c

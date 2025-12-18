@@ -28,13 +28,12 @@ spec:
           restartPolicy: OnFailure
           initContainers:
           - name: ssh-connectivity-check
-            image: alpine/socat:latest
+            image: prodacr1234.azurecr.io/ids-ssh-tunnel:latest
+            imagePullPolicy: Always
             command:
             - /bin/sh
             - -c
             - |
-              echo "Installing SSH client and netcat..."
-              apk add --no-cache openssh-client netcat-openbsd &&
               mkdir -p /root/.ssh &&
               cp /etc/ssh-key/ssh-private-key /root/.ssh/id_rsa &&
               chmod 600 /root/.ssh/id_rsa &&
@@ -66,20 +65,20 @@ spec:
               mountPath: /shared
             resources:
               requests:
-                memory: "32Mi"
-                cpu: "10m"
+                memory: "16Mi"
+                cpu: "5m"
               limits:
-                memory: "64Mi"
-                cpu: "50m"
+                memory: "32Mi"
+                cpu: "25m"
           containers:
           # SSH tunnel sidecar container
           - name: ssh-tunnel
-            image: alpine/socat:latest
+            image: prodacr1234.azurecr.io/ids-ssh-tunnel:latest
+            imagePullPolicy: Always
             command:
             - /bin/sh
             - -c
             - |
-              apk add --no-cache openssh-client netcat-openbsd &&
               mkdir -p /root/.ssh &&
               cp /etc/ssh-key/ssh-private-key /root/.ssh/id_rsa &&
               chmod 600 /root/.ssh/id_rsa &&
@@ -151,11 +150,11 @@ spec:
               mountPath: /shared
             resources:
               requests:
-                memory: "32Mi"
-                cpu: "10m"
+                memory: "16Mi"
+                cpu: "5m"
               limits:
-                memory: "128Mi"
-                cpu: "50m"
+                memory: "64Mi"
+                cpu: "25m"
           # Init embeddings container - runs once and exits
           - name: init-embeddings
             image: prodacr1234.azurecr.io/ids:main-f964066

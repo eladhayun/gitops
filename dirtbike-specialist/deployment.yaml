@@ -33,7 +33,7 @@ spec:
                   name: azure-openai-secrets
                   key: AZURE_OPENAI_ENDPOINT
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
-              value: "gpt-4o-mini" # match the working deployment in this resource
+              value: "gpt-4o" # match the working deployment in this resource
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
               value: "text-embedding-3-small"
             - name: PDF_EXTRACTOR_URL
@@ -52,6 +52,16 @@ spec:
                 secretKeyRef:
                   name: dirtbike-postgres-secret
                   key: postgres-password
+            - name: BASIC_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: BASIC_AUTH_USERNAME
+            - name: BASIC_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: BASIC_AUTH_PASSWORD
           resources:
             requests:
               cpu: 20m

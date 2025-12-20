@@ -21,3 +21,5 @@ data:
   # Azure OpenAI deployment names (endpoint and key are in secrets)
   AZURE_OPENAI_GPT_DEPLOYMENT: "gpt-4o-mini"
   AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-small"
+  # Google Analytics 4 Measurement ID (optional - leave empty to disable)
+  GOOGLE_ANALYTICS_ID: "G-55L4MN6ZPC"

@@ -169,6 +169,16 @@ spec:
               key: SENDGRID_API_KEY
         - name: SUPPORT_EMAIL
           value: "support@israeldefensestore.com"  # Support email address (can be overridden via secret)
+        - name: ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ids-secrets
+              key: ADMIN_USERNAME
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ids-secrets
+              key: ADMIN_PASSWORD
         envFrom:
         - configMapRef:
             name: ids-config

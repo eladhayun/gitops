@@ -4,9 +4,7 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
-
-generators:
-  - secrets-generator.yaml
+  - pvc.yaml
 
 namespace: blutag
 

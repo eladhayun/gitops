@@ -28,11 +28,11 @@ spec:
           value: "8000"
         - name: UVICORN_LOG_LEVEL
           value: "info"
+        - name: DATA_DIR
+          value: "/data"
         volumeMounts:
-        - name: account-secret
-          mountPath: /app/account.json
-          subPath: account.json
-          readOnly: true
+        - name: data
+          mountPath: /data
         resources:
           requests:
             cpu: 10m
@@ -65,9 +65,9 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 30
       volumes:
-      - name: account-secret
-        secret:
-          secretName: blutag-findmy-account-secret
+      - name: data
+        persistentVolumeClaim:
+          claimName: blutag-findmy-data
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001

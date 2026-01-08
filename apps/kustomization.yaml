@@ -18,6 +18,7 @@ resources:
   - blutag-website.yaml
   - blutag-app.yaml
   - blutag-postgres.yaml
+  - blutag-findmy.yaml
   - trips.yaml
   - dirtbike-specialist.yaml
   - dirtbike-postgres.yaml

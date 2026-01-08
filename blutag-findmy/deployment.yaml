@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blutag-findmy
+  labels:
+    app: blutag-findmy
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: blutag-findmy
+  template:
+    metadata:
+      labels:
+        app: blutag-findmy
+    spec:
+      containers:
+      - name: blutag-findmy
+        image: prodacr1234.azurecr.io/blutag-findmy:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: UVICORN_HOST
+          value: "0.0.0.0"
+        - name: UVICORN_PORT
+          value: "8000"
+        - name: UVICORN_LOG_LEVEL
+          value: "info"
+        volumeMounts:
+        - name: account-secret
+          mountPath: /app/account.json
+          subPath: account.json
+          readOnly: true
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+      volumes:
+      - name: account-secret
+        secret:
+          secretName: blutag-findmy-account-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001

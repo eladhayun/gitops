@@ -30,9 +30,9 @@ spec:
           value: "info"
         - name: DATA_DIR
           value: "/data"
-        # Use remote Anisette server to avoid local emulation crashes (UC_ERR_WRITE_UNMAPPED)
+        # Use internal Omnisette server (in-cluster) to avoid local emulation crashes
         - name: ANISETTE_SERVER_URL
-          value: "https://ani.sidestore.io"
+          value: "http://omnisette:6969"
         volumeMounts:
         - name: data
           mountPath: /data

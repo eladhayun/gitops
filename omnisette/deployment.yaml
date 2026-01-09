@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: omnisette
+  labels:
+    app: omnisette
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: omnisette
+  template:
+    metadata:
+      labels:
+        app: omnisette
+    spec:
+      containers:
+      - name: omnisette
+        image: dadoum/anisette-v3-server:latest
+        ports:
+        - containerPort: 6969
+          name: http
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 6969
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 6969
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      securityContext:
+        runAsNonRoot: false

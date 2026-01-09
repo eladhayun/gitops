@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: omnisette
+  labels:
+    app: omnisette
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6969
+    targetPort: 6969
+    protocol: TCP
+    name: http
+  selector:
+    app: omnisette

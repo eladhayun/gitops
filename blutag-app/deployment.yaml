@@ -73,6 +73,30 @@ spec:
               name: blutag-twilio-secret
               key: TWILIO_TO_NUMBERS
               optional: true
+        # FindMy service configuration
+        - name: FINDMY_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-app-config
+              key: FINDMY_SERVICE_URL
+        # JWT Authentication configuration
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: blutag-jwt-secret
+              key: JWT_SECRET
+        - name: SYSTEM_ADMIN_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: blutag-jwt-secret
+              key: SYSTEM_ADMIN_EMAIL
+              optional: true
+        - name: SYSTEM_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: blutag-jwt-secret
+              key: SYSTEM_ADMIN_PASSWORD
+              optional: true
         resources:
           requests:
             cpu: 5m

@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - configmap.yaml
 
 generators:
   - secrets-generator.yaml

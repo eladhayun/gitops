@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blutag-app-config
+  labels:
+    app: blutag-app
+data:
+  FINDMY_SERVICE_URL: "http://blutag-findmy:8000"

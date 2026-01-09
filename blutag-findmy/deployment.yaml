@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: blutag-findmy
-        image: prodacr1234.azurecr.io/blutag-findmy:main-eb754e0
+        image: prodacr1234.azurecr.io/blutag-findmy:main-837deb8
         ports:
         - containerPort: 8000
           name: http

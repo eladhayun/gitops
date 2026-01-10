@@ -22,20 +22,16 @@ data:
           - role: pod
         
         relabel_configs:
-          # Drop pods in kube-system and other system namespaces if desired
+          # Drop pods in kube-system and other system namespaces
           - source_labels: [__meta_kubernetes_namespace]
             action: drop
             regex: (kube-system|kube-public|kube-node-lease)
-          # Set the path to the log file
+          # Set the path to the log file (Kubernetes log path pattern)
           - source_labels: [__meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
             action: replace
             target_label: __path__
             separator: /
             replacement: /var/log/pods/*$1/*/$2/*.log
-          # Keep all other pods
-          - source_labels: [__meta_kubernetes_pod_uid]
-            action: keep
-            regex: .+
         
         pipeline_stages:
           - docker: {}

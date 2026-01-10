@@ -31,7 +31,7 @@ data:
             action: replace
             target_label: __path__
             separator: /
-            replacement: /var/log/pods/*$1/*/$2/*.log
+            replacement: /var/log/pods/$1/*/$2/*.log
         
         pipeline_stages:
           - docker: {}

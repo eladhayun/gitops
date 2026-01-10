@@ -28,14 +28,14 @@ spec:
               continue
             fi
             echo "{\"targets\":[\"localhost\"],\"labels\":{\"__path__\":\"$logfile\"}}"
-          done | jq -s '.' > /etc/promtail/pod-logs.json
-          echo "Generated $(cat /etc/promtail/pod-logs.json | jq 'length') targets"
+          done | jq -s '.' > /etc/promtail/file-sd/pod-logs.json
+          echo "Generated $(cat /etc/promtail/file-sd/pod-logs.json | jq 'length') targets"
         volumeMounts:
         - name: pods
           mountPath: /var/log/pods
           readOnly: true
         - name: file-sd
-          mountPath: /etc/promtail
+          mountPath: /etc/promtail/file-sd
       containers:
       - name: promtail
         image: grafana/promtail:2.9.2
@@ -57,9 +57,7 @@ spec:
           mountPath: /var/log/pods
           readOnly: true
         - name: file-sd
-          mountPath: /etc/promtail/pod-logs.json
-          subPath: pod-logs.json
-          readOnly: true
+          mountPath: /etc/promtail/file-sd
         resources:
           requests:
             cpu: 50m

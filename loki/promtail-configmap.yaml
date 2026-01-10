@@ -21,7 +21,7 @@ data:
       - job_name: kubernetes-pods
         file_sd_configs:
           - files:
-              - /etc/promtail/pod-logs.json
+              - /etc/promtail/file-sd/pod-logs.json
             refresh_interval: 10s
         
         pipeline_stages:

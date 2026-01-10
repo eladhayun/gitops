@@ -70,8 +70,6 @@ spec:
       - name: config
         configMap:
           name: loki-config
-      - name: storage
-        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: storage

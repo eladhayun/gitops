@@ -42,7 +42,7 @@ data:
         account_name: ${AZURE_STORAGE_ACCOUNT}
         account_key: ${AZURE_STORAGE_KEY}
         container_name: loki-logs
-        endpoint_suffix: core.windows.net
+        endpoint_suffix: blob.core.windows.net
     
     limits_config:
       enforce_metric_name: false

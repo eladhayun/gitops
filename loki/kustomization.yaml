@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - statefulset.yaml
+  - service.yaml
+  - promtail-configmap.yaml
+  - promtail-daemonset.yaml
+  - serviceaccount.yaml
+  - secrets-storage-generator.yaml
+  - ingress.yaml
+
+generators:
+  - secrets-auth-generator.yaml  # SOPS-encrypted auth secret (loki-auth)

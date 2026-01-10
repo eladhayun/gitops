@@ -23,4 +23,5 @@ resources:
   # - trips.yaml
   - dirtbike-specialist.yaml
   - dirtbike-postgres.yaml
+  - loki.yaml
   

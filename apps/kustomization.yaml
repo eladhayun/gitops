@@ -11,6 +11,7 @@ resources:
   - argocd-tunnel.yaml
   - ids.yaml
   - ids-postgres.yaml
+  - ids-qdrant.yaml
   - slack-notifications.yaml
   # - argo-rollouts-demo-fe.yaml
   # - argo-rollouts-demo-be.yaml

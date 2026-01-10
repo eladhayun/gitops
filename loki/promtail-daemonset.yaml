@@ -23,13 +23,22 @@ spec:
         - -c
         - |
           echo "Generating file service discovery targets..."
+          echo "[" > /etc/promtail/file-sd/pod-logs.json
+          first=true
           find /var/log/pods -name "*.log" -type f | while read logfile; do
             if echo "$logfile" | grep -qE "(kube-system|kube-public|kube-node-lease)"; then
               continue
             fi
-            echo "{\"targets\":[\"localhost\"],\"labels\":{\"__path__\":\"$logfile\"}}"
-          done | jq -s '.' > /etc/promtail/file-sd/pod-logs.json
-          echo "Generated $(cat /etc/promtail/file-sd/pod-logs.json | jq 'length') targets"
+            if [ "$first" = "true" ]; then
+              first=false
+            else
+              echo "," >> /etc/promtail/file-sd/pod-logs.json
+            fi
+            echo "{\"targets\":[\"localhost\"],\"labels\":{\"__path__\":\"$logfile\"}}" >> /etc/promtail/file-sd/pod-logs.json
+          done
+          echo "]" >> /etc/promtail/file-sd/pod-logs.json
+          count=$(grep -c "__path__" /etc/promtail/file-sd/pod-logs.json || echo "0")
+          echo "Generated $count targets"
         volumeMounts:
         - name: pods
           mountPath: /var/log/pods

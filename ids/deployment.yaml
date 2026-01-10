@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: ids
+      annotations:
+        prometheus.io/scrape: "true"
     spec:
       # Init containers
       initContainers:

@@ -10,7 +10,7 @@ resources:
   - promtail-daemonset.yaml
   - serviceaccount.yaml
   # secrets-storage-generator.yaml - Managed manually via setup-storage.sh (not in GitOps)
-  - ingress.yaml
+  # ingress.yaml - Removed: Loki is accessed via Grafana UI, no external ingress needed
 
 generators:
   - secrets-auth-generator.yaml  # SOPS-encrypted secrets (loki-auth and loki-azure-storage)

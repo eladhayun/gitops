@@ -157,7 +157,7 @@ spec:
                 cpu: "25m"
           # Init embeddings container - runs once and exits
           - name: init-embeddings
-            image: prodacr1234.azurecr.io/ids:main-7573e6c
+            image: prodacr1234.azurecr.io/ids:main-e386fab
             command:
             - /bin/sh
             - -c

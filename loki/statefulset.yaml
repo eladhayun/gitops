@@ -59,14 +59,20 @@ spec:
           httpGet:
             path: /ready
             port: http
-          initialDelaySeconds: 45
-          periodSeconds: 10
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
         readinessProbe:
           httpGet:
             path: /ready
             port: http
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
       volumes:
       - name: config
         configMap:

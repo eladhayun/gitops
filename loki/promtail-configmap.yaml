@@ -16,15 +16,13 @@ data:
       - url: http://loki.loki.svc.cluster.local:3100/loki/api/v1/push
     
     scrape_configs:
-      # Scrape all pod logs directly from /var/log/pods
-      # This bypasses kubernetes service discovery and reads files directly
+      # Scrape all pod logs using file-based service discovery
+      # This reads log files directly from /var/log/pods
       - job_name: kubernetes-pods
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: kubernetes-pods
-              __path__: /var/log/pods/*/*/*.log
+        file_sd_configs:
+          - files:
+              - /etc/promtail/pod-logs.json
+            refresh_interval: 10s
         
         pipeline_stages:
           # Extract metadata from file path: namespace_podname_uid/containername/restartcount.log

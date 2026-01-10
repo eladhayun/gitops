@@ -23,3 +23,5 @@ data:
   AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-small"
   # Google Analytics 4 Measurement ID (optional - leave empty to disable)
   GOOGLE_ANALYTICS_ID: "G-55L4MN6ZPC"
+  # Qdrant vector database configuration
+  QDRANT_URL: "ids-qdrant:6334"

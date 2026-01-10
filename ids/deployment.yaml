@@ -157,6 +157,8 @@ spec:
           value: "8080"
         - name: ENABLE_EMAIL_CONTEXT
           value: "true"  # Toggle email history in chat responses (true/false)
+        - name: QDRANT_ENABLED
+          value: "false"  # Toggle Qdrant search (true/false) - enable after verifying data exists
         - name: EMBEDDINGS_DATABASE_URL
           valueFrom:
             secretKeyRef:

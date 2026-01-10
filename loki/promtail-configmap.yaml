@@ -16,28 +16,28 @@ data:
       - url: http://loki.loki.svc.cluster.local:3100/loki/api/v1/push
     
     scrape_configs:
-      # Scrape all pod logs using kubernetes service discovery with proper path mapping
+      # Scrape all pod logs directly from /var/log/pods
+      # This bypasses kubernetes service discovery and reads files directly
       - job_name: kubernetes-pods
-        kubernetes_sd_configs:
-          - role: pod
-        
-        relabel_configs:
-          # Only scrape pods with the prometheus.io/scrape annotation
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-            action: keep
-            regex: true
-          # Drop system namespaces
-          - source_labels: [__meta_kubernetes_namespace]
-            action: drop
-            regex: (kube-system|kube-public|kube-node-lease)
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: kubernetes-pods
+              __path__: /var/log/pods/*/*/*.log
         
         pipeline_stages:
-          - docker: {}
+          # Extract metadata from file path: namespace_podname_uid/containername/restartcount.log
+          - regex:
+              expression: '^(?P<path>/var/log/pods/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<pod_uid>[^/]+)/(?P<container_name>[^/]+)/(?P<restart_count>\d+)\.log)$'
+              source: filename
+          # Add labels from extracted metadata
           - labels:
-              pod: __meta_kubernetes_pod_name
-              namespace: __meta_kubernetes_namespace
-              container: __meta_kubernetes_pod_container_name
-              node: __meta_kubernetes_pod_node_name
-              app: __meta_kubernetes_pod_label_app
+              namespace: namespace
+              pod: pod_name
+              container: container_name
+              node: __host__
+          # Parse Docker JSON logs
+          - docker: {}
           - output:
               source: message

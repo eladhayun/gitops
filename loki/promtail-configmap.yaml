@@ -16,24 +16,30 @@ data:
       - url: http://loki.loki.svc.cluster.local:3100/loki/api/v1/push
     
     scrape_configs:
-      # Scrape all pod logs from /var/log/pods
+      # Scrape all pod logs using kubernetes service discovery with proper path mapping
       - job_name: kubernetes-pods
-        static_configs:
-          - targets:
-              - localhost
-            labels:
-              job: kubernetes-pods
-              __path__: /var/log/pods/*/*/*.log
+        kubernetes_sd_configs:
+          - role: pod
+        
+        relabel_configs:
+          # Drop system namespaces
+          - source_labels: [__meta_kubernetes_namespace]
+            action: drop
+            regex: (kube-system|kube-public|kube-node-lease)
+          # Map to log file path (Kubernetes log structure)
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_name, __meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
+            action: replace
+            target_label: __path__
+            separator: /
+            replacement: /var/log/pods/${1}_${2}_${3}/${4}/*.log
         
         pipeline_stages:
-          - regex:
-              expression: '^(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<pod_uid>[^/]+)/(?P<container_name>[^/]+)/(?P<restart_count>\d+)\.log$'
-              source: filename
-          - labels:
-              namespace: namespace
-              pod: pod_name
-              container: container_name
-              node: __host__
           - docker: {}
+          - labels:
+              pod: __meta_kubernetes_pod_name
+              namespace: __meta_kubernetes_namespace
+              container: __meta_kubernetes_pod_container_name
+              node: __meta_kubernetes_pod_node_name
+              app: __meta_kubernetes_pod_label_app
           - output:
               source: message

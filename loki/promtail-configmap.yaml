@@ -22,35 +22,14 @@ data:
           - role: pod
         
         relabel_configs:
-          # Only scrape pods that have logs
-          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          # Drop pods in kube-system and other system namespaces if desired
+          - source_labels: [__meta_kubernetes_namespace]
+            action: drop
+            regex: (kube-system|kube-public|kube-node-lease)
+          # Keep all other pods
+          - source_labels: [__meta_kubernetes_pod_uid]
             action: keep
-            regex: true
-          # Or scrape all pods (remove the above if you want all pods)
-          - action: drop
-            regex: ''
-            source_labels:
-              - __meta_kubernetes_pod_annotation_prometheus_io_scrape
-        
-        # Alternative: Scrape all pods without annotation requirement
-        # Remove the relabel_configs above and use this instead:
-        # pipeline_stages:
-        #   - docker: {}
-        
-        pipeline_stages:
-          - docker: {}
-          - labels:
-              pod: __meta_kubernetes_pod_name
-              namespace: __meta_kubernetes_namespace
-              container: __meta_kubernetes_pod_container_name
-              node: __meta_kubernetes_pod_node_name
-          - output:
-              source: message
-
-      # Scrape all pods (simpler version - no annotation required)
-      - job_name: kubernetes-pods-all
-        kubernetes_sd_configs:
-          - role: pod
+            regex: .+
         
         pipeline_stages:
           - docker: {}

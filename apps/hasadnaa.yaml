@@ -13,7 +13,7 @@ spec:
     path: hasadnaa
   destination:
     server: https://kubernetes.default.svc
-    namespace: hasadnaa
+    namespace: dirtbike
   syncPolicy:
     automated:
       prune: true

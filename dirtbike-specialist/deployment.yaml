@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: dirtbike-specialist
-          image: prodacr1234.azurecr.io/dirtbike-specialist:main-019430d
+          image: prodacr1234.azurecr.io/dirtbike-specialist:main-8a1ca37
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -70,7 +70,7 @@ spec:
               cpu: 200m
               memory: 512Mi
         - name: pdf-extractor
-          image: prodacr1234.azurecr.io/pdf-extractor:main-019430d
+          image: prodacr1234.azurecr.io/pdf-extractor:main-8a1ca37
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

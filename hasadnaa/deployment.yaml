@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: hasadnaa
-          image: prodacr1234.azurecr.io/hasadnaa:main-40c5dfa
+          image: prodacr1234.azurecr.io/hasadnaa:main-7cb279d
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

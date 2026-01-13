@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hasadnaa
+  labels:
+    app: hasadnaa
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: hasadnaa
+  template:
+    metadata:
+      labels:
+        app: hasadnaa
+    spec:
+      containers:
+        - name: hasadnaa
+          image: prodacr1234.azurecr.io/hasadnaa:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: hasadnaa-secrets
+                  key: jwt-secret
+            - name: AZURE_STORAGE_ACCOUNT_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: hasadnaa-secrets
+                  key: azure-storage-account-name
+            - name: AZURE_STORAGE_ACCOUNT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hasadnaa-secrets
+                  key: azure-storage-account-key
+            - name: AZURE_STORAGE_CONTAINER_NAME
+              value: "hasadnaa-documents"
+            - name: POSTGRES_HOST
+              value: "dirtbike-postgres.dirtbike.svc.cluster.local"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "hasadnaa"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: hasadnaa-secrets
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hasadnaa-secrets
+                  key: postgres-password
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 2

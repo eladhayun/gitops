@@ -26,4 +26,5 @@ resources:
   - dirtbike-postgres.yaml
   - loki.yaml
   - grafana.yaml
+  - hasadnaa.yaml
   

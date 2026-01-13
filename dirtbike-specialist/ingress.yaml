@@ -11,24 +11,6 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
-    # Cache control for static assets
-    # Don't cache HTML files - they need to be fresh
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-        add_header Cache-Control "public, max-age=31536000, immutable";
-        add_header X-Content-Type-Options "nosniff";
-      }
-      location ~* ^/(index\.html|)$ {
-        add_header Cache-Control "no-cache, no-store, must-revalidate";
-        add_header Pragma "no-cache";
-        add_header Expires "0";
-      }
-    # Cloudflare cache control - bypass cache for HTML
-    nginx.ingress.kubernetes.io/server-snippet: |
-      # Tell Cloudflare not to cache HTML
-      if ($request_uri ~* ^/(index\.html|)$) {
-        add_header CF-Cache-Status "BYPASS" always;
-      }
 spec:
   ingressClassName: nginx
   tls:

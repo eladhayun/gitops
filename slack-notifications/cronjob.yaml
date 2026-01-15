@@ -5,8 +5,8 @@ metadata:
   labels:
     app: azure-billing-report
 spec:
-  # Run every day at 9:00 AM
-  schedule: "0 9 * * *"
+  # Run every Monday at 9:00 AM
+  schedule: "0 9 * * 1"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid

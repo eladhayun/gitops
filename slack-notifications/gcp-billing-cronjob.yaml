@@ -5,8 +5,8 @@ metadata:
   labels:
     app: gcp-billing-report
 spec:
-  # Run every day at 9:30 AM (30 mins after Azure report)
-  schedule: "30 9 * * *"
+  # Run every Monday at 9:30 AM (30 mins after Azure report)
+  schedule: "30 9 * * 1"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
@@ -38,7 +38,7 @@ spec:
             - name: GCP_BIGQUERY_DATASET
               value: "billing_export"
             - name: GCP_BIGQUERY_TABLE
-              value: "gcp_billing_export_v1"
+              value: "gcp_billing_export_v1_01330A_4094BC_DA344E"
             # Point to mounted service account key
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: "/var/secrets/google/service-account.json"

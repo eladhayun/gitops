@@ -304,6 +304,9 @@ Edit the schedule in `cronjob.yaml`:
 
 ```yaml
 spec:
+  # Weekly on Mondays at 9 AM (default)
+  schedule: "0 9 * * 1"
+  
   # Daily at 9 AM
   schedule: "0 9 * * *"
   

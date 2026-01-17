@@ -22,7 +22,7 @@ spec:
           serviceAccountName: gcp-billing-reporter
           containers:
           - name: billing-reporter
-            image: prodacr1234.azurecr.io/slack-notifications:main-a437f0d
+            image: prodacr1234.azurecr.io/slack-notifications:main-704fe4e
             imagePullPolicy: Always
             command: ["/root/slack-notifications"]
             args: ["gcp-billing-report"]

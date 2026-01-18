@@ -36,8 +36,6 @@ spec:
               value: "gpt-4o-mini"
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
               value: "text-embedding-3-small"
-            - name: PDF_EXTRACTOR_URL
-              value: "http://localhost:5000"
             - name: POSTGRES_HOST
               value: dirtbike-postgres
             - name: POSTGRES_DB
@@ -62,6 +60,28 @@ spec:
                 secretKeyRef:
                   name: azure-openai-secrets
                   key: BASIC_AUTH_PASSWORD
+            # GCP Document AI Configuration (OCR)
+            - name: GCP_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gcp-documentai-secret
+                  key: GCP_PROJECT_ID
+            - name: GCP_DOCUMENT_AI_LOCATION
+              valueFrom:
+                secretKeyRef:
+                  name: gcp-documentai-secret
+                  key: GCP_DOCUMENT_AI_LOCATION
+            - name: GCP_DOCUMENT_AI_PROCESSOR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gcp-documentai-secret
+                  key: GCP_DOCUMENT_AI_PROCESSOR_ID
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/gcp/credentials.json
+          volumeMounts:
+            - name: gcp-credentials
+              mountPath: /etc/gcp
+              readOnly: true
           resources:
             requests:
               cpu: 10m
@@ -69,15 +89,10 @@ spec:
             limits:
               cpu: 200m
               memory: 512Mi
-        - name: pdf-extractor
-          image: prodacr1234.azurecr.io/pdf-extractor:main-8a1ca37
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 5000
-          resources:
-            requests:
-              cpu: 10m
-              memory: 128Mi
-            limits:
-              cpu: 200m
-              memory: 512Mi
+      volumes:
+        - name: gcp-credentials
+          secret:
+            secretName: gcp-documentai-secret
+            items:
+              - key: credentials.json
+                path: credentials.json

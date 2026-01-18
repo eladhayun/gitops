@@ -84,11 +84,11 @@ spec:
               readOnly: true
           resources:
             requests:
-              cpu: 10m
-              memory: 128Mi
+              cpu: 50m
+              memory: 256Mi
             limits:
-              cpu: 200m
-              memory: 512Mi
+              cpu: 1000m
+              memory: 1Gi
       volumes:
         - name: gcp-credentials
           secret:

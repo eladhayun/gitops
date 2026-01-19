@@ -53,13 +53,12 @@ data:
           - source_labels: [__meta_kubernetes_pod_label_app]
             target_label: app
           
-          # Set the __path__ label to the pod log path
-          # Format: /var/log/pods/namespace_podname_uid/container/*.log
-          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_name, __meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
-            separator: ;
-            regex: (.*);(.*);(.*);(.*)
+          # Set the __path__ to the pod log path using wildcard to match the full directory name
+          # Directory format: /var/log/pods/namespace_podname_uid/container/*.log
+          - source_labels: [__meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
             target_label: __path__
-            replacement: /var/log/pods/$1_$2_$3/$4/*.log
+            separator: /
+            replacement: /var/log/pods/*$1/$2/*.log
         
         pipeline_stages:
           # Parse Docker/containerd JSON logs

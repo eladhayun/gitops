@@ -10,6 +10,6 @@ data:
   GCP_DOCUMENT_AI_PROCESSOR_ID: "89128960a7bd9600"
   QDRANT_URL: "gen-rag-qdrant:6334"
   QDRANT_COLLECTION: "gen_rag_embeddings"
-  DATABASE_URL: "host=gen-rag-postgres user=gen-rag password=gen-rag dbname=genrag port=5432 sslmode=disable"
+  DATABASE_URL: "host=gen-rag-postgres user=gen-rag password=gen-rag dbname=gen-rag port=5432 sslmode=disable"
   AZURE_OPENAI_GPT_DEPLOYMENT: "gpt-4o"
   AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-large"

@@ -27,4 +27,7 @@ resources:
   - loki.yaml
   - grafana.yaml
   - hasadnaa.yaml
+  - gen-rag.yaml
+  - gen-rag-postgres.yaml
+  - gen-rag-qdrant.yaml
   

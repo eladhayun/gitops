@@ -85,6 +85,8 @@ spec:
             secretKeyRef:
               name: blutag-jwt-secret
               key: JWT_SECRET
+        - name: JWT_REFRESH_EXPIRY
+          value: "30"
         - name: SYSTEM_ADMIN_EMAIL
           valueFrom:
             secretKeyRef:

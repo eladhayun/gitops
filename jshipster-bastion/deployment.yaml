@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: debug-server
+  name: jshipster-bastion
   labels:
-    app: debug-server
+    app: jshipster-bastion
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: debug-server
+      app: jshipster-bastion
   template:
     metadata:
       labels:
-        app: debug-server
+        app: jshipster-bastion
     spec:
       containers:
-      - name: debug-server
-        image: prodacr1234.azurecr.io/debug-server:latest
+      - name: jshipster-bastion
+        image: prodacr1234.azurecr.io/jshipster-bastion:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 22
@@ -58,6 +58,5 @@ spec:
       volumes:
       - name: ssh-keys
         secret:
-          secretName: debug-server-ssh-keys
+          secretName: jshipster-bastion-ssh-keys
           optional: true
-

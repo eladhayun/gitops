@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: debug-server
+  name: jshipster-bastion
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
-    path: debug-server
+    path: jshipster-bastion
 
   destination:
     server: https://kubernetes.default.svc
@@ -24,4 +24,3 @@ spec:
     automated:
       selfHeal: true
       prune: true
-

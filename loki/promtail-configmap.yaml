@@ -33,11 +33,6 @@ data:
             action: drop
             regex: (kube-system|kube-public|kube-node-lease)
           
-          # Set the __path__ label to the pod log path
-          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_name, __meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
-            target_label: __path__
-            replacement: /var/log/pods/${1}_${2}_${3}/${4}/*.log
-          
           # Set namespace label
           - source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
@@ -57,6 +52,14 @@ data:
           # Set app label from pod labels
           - source_labels: [__meta_kubernetes_pod_label_app]
             target_label: app
+          
+          # Set the __path__ label to the pod log path
+          # Format: /var/log/pods/namespace_podname_uid/container/*.log
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_name, __meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
+            separator: ;
+            regex: (.*);(.*);(.*);(.*)
+            target_label: __path__
+            replacement: /var/log/pods/$1_$2_$3/$4/*.log
         
         pipeline_stages:
           # Parse Docker/containerd JSON logs

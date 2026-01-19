@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gen-rag-postgres
+  labels:
+    app: gen-rag-postgres
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: gen-rag-postgres
+  clusterIP: None

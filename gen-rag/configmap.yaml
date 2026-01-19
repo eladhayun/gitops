@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gen-rag-config
+data:
+  PORT: "8080"
+  LOG_LEVEL: "info"
+  GCP_PROJECT_ID: "jshipster"
+  GCP_LOCATION: "us"
+  GCP_DOCUMENT_AI_PROCESSOR_ID: "89128960a7bd9600"
+  QDRANT_URL: "gen-rag-qdrant:6334"
+  QDRANT_COLLECTION: "gen_rag_embeddings"
+  DATABASE_URL: "host=gen-rag-postgres user=postgres password=postgres dbname=genrag port=5432 sslmode=disable"
+  AZURE_OPENAI_GPT_DEPLOYMENT: "gpt-4o"
+  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-large"

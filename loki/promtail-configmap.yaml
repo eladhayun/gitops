@@ -16,26 +16,50 @@ data:
       - url: http://loki.loki.svc.cluster.local:3100/loki/api/v1/push
     
     scrape_configs:
-      # Scrape all pod logs using file-based service discovery
-      # This reads log files directly from /var/log/pods
+      # Scrape all pod logs using Kubernetes service discovery
+      # This dynamically discovers all pods and their log files
       - job_name: kubernetes-pods
-        file_sd_configs:
-          - files:
-              - /etc/promtail/file-sd/pod-logs.json
-            refresh_interval: 10s
+        kubernetes_sd_configs:
+          - role: pod
+        
+        relabel_configs:
+          # Only scrape pods on the same node as this Promtail instance
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            action: keep
+            regex: ${HOSTNAME}
+          
+          # Skip system namespaces
+          - source_labels: [__meta_kubernetes_namespace]
+            action: drop
+            regex: (kube-system|kube-public|kube-node-lease)
+          
+          # Set the __path__ label to the pod log path
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_name, __meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
+            target_label: __path__
+            replacement: /var/log/pods/${1}_${2}_${3}/${4}/*.log
+          
+          # Set namespace label
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          
+          # Set pod label
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          
+          # Set container label
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            target_label: container
+          
+          # Set node label
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            target_label: node
+          
+          # Set app label from pod labels
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            target_label: app
         
         pipeline_stages:
-          # Extract metadata from file path: namespace_podname_uid/containername/restartcount.log
-          - regex:
-              expression: '^(?P<path>/var/log/pods/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<pod_uid>[^/]+)/(?P<container_name>[^/]+)/(?P<restart_count>\d+)\.log)$'
-              source: filename
-          # Add labels from extracted metadata
-          - labels:
-              namespace: namespace
-              pod: pod_name
-              container: container_name
-              node: __host__
-          # Parse Docker JSON logs
-          - docker: {}
+          # Parse Docker/containerd JSON logs
+          - cri: {}
           - output:
               source: message

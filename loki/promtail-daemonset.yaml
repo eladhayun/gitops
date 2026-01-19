@@ -15,41 +15,18 @@ spec:
         app: promtail
     spec:
       serviceAccountName: promtail
-      initContainers:
-      - name: generate-file-sd
-        image: busybox:1.36
-        command:
-        - sh
-        - -c
-        - |
-          echo "Generating file service discovery targets..."
-          echo "[" > /tmp/pod-logs.json
-          count=0
-          for logfile in $(find /var/log/pods -name "*.log" -type f); do
-            if echo "$logfile" | grep -qE "(kube-system|kube-public|kube-node-lease)"; then
-              continue
-            fi
-            if [ $count -gt 0 ]; then
-              echo "," >> /tmp/pod-logs.json
-            fi
-            echo "{\"targets\":[\"localhost\"],\"labels\":{\"__path__\":\"$logfile\"}}" >> /tmp/pod-logs.json
-            count=$((count + 1))
-          done
-          echo "]" >> /tmp/pod-logs.json
-          mv /tmp/pod-logs.json /etc/promtail/file-sd/pod-logs.json
-          echo "Generated $count targets"
-        volumeMounts:
-        - name: pods
-          mountPath: /var/log/pods
-          readOnly: true
-        - name: file-sd
-          mountPath: /etc/promtail/file-sd
       containers:
       - name: promtail
         image: grafana/promtail:2.9.2
         imagePullPolicy: IfNotPresent
         args:
           - -config.file=/etc/promtail/promtail.yaml
+          - -config.expand-env=true
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         ports:
         - containerPort: 3101
           name: http
@@ -64,8 +41,6 @@ spec:
         - name: pods
           mountPath: /var/log/pods
           readOnly: true
-        - name: file-sd
-          mountPath: /etc/promtail/file-sd
         resources:
           requests:
             cpu: 50m
@@ -104,8 +79,6 @@ spec:
       - name: pods
         hostPath:
           path: /var/log/pods
-      - name: file-sd
-        emptyDir: {}
       tolerations:
       - effect: NoSchedule
         operator: Exists

@@ -12,4 +12,4 @@ data:
   QDRANT_COLLECTION: "gen_rag_embeddings"
   DATABASE_URL: "host=gen-rag-postgres user=gen-rag password=gen-rag dbname=gen-rag port=5432 sslmode=disable"
   AZURE_OPENAI_GPT_DEPLOYMENT: "gpt-4o"
-  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-large"
+  AZURE_OPENAI_EMBEDDING_DEPLOYMENT: "text-embedding-3-small"

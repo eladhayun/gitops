@@ -25,6 +25,13 @@ spec:
             name: gen-rag-config
         - secretRef:
             name: gen-rag-secrets
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/gcp/credentials.json
+        volumeMounts:
+        - name: gcp-credentials
+          mountPath: /etc/gcp
+          readOnly: true
         resources:
           requests:
             memory: "256Mi"
@@ -44,3 +51,10 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 15
+      volumes:
+      - name: gcp-credentials
+        secret:
+          secretName: gen-rag-secrets
+          items:
+          - key: GOOGLE_APPLICATION_CREDENTIALS
+            path: credentials.json

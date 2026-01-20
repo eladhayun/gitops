@@ -7,7 +7,7 @@ data:
   LOG_LEVEL: "info"
   GCP_PROJECT_ID: "jshipster"
   GCP_LOCATION: "us"
-  GCP_DOCUMENT_AI_PROCESSOR_ID: "89128960a7bd9600"
+  GCP_DOCUMENT_AI_PROCESSOR_ID: "8c9b3cf642e6fe69"
   QDRANT_URL: "gen-rag-qdrant:6334"
   QDRANT_COLLECTION: "gen_rag_embeddings"
   DATABASE_URL: "host=gen-rag-postgres user=gen-rag password=gen-rag dbname=gen-rag port=5432 sslmode=disable"

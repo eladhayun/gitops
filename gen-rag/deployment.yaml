@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: gen-rag
-        image: prodacr1234.azurecr.io/gen-rag:main-fb192fa
+        image: prodacr1234.azurecr.io/gen-rag:main-cd43f00
         ports:
         - containerPort: 8080
         envFrom:

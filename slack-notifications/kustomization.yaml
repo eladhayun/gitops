@@ -7,6 +7,7 @@ resources:
   - ingress.yaml
   - cronjob.yaml
   - ids-analytics-cronjob.yaml
+  - blutag-findmy-status-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

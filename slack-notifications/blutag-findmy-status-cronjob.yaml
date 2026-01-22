@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: blutag-findmy-status-check
+  labels:
+    app: blutag-findmy-status-check
+spec:
+  # Run every 10 minutes
+  schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: blutag-findmy-status-check
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: blutag-findmy-status-checker
+            image: prodacr1234.azurecr.io/slack-notifications:main-db9f5d1
+            command: ["/root/slack-notifications"]
+            args: ["blutag-findmy-status-check"]
+            env:
+            - name: BLUTAG_FINDMY_URL
+              value: "http://blutag-findmy.jshipster.svc.cluster.local:8000"
+            - name: BLUTAG_FINDMY_REPORT_CHANNEL
+              value: "#notifications"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

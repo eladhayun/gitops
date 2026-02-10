@@ -39,6 +39,8 @@ spec:
               value: "billing_export"
             - name: GCP_BIGQUERY_TABLE
               value: "gcp_billing_export_v1_01330A_4094BC_DA344E"
+            - name: GCP_BILLING_SCOPE
+              value: "account"
             # Point to mounted service account key
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: "/var/secrets/google/service-account.json"

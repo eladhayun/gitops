@@ -5,8 +5,8 @@ metadata:
   labels:
     app: ids-analytics-report
 spec:
-  # Run every day at 8:00 AM UTC
-  schedule: "0 8 * * *"
+  # Run every Monday at 8:00 AM UTC
+  schedule: "0 8 * * 1"
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
@@ -26,7 +26,7 @@ spec:
             args: ["ids-analytics-report"]
             env:
             - name: IDS_ANALYTICS_URL
-              value: "https://ids.jshipster.io/api/analytics/daily-report"
+              value: "https://ids.jshipster.io/api/analytics/weekly-report"
             - name: IDS_REPORT_CHANNEL
               value: "C09P9CPGAN9"
             - name: SLACK_TOKEN

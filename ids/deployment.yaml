@@ -166,13 +166,13 @@ spec:
             secretKeyRef:
               name: ids-postgres-secret
               key: DATABASE_URL
-        - name: SENDGRID_API_KEY
+        - name: ACS_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
               name: ids-secrets
-              key: SENDGRID_API_KEY
+              key: ACS_CONNECTION_STRING
         - name: SUPPORT_EMAIL
-          value: "support@israeldefensestore.com"  # Support email address (can be overridden via secret)
+          value: "DoNotReply@c85c2291-3992-4d7c-8647-f4f9091a331d.azurecomm.net"  # ACS Azure-managed sender domain
         - name: ADMIN_USERNAME
           valueFrom:
             secretKeyRef:

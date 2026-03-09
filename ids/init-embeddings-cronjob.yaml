@@ -16,7 +16,8 @@ spec:
     spec:
       completions: 1
       parallelism: 1
-      ttlSecondsAfterFinished: 86400  # Keep for 24 hours
+      activeDeadlineSeconds: 3600  # Kill job if stuck for more than 1 hour
+      ttlSecondsAfterFinished: 86400  # Clean up finished jobs after 24 hours
       backoffLimit: 2  # Retry up to 2 times on failure
       template:
         metadata:

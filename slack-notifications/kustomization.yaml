@@ -8,6 +8,7 @@ resources:
   - cronjob.yaml
   - ids-analytics-cronjob.yaml
   - blutag-findmy-status-cronjob.yaml
+  - hasadnaa-weekly-summary-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

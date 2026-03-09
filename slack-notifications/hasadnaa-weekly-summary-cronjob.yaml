@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hasadnaa-weekly-summary
+  labels:
+    app: hasadnaa-weekly-summary
+spec:
+  # Run every Monday at 7:30 AM UTC (10:30 AM Israel)
+  schedule: "30 7 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: hasadnaa-weekly-summary
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: hasadnaa-weekly-summary
+            image: prodacr1234.azurecr.io/slack-notifications:main-1a241a8
+            command: ["/root/slack-notifications"]
+            args: ["hasadnaa-weekly-summary"]
+            env:
+            - name: HASADNAA_DB_HOST
+              value: "dirtbike-postgres.dirtbike.svc.cluster.local"
+            - name: HASADNAA_DB_PORT
+              value: "5432"
+            - name: HASADNAA_DB_NAME
+              value: "hasadnaa"
+            - name: HASADNAA_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: HASADNAA_DB_USER
+            - name: HASADNAA_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: HASADNAA_DB_PASSWORD
+            - name: HASADNAA_REPORT_CHANNEL
+              value: "#notifications"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

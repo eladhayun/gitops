@@ -1,0 +1,98 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-backup-ids
+  labels:
+    app: pg-backup
+    database: ids
+spec:
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: pg-backup
+            database: ids
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+          - name: pg-dump
+            image: postgres:16-alpine
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              set -e
+              TIMESTAMP=$(date +%Y-%m-%d)
+              FILENAME="ids_embeddings-${TIMESTAMP}.sql.gz"
+              echo "Backing up ids_embeddings..."
+              pg_dump -h ids-postgres.ids.svc.cluster.local -p 5432 -U "${PGUSER}" -d ids_embeddings --no-password | gzip > "/backups/${FILENAME}"
+              echo "Done: $(du -h /backups/${FILENAME} | cut -f1)"
+            env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: IDS_PGUSER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: IDS_PGPASSWORD
+            volumeMounts:
+            - name: backup-data
+              mountPath: /backups
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "10m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+          containers:
+          - name: upload
+            image: mcr.microsoft.com/azure-cli:latest
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              set -e
+              TIMESTAMP=$(date +%Y-%m-%d)
+              FILENAME="ids_embeddings-${TIMESTAMP}.sql.gz"
+              echo "Uploading to pg-backups/ids_embeddings/${TIMESTAMP}.sql.gz..."
+              az storage blob upload \
+                --account-name "${AZURE_STORAGE_ACCOUNT}" \
+                --account-key "${AZURE_STORAGE_KEY}" \
+                --container-name pg-backups \
+                --name "ids_embeddings/${TIMESTAMP}.sql.gz" \
+                --file "/backups/${FILENAME}" \
+                --overwrite true
+              echo "Upload complete."
+            env:
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: AZURE_STORAGE_ACCOUNT
+            - name: AZURE_STORAGE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: AZURE_STORAGE_KEY
+            volumeMounts:
+            - name: backup-data
+              mountPath: /backups
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+          volumes:
+          - name: backup-data
+            emptyDir:
+              sizeLimit: 1Gi

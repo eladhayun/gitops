@@ -1,0 +1,98 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-backup-genrag
+  labels:
+    app: pg-backup
+    database: genrag
+spec:
+  schedule: "45 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: pg-backup
+            database: genrag
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+          - name: pg-dump
+            image: postgres:16-alpine
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              set -e
+              TIMESTAMP=$(date +%Y-%m-%d)
+              FILENAME="genrag-${TIMESTAMP}.sql.gz"
+              echo "Backing up genrag..."
+              pg_dump -h gen-rag-postgres.gen-rag.svc.cluster.local -p 5432 -U "${PGUSER}" -d genrag --no-password | gzip > "/backups/${FILENAME}"
+              echo "Done: $(du -h /backups/${FILENAME} | cut -f1)"
+            env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: GENRAG_PGUSER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: GENRAG_PGPASSWORD
+            volumeMounts:
+            - name: backup-data
+              mountPath: /backups
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "10m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+          containers:
+          - name: upload
+            image: mcr.microsoft.com/azure-cli:latest
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              set -e
+              TIMESTAMP=$(date +%Y-%m-%d)
+              FILENAME="genrag-${TIMESTAMP}.sql.gz"
+              echo "Uploading to pg-backups/genrag/${TIMESTAMP}.sql.gz..."
+              az storage blob upload \
+                --account-name "${AZURE_STORAGE_ACCOUNT}" \
+                --account-key "${AZURE_STORAGE_KEY}" \
+                --container-name pg-backups \
+                --name "genrag/${TIMESTAMP}.sql.gz" \
+                --file "/backups/${FILENAME}" \
+                --overwrite true
+              echo "Upload complete."
+            env:
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: AZURE_STORAGE_ACCOUNT
+            - name: AZURE_STORAGE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pg-backup-secrets
+                  key: AZURE_STORAGE_KEY
+            volumeMounts:
+            - name: backup-data
+              mountPath: /backups
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+          volumes:
+          - name: backup-data
+            emptyDir:
+              sizeLimit: 1Gi

@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-backup-report
+  labels:
+    app: pg-backup-report
+spec:
+  # Run every Monday at 8:30 AM UTC (11:30 AM Israel)
+  schedule: "30 8 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: pg-backup-report
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: pg-backup-report
+            image: prodacr1234.azurecr.io/slack-notifications:main-4d9c518
+            command: ["/root/slack-notifications"]
+            args: ["pg-backup-report"]
+            env:
+            - name: PG_BACKUP_STORAGE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: PG_BACKUP_STORAGE_ACCOUNT
+            - name: PG_BACKUP_STORAGE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: PG_BACKUP_STORAGE_KEY
+            - name: PG_BACKUP_REPORT_CHANNEL
+              value: "#notifications"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

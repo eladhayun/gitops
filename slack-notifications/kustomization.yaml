@@ -10,6 +10,7 @@ resources:
   - blutag-findmy-status-cronjob.yaml
   - hasadnaa-weekly-summary-cronjob.yaml
   - blutag-weekly-summary-cronjob.yaml
+  - pg-backup-report-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

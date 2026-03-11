@@ -22,7 +22,7 @@ spec:
           serviceAccountName: azure-billing-reporter
           containers:
           - name: billing-reporter
-            image: prodacr1234.azurecr.io/slack-notifications:main-4f277da
+            image: prodacr1234.azurecr.io/slack-notifications:main-1baae94
             command: ["/root/slack-notifications"]
             args: ["billing-report"]
             env:

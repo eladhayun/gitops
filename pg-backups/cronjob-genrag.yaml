@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: pg-backup-genrag
+  name: pg-backup-gen-rag
   labels:
     app: pg-backup
-    database: genrag
+    database: gen-rag
 spec:
   schedule: "45 2 * * *"
   successfulJobsHistoryLimit: 1
@@ -17,7 +17,7 @@ spec:
         metadata:
           labels:
             app: pg-backup
-            database: genrag
+            database: gen-rag
         spec:
           restartPolicy: OnFailure
           initContainers:
@@ -28,9 +28,9 @@ spec:
             - |
               set -e
               TIMESTAMP=$(date +%Y-%m-%d)
-              FILENAME="genrag-${TIMESTAMP}.sql.gz"
-              echo "Backing up genrag..."
-              pg_dump -h gen-rag-postgres.gen-rag.svc.cluster.local -p 5432 -U "${PGUSER}" -d genrag --no-password | gzip > "/backups/${FILENAME}"
+              FILENAME="gen-rag-${TIMESTAMP}.sql.gz"
+              echo "Backing up gen-rag..."
+              pg_dump -h gen-rag-postgres.gen-rag.svc.cluster.local -p 5432 -U "${PGUSER}" -d gen-rag --no-password | gzip > "/backups/${FILENAME}"
               echo "Done: $(du -h /backups/${FILENAME} | cut -f1)"
             env:
             - name: PGUSER
@@ -61,13 +61,13 @@ spec:
             - |
               set -e
               TIMESTAMP=$(date +%Y-%m-%d)
-              FILENAME="genrag-${TIMESTAMP}.sql.gz"
-              echo "Uploading to pg-backups/genrag/${TIMESTAMP}.sql.gz..."
+              FILENAME="gen-rag-${TIMESTAMP}.sql.gz"
+              echo "Uploading to pg-backups/gen-rag/${TIMESTAMP}.sql.gz..."
               az storage blob upload \
                 --account-name "${AZURE_STORAGE_ACCOUNT}" \
                 --account-key "${AZURE_STORAGE_KEY}" \
                 --container-name pg-backups \
-                --name "genrag/${TIMESTAMP}.sql.gz" \
+                --name "gen-rag/${TIMESTAMP}.sql.gz" \
                 --file "/backups/${FILENAME}" \
                 --overwrite true
               echo "Upload complete."

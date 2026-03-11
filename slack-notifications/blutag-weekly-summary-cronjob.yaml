@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: blutag-weekly-summary
+  labels:
+    app: blutag-weekly-summary
+spec:
+  # Run every Monday at 8:00 AM UTC (11:00 AM Israel)
+  schedule: "0 8 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: blutag-weekly-summary
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: blutag-weekly-summary
+            image: prodacr1234.azurecr.io/slack-notifications:main-4d9c518
+            command: ["/root/slack-notifications"]
+            args: ["blutag-weekly-summary"]
+            env:
+            - name: BLUTAG_APP_URL
+              value: "http://blutag-app.blutag.svc.cluster.local:80"
+            - name: BLUTAG_APP_REPORT_CHANNEL
+              value: "#notifications"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_WEBHOOK_URL
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

@@ -6,3 +6,4 @@ metadata:
     app: blutag-app
 data:
   FINDMY_SERVICE_URL: "http://blutag-findmy:8000"
+  SYSTEM_ADMIN_ORG_SLUG: "blutag"

@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: argo-rollouts-demo-fe
-          image: prodacr1234.azurecr.io/argo-rollouts-demo-fe:main-261c9a5
+          image: prodacr1234.azurecr.io/argo-rollouts-demo-fe:main-540ea23
           ports:
             - containerPort: 80
           env:

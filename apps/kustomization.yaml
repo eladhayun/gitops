@@ -21,7 +21,7 @@ resources:
   - blutag-postgres.yaml
   - blutag-findmy.yaml
   - blutag-omnisette.yaml
-  # - trips.yaml
+  - trips.yaml
   - dirtbike-specialist.yaml
   - dirtbike-postgres.yaml
   - loki.yaml

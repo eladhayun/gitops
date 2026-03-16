@@ -21,7 +21,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: blutag-findmy-status-checker
-            image: prodacr1234.azurecr.io/slack-notifications:main-9e8115d
+            image: prodacr1234.azurecr.io/slack-notifications:main-6e4cd7c
             command: ["/root/slack-notifications"]
             args: ["blutag-findmy-status-check"]
             env:

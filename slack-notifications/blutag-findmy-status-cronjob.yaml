@@ -26,7 +26,7 @@ spec:
             args: ["blutag-findmy-status-check"]
             env:
             - name: BLUTAG_FINDMY_URL
-              value: "http://blutag-findmy.jshipster.svc.cluster.local:8000"
+              value: "http://blutag-findmy.blutag.svc.cluster.local:8000"
             - name: BLUTAG_FINDMY_REPORT_CHANNEL
               value: "C0A3HT1JXFV"
             - name: SLACK_TOKEN

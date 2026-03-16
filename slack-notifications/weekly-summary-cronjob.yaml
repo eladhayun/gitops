@@ -90,7 +90,7 @@ spec:
                   key: HASADNAA_DB_PASSWORD
             # Blutag FindMy
             - name: BLUTAG_FINDMY_URL
-              value: "http://blutag-findmy.jshipster.svc.cluster.local:8000"
+              value: "http://blutag-findmy.blutag.svc.cluster.local:8000"
             # Blutag App
             - name: BLUTAG_APP_URL
               value: "http://blutag-app.blutag.svc.cluster.local:80"

@@ -15,7 +15,7 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: jshipster
+    namespace: trips
 
   syncPolicy:
     syncOptions:

@@ -28,17 +28,12 @@ spec:
             - name: BLUTAG_FINDMY_URL
               value: "http://blutag-findmy.jshipster.svc.cluster.local:8000"
             - name: BLUTAG_FINDMY_REPORT_CHANNEL
-              value: "#notifications"
+              value: "C0A3HT1JXFV"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: slack-notifications-secrets
                   key: SLACK_TOKEN
-            - name: SLACK_WEBHOOK_URL
-              valueFrom:
-                secretKeyRef:
-                  name: slack-notifications-secrets
-                  key: SLACK_WEBHOOK_URL
             resources:
               requests:
                 memory: "16Mi"

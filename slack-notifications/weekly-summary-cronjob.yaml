@@ -1,0 +1,102 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: weekly-summary
+  labels:
+    app: weekly-summary
+spec:
+  # Run every Monday at 10:00 AM UTC (after all individual reports)
+  schedule: "0 10 * * 1"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: weekly-summary
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: azure-billing-reporter
+          containers:
+          - name: weekly-summary
+            image: prodacr1234.azurecr.io/slack-notifications:main-1baae94
+            command: ["/root/slack-notifications"]
+            args: ["weekly-summary"]
+            env:
+            # Slack Configuration
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: WEEKLY_SUMMARY_CHANNEL
+              value: "C09QJ6769QR"
+            # Azure Billing
+            - name: AZURE_SUBSCRIPTION_ID
+              value: "b76ecd16-669b-4ca9-b797-b7786eb1b334"
+            - name: AZURE_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: AZURE_TENANT_ID
+            - name: AZURE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: AZURE_CLIENT_ID
+            - name: AZURE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: AZURE_CLIENT_SECRET
+            # GCP Billing
+            - name: GCP_PROJECT_ID
+              value: "jshipster"
+            - name: GCP_BILLING_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gcp-credentials-secret
+                  key: GCP_BILLING_ACCOUNT_ID
+            - name: GCP_BIGQUERY_DATASET
+              value: "billing_export"
+            - name: GCP_BIGQUERY_TABLE
+              value: "gcp_billing_export_v1_01330A_4094BC_DA344E"
+            - name: GCP_BILLING_SCOPE
+              value: "account"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/var/secrets/google/service-account.json"
+            # IDS Analytics (uses default URL)
+            - name: IDS_ANALYTICS_URL
+              value: "https://ids.jshipster.io/api/analytics/weekly-report"
+            # Hasadnaa
+            - name: HASADNAA_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: HASADNAA_DB_USER
+            - name: HASADNAA_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: HASADNAA_DB_PASSWORD
+            volumeMounts:
+            - name: gcp-sa-key
+              mountPath: /var/secrets/google
+              readOnly: true
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+          volumes:
+          - name: gcp-sa-key
+            secret:
+              secretName: gcp-credentials-secret
+              items:
+              - key: GCP_SERVICE_ACCOUNT_KEY
+                path: service-account.json

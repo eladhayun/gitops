@@ -43,13 +43,13 @@ spec:
                 secretKeyRef:
                   name: slack-notifications-secrets
                   key: AZURE_CLIENT_SECRET
-            - name: SLACK_WEBHOOK_URL
+            - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: slack-notifications-secrets
-                  key: SLACK_WEBHOOK_URL
+                  key: SLACK_TOKEN
             - name: SLACK_REPORT_CHANNEL
-              value: "#billing"
+              value: "C09QJ6769QR"
             resources:
               requests:
                 memory: "16Mi"

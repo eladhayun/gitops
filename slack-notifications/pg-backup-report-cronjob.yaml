@@ -36,7 +36,7 @@ spec:
                   name: slack-notifications-secrets
                   key: PG_BACKUP_STORAGE_KEY
             - name: PG_BACKUP_REPORT_CHANNEL
-              value: "#notifications"
+              value: "C09QJ6769QR"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:

@@ -45,13 +45,13 @@ spec:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: "/var/secrets/google/service-account.json"
             # Slack Configuration
-            - name: SLACK_WEBHOOK_URL
+            - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: slack-notifications-secrets
-                  key: SLACK_WEBHOOK_URL
+                  key: SLACK_TOKEN
             - name: SLACK_REPORT_CHANNEL
-              value: "#billing"
+              value: "C09QJ6769QR"
             volumeMounts:
             - name: gcp-sa-key
               mountPath: /var/secrets/google

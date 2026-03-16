@@ -72,6 +72,12 @@ spec:
             - name: IDS_ANALYTICS_URL
               value: "https://ids.jshipster.io/api/analytics/weekly-report"
             # Hasadnaa
+            - name: HASADNAA_DB_HOST
+              value: "dirtbike-postgres.dirtbike.svc.cluster.local"
+            - name: HASADNAA_DB_PORT
+              value: "5432"
+            - name: HASADNAA_DB_NAME
+              value: "hasadnaa"
             - name: HASADNAA_DB_USER
               valueFrom:
                 secretKeyRef:
@@ -82,6 +88,12 @@ spec:
                 secretKeyRef:
                   name: slack-notifications-secrets
                   key: HASADNAA_DB_PASSWORD
+            # Blutag FindMy
+            - name: BLUTAG_FINDMY_URL
+              value: "http://blutag-findmy.jshipster.svc.cluster.local:8000"
+            # Blutag App
+            - name: BLUTAG_APP_URL
+              value: "http://blutag-app.blutag.svc.cluster.local:80"
             volumeMounts:
             - name: gcp-sa-key
               mountPath: /var/secrets/google

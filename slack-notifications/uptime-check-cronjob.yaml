@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: uptime-check
+  labels:
+    app: uptime-check
+spec:
+  # Run every 5 minutes
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app: uptime-check
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: uptime-check
+            image: prodacr1234.azurecr.io/slack-notifications:main-1baae94
+            command: ["/root/slack-notifications"]
+            args: ["uptime-check"]
+            env:
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: UPTIME_CHECK_CHANNEL
+              value: "C09QJ6769QR"
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

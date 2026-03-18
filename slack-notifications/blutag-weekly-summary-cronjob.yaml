@@ -21,7 +21,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: blutag-weekly-summary
-            image: prodacr1234.azurecr.io/slack-notifications:main-97b8e53
+            image: prodacr1234.azurecr.io/slack-notifications:main-df67020
             command: ["/root/slack-notifications"]
             args: ["blutag-weekly-summary"]
             env:

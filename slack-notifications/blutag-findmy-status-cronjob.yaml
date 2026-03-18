@@ -29,6 +29,8 @@ spec:
               value: "http://blutag-findmy.blutag.svc.cluster.local:8000"
             - name: BLUTAG_FINDMY_REPORT_CHANNEL
               value: "C0A3HT1JXFV"
+            - name: BLUTAG_APP_URL
+              value: "http://blutag-app.blutag.svc.cluster.local:80"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:

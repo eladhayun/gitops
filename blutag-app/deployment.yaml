@@ -73,6 +73,19 @@ spec:
               name: blutag-twilio-secret
               key: TWILIO_TO_NUMBERS
               optional: true
+        # Azure Communication Services (email notifications)
+        - name: ACS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: blutag-acs-secret
+              key: ACS_CONNECTION_STRING
+              optional: true
+        - name: ACS_SENDER_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: blutag-acs-secret
+              key: ACS_SENDER_ADDRESS
+              optional: true
         # FindMy service configuration
         - name: FINDMY_SERVICE_URL
           valueFrom:

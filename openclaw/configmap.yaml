@@ -9,13 +9,14 @@ data:
     {
       "gateway": {
         "mode": "local",
-        "bind": "0.0.0.0",
+        "bind": "lan",
         "port": 18789,
         "auth": {
           "mode": "token"
         },
         "controlUi": {
-          "enabled": true
+          "enabled": true,
+          "allowedOrigins": ["http://localhost:18789", "http://127.0.0.1:18789"]
         }
       },
       "agents": {

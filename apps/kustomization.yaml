@@ -31,4 +31,5 @@ resources:
   - gen-rag-postgres.yaml
   - gen-rag-qdrant.yaml
   - pg-backups.yaml
+  - openclaw.yaml
   

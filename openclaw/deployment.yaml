@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openclaw
+  labels:
+    app: openclaw
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: openclaw
+  template:
+    metadata:
+      labels:
+        app: openclaw
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: init-config
+          image: busybox:1.37
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp /config-source/openclaw.json /home/openclaw/.openclaw/openclaw.json
+              cp /config-source/AGENTS.md /home/openclaw/.openclaw/AGENTS.md
+              mkdir -p /home/openclaw/.openclaw/workspace
+              chown -R 1000:1000 /home/openclaw
+          volumeMounts:
+            - name: home
+              mountPath: /home/openclaw
+            - name: config
+              mountPath: /config-source
+              readOnly: true
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+      containers:
+        - name: openclaw
+          image: ghcr.io/openclaw/openclaw:latest
+          ports:
+            - name: gateway
+              containerPort: 18789
+              protocol: TCP
+          env:
+            - name: HOME
+              value: /home/openclaw
+            - name: OPENCLAW_CONFIG_DIR
+              value: /home/openclaw/.openclaw
+            - name: NODE_ENV
+              value: production
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openclaw-secrets
+                  key: OPENAI_API_KEY
+            - name: OPENCLAW_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: openclaw-secrets
+                  key: OPENCLAW_GATEWAY_TOKEN
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 18789
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 18789
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          volumeMounts:
+            - name: home
+              mountPath: /home/openclaw
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: openclaw-home-pvc
+        - name: config
+          configMap:
+            name: openclaw-config
+        - name: tmp
+          emptyDir: {}

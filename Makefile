@@ -1,4 +1,4 @@
-.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password sops-encrypt sops-decrypt sops-encrypt-all sops-decrypt-all sops-edit sops-setup-argocd
+.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password sops-encrypt sops-decrypt sops-encrypt-all sops-decrypt-all sops-edit sops-setup-argocd openclaw-access
 
 CONTEXT := jshipster
 NAMESPACE := argocd
@@ -352,3 +352,26 @@ sops-setup-argocd:
 	@echo ""
 	@echo "ArgoCD will now automatically decrypt secrets during deployment"
 	@echo ""
+
+# ==========================================
+# OpenClaw
+# ==========================================
+
+# Port forward to OpenClaw gateway
+openclaw-access:
+	@echo "=========================================="
+	@echo "OpenClaw Access"
+	@echo "=========================================="
+	@echo ""
+	@echo "Starting port forward to OpenClaw gateway..."
+	@echo "Access OpenClaw UI at: http://localhost:18789"
+	@echo ""
+	@echo "Gateway token:"
+	@kubectl get secret openclaw-secrets -n openclaw \
+		-o jsonpath='{.data.OPENCLAW_GATEWAY_TOKEN}' \
+		--context $(CONTEXT) | base64 -d
+	@echo ""
+	@echo ""
+	kubectl port-forward svc/openclaw 18789:18789 \
+		-n openclaw \
+		--context $(CONTEXT)

@@ -33,6 +33,13 @@ spec:
               mkdir -p /home/openclaw/.openclaw/workspace
               cp /config-source/openclaw.json /home/openclaw/.openclaw/openclaw.json
               cp /config-source/AGENTS.md /home/openclaw/.openclaw/AGENTS.md
+              sed -i "s/__SLACK_SIGNING_SECRET__/$SLACK_SIGNING_SECRET/" /home/openclaw/.openclaw/openclaw.json
+          env:
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: openclaw-secrets
+                  key: SLACK_SIGNING_SECRET
           volumeMounts:
             - name: home
               mountPath: /home/openclaw

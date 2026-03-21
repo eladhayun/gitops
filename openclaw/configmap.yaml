@@ -24,7 +24,7 @@ data:
         "slack": {
           "enabled": true,
           "mode": "http",
-          "signingSecret": "7d49d52e412313a621457f495c2011cb",
+          "signingSecret": "__SLACK_SIGNING_SECRET__",
           "webhookPath": "/slack/events"
         }
       },

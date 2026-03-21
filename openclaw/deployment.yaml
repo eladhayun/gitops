@@ -30,10 +30,9 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
+              mkdir -p /home/openclaw/.openclaw/workspace
               cp /config-source/openclaw.json /home/openclaw/.openclaw/openclaw.json
               cp /config-source/AGENTS.md /home/openclaw/.openclaw/AGENTS.md
-              mkdir -p /home/openclaw/.openclaw/workspace
-              chown -R 1000:1000 /home/openclaw
           volumeMounts:
             - name: home
               mountPath: /home/openclaw
@@ -41,8 +40,10 @@ spec:
               mountPath: /config-source
               readOnly: true
           securityContext:
-            runAsUser: 0
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
       containers:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:latest

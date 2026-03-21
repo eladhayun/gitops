@@ -21,15 +21,15 @@ resources:
   - blutag-postgres.yaml
   - blutag-findmy.yaml
   - blutag-omnisette.yaml
-  - trips.yaml
+  # - trips.yaml
   - dirtbike-specialist.yaml
   - dirtbike-postgres.yaml
   - loki.yaml
   - grafana.yaml
   - hasadnaa.yaml
-  - gen-rag.yaml
-  - gen-rag-postgres.yaml
-  - gen-rag-qdrant.yaml
+  # - gen-rag.yaml
+  # - gen-rag-postgres.yaml
+  # - gen-rag-qdrant.yaml
   - pg-backups.yaml
   - openclaw.yaml
   

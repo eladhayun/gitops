@@ -5,7 +5,7 @@ resources:
   - cronjob-ids.yaml
   - cronjob-dirtbike.yaml
   - cronjob-hasadnaa.yaml
-  - cronjob-genrag.yaml
+  # - cronjob-genrag.yaml
   - cronjob-blutag.yaml
 
 generators:

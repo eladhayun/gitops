@@ -21,7 +21,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: hasadnaa-weekly-summary
-            image: prodacr1234.azurecr.io/slack-notifications:main-c886087
+            image: prodacr1234.azurecr.io/slack-notifications:main-1745df4
             command: ["/root/slack-notifications"]
             args: ["hasadnaa-weekly-summary"]
             env:

@@ -35,7 +35,7 @@ spec:
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
               value: "gpt-4o-mini"
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
-              value: "text-embedding-3-small"
+              value: "text-embedding-3-large"
             - name: POSTGRES_HOST
               value: dirtbike-postgres
             - name: POSTGRES_DB
@@ -60,28 +60,17 @@ spec:
                 secretKeyRef:
                   name: azure-openai-secrets
                   key: BASIC_AUTH_PASSWORD
-            # GCP Document AI Configuration (OCR)
-            - name: GCP_PROJECT_ID
+            # Azure AI Document Intelligence (OCR replacement for GCP Document AI)
+            - name: AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT
               valueFrom:
                 secretKeyRef:
-                  name: gcp-documentai-secret
-                  key: GCP_PROJECT_ID
-            - name: GCP_DOCUMENT_AI_LOCATION
+                  name: azure-document-intelligence-secret
+                  key: AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT
+            - name: AZURE_DOCUMENT_INTELLIGENCE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: gcp-documentai-secret
-                  key: GCP_DOCUMENT_AI_LOCATION
-            - name: GCP_DOCUMENT_AI_PROCESSOR_ID
-              valueFrom:
-                secretKeyRef:
-                  name: gcp-documentai-secret
-                  key: GCP_DOCUMENT_AI_PROCESSOR_ID
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /etc/gcp/credentials.json
-          volumeMounts:
-            - name: gcp-credentials
-              mountPath: /etc/gcp
-              readOnly: true
+                  name: azure-document-intelligence-secret
+                  key: AZURE_DOCUMENT_INTELLIGENCE_KEY
           resources:
             requests:
               cpu: 50m
@@ -89,10 +78,3 @@ spec:
             limits:
               cpu: 1000m
               memory: 1Gi
-      volumes:
-        - name: gcp-credentials
-          secret:
-            secretName: gcp-documentai-secret
-            items:
-              - key: credentials.json
-                path: credentials.json

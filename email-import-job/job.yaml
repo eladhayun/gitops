@@ -153,11 +153,26 @@ spec:
             secretKeyRef:
               name: ids-postgres-secret
               key: DATABASE_URL
-        - name: OPENAI_API_KEY
+        - name: AZURE_OPENAI_ENDPOINT
           valueFrom:
             secretKeyRef:
               name: ids-secrets
-              key: OPENAI_API_KEY
+              key: AZURE_OPENAI_ENDPOINT
+        - name: AZURE_OPENAI_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ids-secrets
+              key: AZURE_OPENAI_KEY
+        - name: AZURE_OPENAI_GPT_DEPLOYMENT
+          valueFrom:
+            configMapKeyRef:
+              name: ids-config
+              key: AZURE_OPENAI_GPT_DEPLOYMENT
+        - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT
+          valueFrom:
+            configMapKeyRef:
+              name: ids-config
+              key: AZURE_OPENAI_EMBEDDING_DEPLOYMENT
         volumeMounts:
         - name: email-data
           mountPath: /emails

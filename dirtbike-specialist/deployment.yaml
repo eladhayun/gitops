@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: dirtbike-specialist
-          image: prodacr1234.azurecr.io/dirtbike-specialist:main-4c898d0
+          image: prodacr1234.azurecr.io/dirtbike-specialist:main-2e74454
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

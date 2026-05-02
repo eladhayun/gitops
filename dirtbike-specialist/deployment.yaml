@@ -72,20 +72,16 @@ spec:
                   name: azure-document-intelligence-secret
                   key: AZURE_DOCUMENT_INTELLIGENCE_KEY
             # Azure AI Speech (server-side STT for chat-composer mic).
-            # optional=true so the pod still boots if the secret hasn't been
-            # created yet — the /api/transcribe handler returns 503 in that case.
             - name: AZURE_SPEECH_KEY
               valueFrom:
                 secretKeyRef:
                   name: azure-speech-secret
                   key: AZURE_SPEECH_KEY
-                  optional: true
             - name: AZURE_SPEECH_REGION
               valueFrom:
                 secretKeyRef:
                   name: azure-speech-secret
                   key: AZURE_SPEECH_REGION
-                  optional: true
           resources:
             requests:
               cpu: 50m

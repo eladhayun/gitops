@@ -12,7 +12,7 @@ data:
   # SSH tunnel configuration
   SSH_HOST: "50.28.87.147"
   SSH_PORT: "522"
-  SSH_USER: "root"
+  SSH_USER: "isrealde"
   LOCAL_PORT: "3306"
   REMOTE_HOST: "localhost"
   REMOTE_PORT: "3306"

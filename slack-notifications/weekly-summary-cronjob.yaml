@@ -22,7 +22,7 @@ spec:
           serviceAccountName: azure-billing-reporter
           containers:
           - name: weekly-summary
-            image: prodacr1234.azurecr.io/slack-notifications:main-fac4bd8
+            image: prodacr1234.azurecr.io/slack-notifications:main-f5344c2
             command: ["/root/slack-notifications"]
             args: ["weekly-summary"]
             env:

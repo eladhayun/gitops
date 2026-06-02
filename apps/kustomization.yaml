@@ -20,6 +20,7 @@ resources:
   - blutag-app.yaml
   - blutag-postgres.yaml
   - blutag-findmy.yaml
+  - blutag-pointer-push.yaml
   - blutag-omnisette.yaml
   # - trips.yaml
   - dirtbike-specialist.yaml

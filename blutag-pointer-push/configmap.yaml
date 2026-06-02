@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blutag-pointer-push-config
+  labels:
+    app: blutag-pointer-push
+data:
+  POINTER_BASE_URL: "https://iot.pointer4u.co.il/iservices/PointerAPI"
+  POINTER_PUSH_PATH: "/api/Fleet/ManageRequest"
+  # Token cache TTL in seconds (24h). Login is rate-limited to 10/24h by Pointer.
+  TOKEN_TTL_SECONDS: "86400"

@@ -7,3 +7,7 @@ metadata:
 data:
   FINDMY_SERVICE_URL: "http://blutag-findmy:8000"
   SYSTEM_ADMIN_ORG_SLUG: "blutag"
+  # Location-push webhook seed (Pointer relay). On boot blutag-app ensures a
+  # location.update webhook for this org pointing at the in-cluster relay.
+  LOCATION_WEBHOOK_ORG_SLUG: "pointer"
+  LOCATION_WEBHOOK_URL: "http://blutag-pointer-push:8000/internal/location"

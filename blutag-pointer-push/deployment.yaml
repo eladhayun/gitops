@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blutag-pointer-push
+  labels:
+    app: blutag-pointer-push
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    type: Recreate  # Required for ReadWriteOnce PVC (token cache) - no overlapping pods
+  selector:
+    matchLabels:
+      app: blutag-pointer-push
+  template:
+    metadata:
+      labels:
+        app: blutag-pointer-push
+    spec:
+      containers:
+      - name: blutag-pointer-push
+        image: prodacr1234.azurecr.io/blutag-pointer-push:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: UVICORN_HOST
+          value: "0.0.0.0"
+        - name: UVICORN_PORT
+          value: "8000"
+        - name: UVICORN_LOG_LEVEL
+          value: "info"
+        - name: DATA_DIR
+          value: "/data"
+        - name: POINTER_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-pointer-push-config
+              key: POINTER_BASE_URL
+        - name: POINTER_PUSH_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-pointer-push-config
+              key: POINTER_PUSH_PATH
+        - name: TOKEN_TTL_SECONDS
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-pointer-push-config
+              key: TOKEN_TTL_SECONDS
+        - name: POINTER_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: blutag-pointer-push-secret
+              key: POINTER_USERNAME
+        - name: POINTER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: blutag-pointer-push-secret
+              key: POINTER_PASSWORD
+        - name: POINTER_ACCOUNT_ID
+          valueFrom:
+            secretKeyRef:
+              name: blutag-pointer-push-secret
+              key: POINTER_ACCOUNT_ID
+        - name: WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: blutag-pointer-push-secret
+              key: WEBHOOK_SECRET
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 30
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: blutag-pointer-push-data
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001

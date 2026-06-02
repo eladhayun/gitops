@@ -118,6 +118,25 @@ spec:
               name: blutag-app-config
               key: SYSTEM_ADMIN_ORG_SLUG
               optional: true
+        # Location-push webhook seed (Pointer relay)
+        - name: LOCATION_WEBHOOK_ORG_SLUG
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-app-config
+              key: LOCATION_WEBHOOK_ORG_SLUG
+              optional: true
+        - name: LOCATION_WEBHOOK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-app-config
+              key: LOCATION_WEBHOOK_URL
+              optional: true
+        - name: LOCATION_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: blutag-location-webhook-secret
+              key: LOCATION_WEBHOOK_SECRET
+              optional: true
         resources:
           requests:
             cpu: 5m

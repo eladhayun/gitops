@@ -9,3 +9,5 @@ data:
   POINTER_PUSH_PATH: "/api/Fleet/ManageRequest"
   # Token cache TTL in seconds (24h). Login is rate-limited to 10/24h by Pointer.
   TOKEN_TTL_SECONDS: "86400"
+  # Max locations per Pointer request; larger arrays are split into sequential requests.
+  MAX_BATCH_SIZE: "500"

@@ -47,6 +47,11 @@ spec:
             configMapKeyRef:
               name: blutag-pointer-push-config
               key: TOKEN_TTL_SECONDS
+        - name: MAX_BATCH_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-pointer-push-config
+              key: MAX_BATCH_SIZE
         - name: POINTER_USERNAME
           valueFrom:
             secretKeyRef:

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: blutag-pointer-push
-        image: prodacr1234.azurecr.io/blutag-pointer-push:main-4-1
+        image: prodacr1234.azurecr.io/blutag-pointer-push:main-5-1
         ports:
         - containerPort: 8000
           name: http

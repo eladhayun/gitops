@@ -52,6 +52,16 @@ spec:
             configMapKeyRef:
               name: blutag-pointer-push-config
               key: MAX_BATCH_SIZE
+        - name: MAX_PUSH_ATTEMPTS
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-pointer-push-config
+              key: MAX_PUSH_ATTEMPTS
+        - name: PUSH_RETRY_BASE_SECONDS
+          valueFrom:
+            configMapKeyRef:
+              name: blutag-pointer-push-config
+              key: PUSH_RETRY_BASE_SECONDS
         - name: POINTER_USERNAME
           valueFrom:
             secretKeyRef:

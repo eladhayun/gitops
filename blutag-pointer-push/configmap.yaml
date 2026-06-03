@@ -11,3 +11,7 @@ data:
   TOKEN_TTL_SECONDS: "86400"
   # Max locations per Pointer request; larger arrays are split into sequential requests.
   MAX_BATCH_SIZE: "500"
+  # Pointer push retry: total attempts and exponential-backoff base (seconds) for transient
+  # failures (network / HTTP 5xx). Runs in the background so blutag-app isn't blocked.
+  MAX_PUSH_ATTEMPTS: "3"
+  PUSH_RETRY_BASE_SECONDS: "2"

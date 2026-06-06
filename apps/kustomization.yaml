@@ -28,6 +28,8 @@ resources:
   - loki.yaml
   - grafana.yaml
   - hasadnaa.yaml
+  - trainings.yaml
+  - trainings-postgres.yaml
   # - gen-rag.yaml
   # - gen-rag-postgres.yaml
   # - gen-rag-qdrant.yaml

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trainings
+  labels:
+    app: trainings
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: trainings
+  template:
+    metadata:
+      labels:
+        app: trainings
+    spec:
+      containers:
+      - name: trainings
+        image: prodacr1234.azurecr.io/trainings:main-0000000
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: trainings-config
+        - secretRef:
+            name: trainings-secrets
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 15

@@ -5,7 +5,7 @@ metadata:
 data:
   PORT: "8080"
   LOG_LEVEL: "info"
-  APP_BASE_URL: "https://trainings.jshipster.io"
+  APP_BASE_URL: "https://drc-trainings.jshipster.io"
   ADMIN_USERNAME: "admin"
   OTP_TTL_MINUTES: "5"
   OTP_LENGTH: "6"

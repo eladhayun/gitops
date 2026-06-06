@@ -5,13 +5,13 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
     nginx.ingress.kubernetes.io/compute-full-forwarded-for: "true"
-    external-dns.alpha.kubernetes.io/hostname: trainings.jshipster.io
+    external-dns.alpha.kubernetes.io/hostname: drc-trainings.jshipster.io
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
 spec:
   ingressClassName: nginx
   rules:
-  - host: trainings.jshipster.io
+  - host: drc-trainings.jshipster.io
     http:
       paths:
       - path: /

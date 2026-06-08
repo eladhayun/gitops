@@ -13,6 +13,10 @@ resources:
   - pg-backup-report-cronjob.yaml
   - weekly-summary-cronjob.yaml
   - uptime-check-cronjob.yaml
+  # DRC (trainings)
+  - drc-weekly-summary-cronjob.yaml
+  - drc-uptime-check-cronjob.yaml
+  - drc-pg-backup-report-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

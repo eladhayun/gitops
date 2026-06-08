@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: drc-pg-backup-report
+  labels:
+    app: drc-pg-backup-report
+spec:
+  # Every Monday at 8:40 AM UTC (11:40 AM Israel) — DRC-scoped view of the daily
+  # trainings DB backups, sent to the DRC channel.
+  schedule: "40 8 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: drc-pg-backup-report
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: drc-pg-backup-report
+            image: prodacr1234.azurecr.io/slack-notifications:main-0ca0a08
+            command: ["/root/slack-notifications"]
+            args: ["drc-pg-backup-report"]
+            env:
+            - name: PG_BACKUP_STORAGE_ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: PG_BACKUP_STORAGE_ACCOUNT
+            - name: PG_BACKUP_STORAGE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: PG_BACKUP_STORAGE_KEY
+            - name: DRC_REPORT_CHANNEL
+              value: "C0B93ML2RJQ"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

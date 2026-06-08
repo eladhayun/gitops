@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: drc-weekly-summary
+  labels:
+    app: drc-weekly-summary
+spec:
+  # Every Monday at 9:00 AM UTC (12:00 PM Israel) — weekly business summary of
+  # the DRC trainings app, sent to the DRC channel.
+  schedule: "0 9 * * 1"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: drc-weekly-summary
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: drc-weekly-summary
+            image: prodacr1234.azurecr.io/slack-notifications:main-0ca0a08
+            command: ["/root/slack-notifications"]
+            args: ["drc-weekly-summary"]
+            env:
+            - name: DRC_DB_HOST
+              value: "trainings-postgres.trainings.svc.cluster.local"
+            - name: DRC_DB_PORT
+              value: "5432"
+            - name: DRC_DB_NAME
+              value: "trainings"
+            - name: DRC_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: DRC_DB_USER
+            - name: DRC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: DRC_DB_PASSWORD
+            - name: DRC_REPORT_CHANNEL
+              value: "C0B93ML2RJQ"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "200m"

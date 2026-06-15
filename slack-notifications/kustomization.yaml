@@ -11,12 +11,10 @@ resources:
   - hasadnaa-weekly-summary-cronjob.yaml
   - blutag-weekly-summary-cronjob.yaml
   - pg-backup-report-cronjob.yaml
-  - weekly-summary-cronjob.yaml
   - uptime-check-cronjob.yaml
-  # DRC (trainings)
+  # DRC (trainings) — backups & uptime are folded into the global per-service
+  # fan-out (pg-backup-report / uptime-check); only the business summary is DRC-specific.
   - drc-weekly-summary-cronjob.yaml
-  - drc-uptime-check-cronjob.yaml
-  - drc-pg-backup-report-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

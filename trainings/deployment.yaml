@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: trainings
-        image: prodacr1234.azurecr.io/trainings:main-392fadb
+        image: prodacr1234.azurecr.io/trainings:main-622b90c
         ports:
         - containerPort: 8080
         envFrom:

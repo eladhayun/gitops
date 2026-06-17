@@ -15,7 +15,3 @@ data:
   TWILIO_SMS_FROM: "DRC"
   TWILIO_WHATSAPP_FROM: ""
   GROW_BASE_URL: "https://secure.meshulam.co.il/api/light/server/1.0/"
-  # Browser Google Maps key for the admin location pin-picker. Public by nature
-  # (referrer-restricted to drc-trainings.jshipster.io + localhost), so it lives
-  # in the ConfigMap rather than the SOPS secret. Key: drc-trainings-maps.
-  GOOGLE_MAPS_API_KEY: "AIzaSyBv931QqZ9hiHdrcKykuLurCZZ8WE_Moxo"

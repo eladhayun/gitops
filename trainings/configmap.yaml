@@ -19,4 +19,4 @@ data:
   # Create one: Google Cloud console → Google Maps Platform → Map Management →
   # Create Map ID (Map type: JavaScript, Vector). Not secret. Empty = the picker
   # falls back to the classic marker.
-  GOOGLE_MAPS_MAP_ID: ""
+  GOOGLE_MAPS_MAP_ID: "95c7ada0a2a54acc60517979"

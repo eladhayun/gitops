@@ -8,6 +8,14 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: drc-trainings.jshipster.io
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # Realtime SSE stream (GET /api/events/stream): keep long-lived connections
+    # open and flush events immediately. The app's 25s heartbeat already keeps the
+    # connection inside these timeouts, and the handler sets X-Accel-Buffering:no
+    # per-response — these are defense-in-depth so a deploy/config change can't
+    # silently start buffering or dropping the stream.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
 spec:
   ingressClassName: nginx
   rules:

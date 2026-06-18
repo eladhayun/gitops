@@ -15,3 +15,8 @@ data:
   TWILIO_SMS_FROM: "DRC"
   TWILIO_WHATSAPP_FROM: ""
   GROW_BASE_URL: "https://secure.meshulam.co.il/api/light/server/1.0/"
+  # Cloud (vector) Map ID for the location picker's AdvancedMarkerElement.
+  # Create one: Google Cloud console → Google Maps Platform → Map Management →
+  # Create Map ID (Map type: JavaScript, Vector). Not secret. Empty = the picker
+  # falls back to the classic marker.
+  GOOGLE_MAPS_MAP_ID: ""

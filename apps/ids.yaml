@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: ids
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/manifest-generate-paths: .
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:

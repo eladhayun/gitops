@@ -35,7 +35,7 @@ spec:
                 secretKeyRef:
                   name: slack-notifications-secrets
                   key: PG_BACKUP_STORAGE_KEY
-            # Fallback channel for DBs without a dedicated service channel (e.g. dirtbike)
+            # Fallback channel for any DB without a dedicated service channel
             - name: PG_BACKUP_REPORT_CHANNEL
               value: "C09QJ6769QR"
             # Per-service routing: each DB's backup status goes to its own channel
@@ -47,6 +47,8 @@ spec:
               value: "C09P9CPGAN9"
             - name: DRC_REPORT_CHANNEL
               value: "C0B93ML2RJQ"
+            - name: DIRTBIKE_REPORT_CHANNEL
+              value: "C0BD40N45UY"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:

@@ -41,6 +41,8 @@ spec:
               value: "C0B93ML2RJQ"
             - name: DRC_HEALTH_URL
               value: "https://drc-trainings.jshipster.io/api/healthz"
+            - name: DIRTBIKE_REPORT_CHANNEL
+              value: "C0BD40N45UY"
             resources:
               requests:
                 memory: "16Mi"

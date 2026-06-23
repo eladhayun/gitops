@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dirtbike-weekly-summary
+  labels:
+    app: dirtbike-weekly-summary
+spec:
+  # Every Monday at 8:50 AM UTC — weekly summary of the Dirtbike Specialist
+  # document/RAG assistant, sent to the dirtbike channel.
+  schedule: "50 8 * * 1"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: dirtbike-weekly-summary
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: dirtbike-weekly-summary
+            image: prodacr1234.azurecr.io/slack-notifications:main-7af2857
+            command: ["/root/slack-notifications"]
+            args: ["dirtbike-weekly-summary"]
+            env:
+            - name: DIRTBIKE_DB_HOST
+              value: "dirtbike-postgres.dirtbike.svc.cluster.local"
+            - name: DIRTBIKE_DB_PORT
+              value: "5432"
+            - name: DIRTBIKE_DB_NAME
+              value: "dirtbike"
+            - name: DIRTBIKE_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: DIRTBIKE_DB_USER
+            - name: DIRTBIKE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: DIRTBIKE_DB_PASSWORD
+            - name: DIRTBIKE_REPORT_CHANNEL
+              value: "C0BD40N45UY"
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "10m"
+              limits:
+                memory: "128Mi"
+                cpu: "200m"

@@ -21,7 +21,8 @@ spec:
         args:
         - --source=ingress
         - --source=service
-        - --domain-filter=jshipster.io  # Only manage DNS records for this domain
+        - --domain-filter=jshipster.io  # Only manage DNS records for these domains
+        - --domain-filter=blutag.company
         - --provider=cloudflare
         - --txt-owner-id=jshipster-cluster
         - --log-format=text

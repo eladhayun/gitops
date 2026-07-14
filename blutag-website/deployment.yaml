@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: blutag-website
-        image: prodacr1234.azurecr.io/blutag-website:main-bf4a624
+        image: prodacr1234.azurecr.io/blutag-website:main-9531bb1
         ports:
         - containerPort: 80
           name: http

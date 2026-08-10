@@ -82,6 +82,12 @@ spec:
                 secretKeyRef:
                   name: azure-speech-secret
                   key: AZURE_SPEECH_REGION
+            # Session authentication secret
+            - name: AUTH_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: AUTH_SESSION_SECRET
           resources:
             requests:
               cpu: 50m

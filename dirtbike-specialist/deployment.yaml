@@ -12,6 +12,8 @@ spec:
       app: dirtbike-specialist
   template:
     metadata:
+      annotations:
+        config-revision: "2026-08-10-twilio"
       labels:
         app: dirtbike-specialist
     spec:

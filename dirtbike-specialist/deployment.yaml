@@ -22,6 +22,10 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: APP_ENV
+              value: "production"
+            - name: APP_BASE_URL
+              value: "https://dirtbike.jshipster.io"
             - name: AZURE_OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -99,6 +103,21 @@ spec:
                 secretKeyRef:
                   name: azure-openai-secrets
                   key: OWNER_PHONES
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: TWILIO_ACCOUNT_SID
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: TWILIO_AUTH_TOKEN
+            - name: TWILIO_SMS_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: TWILIO_SMS_FROM
           resources:
             requests:
               cpu: 50m

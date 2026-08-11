@@ -94,6 +94,11 @@ spec:
                 secretKeyRef:
                   name: azure-openai-secrets
                   key: AUTH_SESSION_SECRET
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azure-openai-secrets
+                  key: GOOGLE_CLIENT_ID
             # Owner authorization
             - name: OWNER_EMAILS
               valueFrom:

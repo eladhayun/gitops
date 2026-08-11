@@ -99,6 +99,8 @@ spec:
                 secretKeyRef:
                   name: azure-openai-secrets
                   key: GOOGLE_CLIENT_ID
+            - name: ENABLE_PHONE_AUTH
+              value: "false"
             # Owner authorization
             - name: OWNER_EMAILS
               valueFrom:

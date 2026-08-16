@@ -26,6 +26,8 @@ spec:
           env:
             - name: APP_ENV
               value: "production"
+            - name: ENABLE_RAG_DIAGNOSTICS
+              value: "true"
             - name: APP_BASE_URL
               value: "https://dirtbike.jshipster.io"
             - name: AZURE_OPENAI_API_KEY

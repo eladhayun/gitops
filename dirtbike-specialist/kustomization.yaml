@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - shadow-corpus-benchmark.yaml
+  - shadow-corpus-benchmark-v2.yaml
   - service.yaml
   - ingress.yaml
 

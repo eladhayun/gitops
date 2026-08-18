@@ -1,13 +1,13 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rag-shadow-corpus-benchmark-20260818
+  name: rag-shadow-corpus-benchmark-20260818-v2
   labels:
     app: dirtbike-specialist
     purpose: rag-shadow-corpus-benchmark
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 2700
+  activeDeadlineSeconds: 3600
   template:
     metadata:
       labels:
@@ -21,7 +21,7 @@ spec:
           imagePullPolicy: Always
           command:
             - /bin/sh
-            - -ec
+            - -c
           args:
             - |
               until [ -s /work/dataset.json ]; do sleep 2; done
@@ -33,7 +33,12 @@ spec:
                 -benchmark-reference production-shadow-20260818-0626537 \
                 -timeout 45s \
                 -output-dir /work/output \
-                > /work/report.json
+                > /work/report.json 2> /work/benchmark.log
+              status=$?
+              echo "$status" > /work/status
+              touch /work/finished
+              until [ -f /work/release ]; do sleep 2; done
+              exit "$status"
           env:
             - name: APP_ENV
               value: "production"

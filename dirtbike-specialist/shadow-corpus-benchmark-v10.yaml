@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rag-shadow-corpus-benchmark-20260818-v9
+  name: rag-shadow-corpus-benchmark-20260818-v10
   labels:
     app: dirtbike-specialist
     purpose: rag-shadow-corpus-benchmark
@@ -17,7 +17,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: benchmark
-          image: prodacr1234.azurecr.io/dirtbike-specialist:main-3c14cd4
+          image: prodacr1234.azurecr.io/dirtbike-specialist:main-392e13f
           imagePullPolicy: Always
           command:
             - /bin/sh
@@ -30,7 +30,7 @@ spec:
                 -dataset /work/dataset.json \
                 -benchmark \
                 -record-benchmark \
-                -benchmark-reference production-shadow-20260818-3c14cd4 \
+                -benchmark-reference production-shadow-20260818-392e13f \
                 -timeout 45s \
                 -output-dir /work/output \
                 > /work/report.json 2> /work/benchmark.log

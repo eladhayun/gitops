@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rag-shadow-corpus-benchmark-20260818-v15
+  name: rag-shadow-corpus-benchmark-20260818-v16
   labels:
     app: dirtbike-specialist
     purpose: rag-shadow-corpus-benchmark
@@ -30,7 +30,7 @@ spec:
                 -dataset /work/dataset.json \
                 -benchmark \
                 -record-benchmark \
-                -benchmark-reference production-shadow-20260818-2104671 \
+                -benchmark-reference production-shadow-20260818-2104671-retry \
                 -timeout 45s \
                 -output-dir /work/output \
                 > /work/report.json 2> /work/benchmark.log

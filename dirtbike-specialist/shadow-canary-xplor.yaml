@@ -1,36 +1,28 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rag-pdf-extraction-audit-20260818
+  name: rag-shadow-xplor-20260818
   labels:
     app: dirtbike-specialist
-    purpose: rag-pdf-extraction-audit
+    purpose: rag-shadow-canary
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 900
+  activeDeadlineSeconds: 2700
   template:
     metadata:
       labels:
-        app: dirtbike-specialist-operator
-        purpose: rag-pdf-extraction-audit
+        app: dirtbike-specialist-shadow-canary
+        purpose: rag-shadow-canary
     spec:
       restartPolicy: Never
       containers:
-        - name: audit-pdfs
+        - name: reindex-shadow
           image: prodacr1234.azurecr.io/dirtbike-specialist:main-8e74c64
           imagePullPolicy: Always
           command:
-            - /bin/sh
-            - -ec
-          args:
-            - |
-              ./server audit-pdf d0d92351299bae06b91be6617bf05cc9c5b2134ac046751e7b5f8bb9393d8dc6
-              ./server audit-pdf ab1eab3e04d3c1bb54ba1cce63df14281c06a8cb77e7f3c98903a823f2d3eda1
-              ./server audit-pdf c15e223c526305501fcb5c32e0fa31c8ef42c4072d6e4b0cd4dc057ec095d0b7
-              ./server audit-pdf dfc9f6537a8d209b1035f1f1e68c9e67fd0ec7979295d9bdb5f6ebc9e81fd9f0
-              ./server audit-pdf 82ea06aed862d977592ccf13abff8002131c2711e3cb504f725459a19b304df6
-              ./server audit-pdf c1be50897179ccca124d2eaa51cb3cd1a067028d82afd2b505433a394ca030fd
-              ./server audit-pdf f6c6ef1e9ff65b1f00637bd3abc7f2e2e7987517a13b986445f43f156d7bc3c7
+            - ./server
+            - reindex-shadow
+            - f6c6ef1e9ff65b1f00637bd3abc7f2e2e7987517a13b986445f43f156d7bc3c7
           env:
             - name: APP_ENV
               value: "production"

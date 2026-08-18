@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - pdf-extraction-audit.yaml
+  - shadow-canary-xplor.yaml
   - service.yaml
   - ingress.yaml
 

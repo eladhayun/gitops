@@ -1,28 +1,30 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rag-shadow-xplor-20260818-v2
+  name: rag-shadow-xplor-benchmark-20260818-v2
   labels:
     app: dirtbike-specialist
-    purpose: rag-shadow-canary
+    purpose: rag-shadow-canary-benchmark
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 2700
+  activeDeadlineSeconds: 600
   template:
     metadata:
       labels:
         app: dirtbike-specialist-shadow-canary
-        purpose: rag-shadow-canary
+        purpose: rag-shadow-canary-benchmark
     spec:
       restartPolicy: Never
       containers:
-        - name: reindex-shadow
+        - name: benchmark-shadow
           image: prodacr1234.azurecr.io/dirtbike-specialist:main-377111d
           imagePullPolicy: Always
           command:
             - ./server
-            - reindex-shadow
+            - benchmark-shadow
             - f6c6ef1e9ff65b1f00637bd3abc7f2e2e7987517a13b986445f43f156d7bc3c7
+            - e3b29fc89893fcd5cb6c56c7054bd6240e12a90bacc8d80a8c3e0774a3240ccb
+            - According to the XPLOR PRO 6500 manual, what is the standard compression damping setting for a 250 EXC TPI?
           env:
             - name: APP_ENV
               value: "production"

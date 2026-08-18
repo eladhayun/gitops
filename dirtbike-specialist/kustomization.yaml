@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - shadow-canary-xplor.yaml
+  - shadow-canary-xplor-benchmark.yaml
   - service.yaml
   - ingress.yaml
 

@@ -30,6 +30,10 @@ spec:
               value: "true"
             - name: ENABLE_RAG_SEMANTIC_V2_SHADOW
               value: "true"
+            - name: ENABLE_RAG_STRICT_GROUNDING
+              value: "true"
+            - name: RAG_GENERATION_CONTROL_TARGET_ID
+              value: "azure-generation-strict-v1"
             - name: APP_BASE_URL
               value: "https://dirtbike.jshipster.io"
             - name: AZURE_OPENAI_API_KEY

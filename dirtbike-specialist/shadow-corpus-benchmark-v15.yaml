@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rag-shadow-corpus-benchmark-20260818-v14
+  name: rag-shadow-corpus-benchmark-20260818-v15
   labels:
     app: dirtbike-specialist
     purpose: rag-shadow-corpus-benchmark
@@ -17,7 +17,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: benchmark
-          image: prodacr1234.azurecr.io/dirtbike-specialist:main-7c0e1c3
+          image: prodacr1234.azurecr.io/dirtbike-specialist:main-2104671
           imagePullPolicy: Always
           command:
             - /bin/sh
@@ -30,7 +30,7 @@ spec:
                 -dataset /work/dataset.json \
                 -benchmark \
                 -record-benchmark \
-                -benchmark-reference production-shadow-20260818-7c0e1c3-strict \
+                -benchmark-reference production-shadow-20260818-2104671 \
                 -timeout 45s \
                 -output-dir /work/output \
                 > /work/report.json 2> /work/benchmark.log
@@ -44,10 +44,6 @@ spec:
               value: "production"
             - name: ENABLE_RAG_SEMANTIC_V2_SHADOW
               value: "true"
-            - name: ENABLE_RAG_STRICT_GROUNDING
-              value: "true"
-            - name: RAG_GENERATION_CONTROL_TARGET_ID
-              value: "azure-generation-strict-v1"
             - name: AZURE_OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:

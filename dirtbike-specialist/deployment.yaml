@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        config-revision: "2026-08-23-hybrid-off-pending-fix"
+        config-revision: "2026-08-23-hybrid-fixed-gpt41"
       labels:
         app: dirtbike-specialist
     spec:
@@ -33,9 +33,9 @@ spec:
             - name: ENABLE_RAG_SEMANTIC_V2_SHADOW
               value: "true"
             - name: ENABLE_RAG_HYBRID_RETRIEVAL
-              value: "false"
+              value: "true"
             - name: ENABLE_RAG_RERANKING
-              value: "false"
+              value: "true"
             - name: ENABLE_RAG_CONTEXTUAL_REWRITE
               value: "true"
             - name: ENABLE_RAG_MULTI_QUERY
@@ -55,11 +55,11 @@ spec:
                   name: azure-openai-secrets
                   key: AZURE_OPENAI_ENDPOINT
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
-              value: "gpt-4o-mini"
+              value: "gpt-4.1"
             # Control target is digest-pinned to (model, deployment, prompt);
             # bump the ID whenever the deployment or prompt changes.
             - name: RAG_GENERATION_CONTROL_TARGET_ID
-              value: "azure-generation-control-v5"
+              value: "azure-generation-control-v6"
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
               value: "text-embedding-3-large"
             - name: POSTGRES_HOST

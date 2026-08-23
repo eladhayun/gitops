@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        config-revision: "2026-08-23-gpt41-rollback"
+        config-revision: "2026-08-23-hybrid-off-pending-fix"
       labels:
         app: dirtbike-specialist
     spec:
@@ -33,9 +33,9 @@ spec:
             - name: ENABLE_RAG_SEMANTIC_V2_SHADOW
               value: "true"
             - name: ENABLE_RAG_HYBRID_RETRIEVAL
-              value: "true"
+              value: "false"
             - name: ENABLE_RAG_RERANKING
-              value: "true"
+              value: "false"
             - name: ENABLE_RAG_CONTEXTUAL_REWRITE
               value: "true"
             - name: ENABLE_RAG_MULTI_QUERY

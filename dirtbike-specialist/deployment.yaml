@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        config-revision: "2026-08-23-hybrid-fixed-gpt41"
+        config-revision: "2026-08-23-real-client-ip"
       labels:
         app: dirtbike-specialist
     spec:
@@ -44,6 +44,12 @@ spec:
               value: "prebuilt-layout"
             - name: APP_BASE_URL
               value: "https://dirtbike.jshipster.io"
+            # Trust X-Forwarded-For only when the peer chain is inside the
+            # cluster VNet; ingress-nginx appends the Cloudflare-verified
+            # client IP as the last hop (see nginx-ingress-controller
+            # configmap-patch.yaml). Required for per-client guest quotas.
+            - name: TRUSTED_PROXY_CIDRS
+              value: "10.1.0.0/16"
             - name: AZURE_OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:

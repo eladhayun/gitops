@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        config-revision: "2026-08-23-rag-quality"
+        config-revision: "2026-08-23-gpt41"
       labels:
         app: dirtbike-specialist
     spec:
@@ -55,7 +55,11 @@ spec:
                   name: azure-openai-secrets
                   key: AZURE_OPENAI_ENDPOINT
             - name: AZURE_OPENAI_DEPLOYMENT_NAME
-              value: "gpt-4o-mini"
+              value: "gpt-4.1"
+            # Control target is digest-pinned to (model, deployment, prompt);
+            # bump the ID whenever the deployment or prompt changes.
+            - name: RAG_GENERATION_CONTROL_TARGET_ID
+              value: "azure-generation-control-v6"
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
               value: "text-embedding-3-large"
             - name: POSTGRES_HOST

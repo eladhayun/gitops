@@ -59,3 +59,42 @@ spec:
             capabilities:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
+        - name: anpr-ocr
+          image: prodacr1234.azurecr.io/anpr-ocr:main-b974332
+          imagePullPolicy: Always
+          env:
+            - name: ANPR_OCR_LISTEN
+              value: "0.0.0.0:8090"
+            - name: RUST_LOG
+              value: "anpr_ocr=info"
+          ports:
+            - name: ocr-http
+              containerPort: 8090
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: ocr-http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: ocr-http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true

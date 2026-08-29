@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: anpr-cloud
-          image: prodacr1234.azurecr.io/anpr-cloud:main-e947d0c
+          image: prodacr1234.azurecr.io/anpr-cloud:main-ee0ba19
           imagePullPolicy: Always
           envFrom:
             - configMapRef:

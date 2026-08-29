@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: anpr-postgres
+  labels:
+    app: anpr-postgres
+spec:
+  clusterIP: None
+  selector:
+    app: anpr-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres

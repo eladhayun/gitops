@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anpr-cloud-config
+data:
+  ANPR_LISTEN: "0.0.0.0:8080"
+  ANPR_OBJECT_STORE: "azure"
+  ANPR_AZURE_CONTAINER: "anpr-plates"
+  ANPR_MCP_ALLOWED_HOSTS: "anpr.jshipster.io"
+  ANPR_MCP_ALLOWED_ORIGINS: "https://anpr.jshipster.io"
+  ANPR_ENRICHMENT_INTERVAL_MS: "500"
+  RUST_LOG: "anpr_cloud=info,tower_http=info"

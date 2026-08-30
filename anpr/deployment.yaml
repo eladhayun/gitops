@@ -21,7 +21,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: anpr-cloud
-          image: prodacr1234.azurecr.io/anpr-cloud:main-98dc1ba
+          image: prodacr1234.azurecr.io/anpr-cloud:main-8144d7e
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
@@ -60,7 +60,7 @@ spec:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
         - name: anpr-ocr
-          image: prodacr1234.azurecr.io/anpr-ocr:main-98dc1ba
+          image: prodacr1234.azurecr.io/anpr-ocr:main-8144d7e
           imagePullPolicy: Always
           env:
             - name: ANPR_OCR_LISTEN

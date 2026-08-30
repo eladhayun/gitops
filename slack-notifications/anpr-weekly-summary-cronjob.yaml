@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: anpr-weekly-summary
+  labels:
+    app: anpr-weekly-summary
+spec:
+  # Monday 09:10 UTC (12:10 Israel daylight time)
+  schedule: "10 9 * * 1"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: anpr-weekly-summary
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: summary
+            image: prodacr1234.azurecr.io/slack-notifications:main-e0da651
+            command: ["/root/slack-notifications"]
+            args: ["anpr-weekly-summary"]
+            env:
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: SLACK_TOKEN
+            - name: ANPR_DB_HOST
+              value: "anpr-postgres.anpr.svc.cluster.local"
+            - name: ANPR_DB_PORT
+              value: "5432"
+            - name: ANPR_DB_NAME
+              value: "anpr"
+            - name: ANPR_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: ANPR_DB_USER
+            - name: ANPR_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: slack-notifications-secrets
+                  key: ANPR_DB_PASSWORD
+            - name: ANPR_REPORT_CHANNEL
+              value: "C0BTGPSF7RR"
+            resources:
+              requests:
+                memory: "16Mi"
+                cpu: "5m"
+              limits:
+                memory: "32Mi"
+                cpu: "50m"

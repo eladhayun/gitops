@@ -49,6 +49,8 @@ spec:
               value: "C0B93ML2RJQ"
             - name: DIRTBIKE_REPORT_CHANNEL
               value: "C0BD40N45UY"
+            - name: ANPR_REPORT_CHANNEL
+              value: "C0BTGPSF7RR"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:

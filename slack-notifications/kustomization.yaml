@@ -17,6 +17,7 @@ resources:
   - drc-weekly-summary-cronjob.yaml
   # Dirtbike Specialist — backups & uptime are in the global fan-out; business summary is service-specific.
   - dirtbike-weekly-summary-cronjob.yaml
+  - anpr-weekly-summary-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

@@ -8,6 +8,7 @@ resources:
   # - cronjob-genrag.yaml
   - cronjob-blutag.yaml
   - cronjob-trainings.yaml
+  - cronjob-anpr.yaml
 
 generators:
   - secrets-generator.yaml

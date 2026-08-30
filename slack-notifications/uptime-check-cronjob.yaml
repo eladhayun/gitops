@@ -43,6 +43,10 @@ spec:
               value: "https://drc-trainings.jshipster.io/api/healthz"
             - name: DIRTBIKE_REPORT_CHANNEL
               value: "C0BD40N45UY"
+            - name: ANPR_REPORT_CHANNEL
+              value: "C0BTGPSF7RR"
+            - name: ANPR_HEALTH_URL
+              value: "https://anpr.jshipster.io/healthz"
             resources:
               requests:
                 memory: "16Mi"

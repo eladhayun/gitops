@@ -21,7 +21,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: summary
-            image: prodacr1234.azurecr.io/slack-notifications:main-e0da651
+            image: prodacr1234.azurecr.io/slack-notifications:main-2a0a1dd
             command: ["/root/slack-notifications"]
             args: ["anpr-weekly-summary"]
             env:

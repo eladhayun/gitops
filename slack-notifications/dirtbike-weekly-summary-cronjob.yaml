@@ -22,7 +22,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: dirtbike-weekly-summary
-            image: prodacr1234.azurecr.io/slack-notifications:main-e0da651
+            image: prodacr1234.azurecr.io/slack-notifications:main-2a0a1dd
             command: ["/root/slack-notifications"]
             args: ["dirtbike-weekly-summary"]
             env:

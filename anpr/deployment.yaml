@@ -5,7 +5,7 @@ metadata:
   labels:
     app: anpr-cloud
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:

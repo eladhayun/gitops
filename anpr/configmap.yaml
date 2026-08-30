@@ -9,5 +9,6 @@ data:
   ANPR_MCP_ALLOWED_HOSTS: "anpr.jshipster.io"
   ANPR_MCP_ALLOWED_ORIGINS: "https://anpr.jshipster.io"
   ANPR_ENRICHMENT_INTERVAL_MS: "500"
+  ANPR_PARKED_VEHICLE_GAP_SECONDS: "300"
   ANPR_OCR_URL: "http://127.0.0.1:8090/recognize"
   RUST_LOG: "anpr_cloud=info,tower_http=info"

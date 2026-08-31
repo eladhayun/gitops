@@ -4,10 +4,8 @@ metadata:
   name: jshipster-bastion
   labels:
     app: jshipster-bastion
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: debug.jshipster.io
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - port: 22
     targetPort: 22

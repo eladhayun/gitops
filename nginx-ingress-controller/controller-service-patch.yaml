@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: debug.jshipster.io
+spec:
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22

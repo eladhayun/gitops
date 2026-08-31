@@ -5,7 +5,7 @@ metadata:
   labels:
     app: blutag-website
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: blutag-website
@@ -39,4 +39,3 @@ spec:
             port: 80
           initialDelaySeconds: 5
           periodSeconds: 5
-

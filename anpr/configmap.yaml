@@ -12,5 +12,4 @@ data:
   ANPR_PARKED_VEHICLE_GAP_SECONDS: "300"
   ANPR_OCR_URL: "http://127.0.0.1:8090/recognize"
   ANPR_SLACK_NOTIFICATIONS_URL: "http://slack-notifications.jshipster.svc.cluster.local:8080/anpr/events"
-  ANPR_NOTIFY_MIN_OCR_CONFIDENCE: "0.60"
   RUST_LOG: "anpr_cloud=info,tower_http=info"

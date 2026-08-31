@@ -6,7 +6,7 @@ metadata:
   labels:
     app: cloudflared
 spec:
-  replicas: 2  # For high availability
+  replicas: 1
   selector:
     matchLabels:
       app: cloudflared
@@ -55,4 +55,3 @@ spec:
       - name: creds
         secret:
           secretName: tunnel-credentials
-

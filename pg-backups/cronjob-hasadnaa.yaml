@@ -22,16 +22,21 @@ spec:
           restartPolicy: OnFailure
           initContainers:
           - name: pg-dump
-            image: postgres:16-alpine
+            image: postgres:17-alpine
             command: ["/bin/sh", "-c"]
             args:
             - |
-              set -e
+              set -eu
               TIMESTAMP=$(date +%Y-%m-%d)
-              FILENAME="hasadnaa-${TIMESTAMP}.sql.gz"
+              SQL_FILE="/backups/hasadnaa-${TIMESTAMP}.sql"
+              ARCHIVE_FILE="${SQL_FILE}.gz"
               echo "Backing up hasadnaa..."
-              pg_dump -h dirtbike-postgres.dirtbike.svc.cluster.local -p 5432 -U "${PGUSER}" -d hasadnaa --no-password | gzip > "/backups/${FILENAME}"
-              echo "Done: $(du -h /backups/${FILENAME} | cut -f1)"
+              pg_dump -h shared-postgres.postgres.svc.cluster.local -p 5432 -U "${PGUSER}" -d hasadnaa --no-password --file "${SQL_FILE}"
+              test -s "${SQL_FILE}"
+              gzip "${SQL_FILE}"
+              gzip -t "${ARCHIVE_FILE}"
+              gzip -cd "${ARCHIVE_FILE}" | tail -20 | grep -q '^-- PostgreSQL database dump complete'
+              echo "Backup validated: $(du -h "${ARCHIVE_FILE}" | cut -f1)"
             env:
             - name: PGUSER
               valueFrom:

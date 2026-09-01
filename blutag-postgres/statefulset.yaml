@@ -6,7 +6,10 @@ metadata:
     app: blutag-postgres
 spec:
   serviceName: blutag-postgres
-  replicas: 1
+  replicas: 0
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   selector:
     matchLabels:
       app: blutag-postgres

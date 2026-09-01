@@ -6,7 +6,10 @@ metadata:
     app: anpr-postgres
 spec:
   serviceName: anpr-postgres
-  replicas: 1
+  replicas: 0
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   selector:
     matchLabels:
       app: anpr-postgres

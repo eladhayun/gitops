@@ -6,7 +6,10 @@ metadata:
     app: dirtbike-postgres
 spec:
   serviceName: dirtbike-postgres
-  replicas: 1
+  replicas: 0
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   selector:
     matchLabels:
       app: dirtbike-postgres

@@ -27,7 +27,7 @@ spec:
             args: ["drc-weekly-summary"]
             env:
             - name: DRC_DB_HOST
-              value: "trainings-postgres.trainings.svc.cluster.local"
+              value: "shared-postgres.postgres.svc.cluster.local"
             - name: DRC_DB_PORT
               value: "5432"
             - name: DRC_DB_NAME

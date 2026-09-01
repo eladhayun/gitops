@@ -5,7 +5,8 @@ metadata:
   labels:
     app: ids
 spec:
-  replicas: 1
+  # Temporarily paused for the frozen shared-PostgreSQL cutover.
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:

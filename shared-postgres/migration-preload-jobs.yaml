@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: shared-postgres-preload-trainings-20260901
+  name: shared-postgres-preload-trainings-20260901-r2
   namespace: postgres
   annotations:
     argocd.argoproj.io/sync-wave: "10"

@@ -12,6 +12,7 @@ resources:
   - migration-final-trainings-job.yaml
   - migration-final-hasadnaa-job.yaml
   - migration-final-anpr-job.yaml
+  - migration-final-blutag-job.yaml
 
 generators:
   - secrets-generator.yaml

@@ -5,7 +5,9 @@ metadata:
   labels:
     app: trainings
 spec:
-  replicas: 1
+  # Temporarily paused while the authoritative database is copied to the
+  # shared PostgreSQL server. The cutover commit restores this to one.
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:

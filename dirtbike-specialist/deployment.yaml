@@ -5,7 +5,8 @@ metadata:
   labels:
     app: dirtbike-specialist
 spec:
-  replicas: 1
+  # Temporarily paused for the frozen shared-PostgreSQL cutover.
+  replicas: 0
   revisionHistoryLimit: 1
   selector:
     matchLabels:

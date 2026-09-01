@@ -10,6 +10,7 @@ resources:
   - bootstrap-job.yaml
   - migration-preload-jobs.yaml
   - migration-final-trainings-job.yaml
+  - migration-final-hasadnaa-job.yaml
 
 generators:
   - secrets-generator.yaml

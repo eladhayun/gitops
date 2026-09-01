@@ -66,6 +66,54 @@ Their retained Kubernetes PVC objects reference Azure disks that were deleted on
 2026-08-31, and no corresponding logical backups exist in the `pg-backups`
 container. Do not treat those stale PVC objects as recoverable databases.
 
+## Completed consolidation evidence
+
+All six active databases were cut over on 2026-09-01. For each database, its
+writers were stopped, a consistent custom-format dump was uploaded, the shared
+target was replaced from that dump, and exact table row counts and sequence
+states were compared before the writer was resumed.
+
+Final recovery archives are stored in Azure Blob Storage under the following
+content-addressed prefixes. Each dump has a matching `.sha256` sidecar; all 12
+objects were independently listed as current, versioned, and server-encrypted.
+
+| Database | Final prefix | SHA-256 | Bytes |
+|---|---|---|---:|
+| `trainings` | `consolidation/final/20260901T062148Z/` | `487468bf6647b78a1f78d4b9d60a1efd93c54ecdd526404f8fec62ce5803d96d` | 155,208 |
+| `hasadnaa` | `consolidation/final/20260901T063112Z/` | `da0ee6e0d152c63c991e73f035a9c837380e3454b577047a657b41e2f5c51d1a` | 29,811 |
+| `anpr` | `consolidation/final/20260901T063753Z/` | `bfcb672b4e0c70ebe10696ea61b051f2b518b0c3833a8fc8a7c3533a636e1620` | 868,211 |
+| `blutag` | `consolidation/final/20260901T064502Z/` | `2dd7bd1c611e51682e107ff8dc8748fb7250e5e5a291af62ad3e377558905937` | 3,830,849 |
+| `dirtbike` | `consolidation/final/20260901T065235Z/` | `21f863bcac8df0a153cea5683168aa6d6fbd546d87f752932909c464cc378511` | 321,174,369 |
+| `ids_embeddings` | `consolidation/final/20260901T071004Z/` | `7e5241854551713c14eae2666616cf3f68d335de12ca72329ac1982ae6a94092` | 529,174,454 |
+
+Post-cutover validation established:
+
+- all databases have the intended owner, zero invalid indexes, and zero
+  unvalidated constraints;
+- Dirtbike and IDS use pgvector `0.8.6`; 3,777 Dirtbike vectors have 3,072
+  dimensions and 64,086 IDS email vectors have 1,536 dimensions;
+- the six application health endpoints returned HTTP 200 and all Argo CD
+  applications were `Synced/Healthy`;
+- all application and reporting consumers connect to the shared service, while
+  every retained legacy server has zero client connections;
+- the six `pg-backup-*-shared-20260901` Jobs completed against PostgreSQL 17 and
+  uploaded validated, server-encrypted daily backups; and
+- a manual `ids-init-embeddings-shared-20260901` run completed against shared
+  PostgreSQL, finding 2,125 products and zero changed embeddings.
+
+The shared PVC is 16 GiB and was 17% used after migration. Data checksums are
+enabled, `max_connections` is 200, application roles are non-superusers, and a
+cross-database CONNECT privilege audit returned zero violations.
+
+## Legacy rollback state
+
+The five legacy PostgreSQL StatefulSets and all of their PVCs remain running at
+one replica with zero application clients. They are deliberately retained as
+rollback state and must not be scaled down or deleted until the observation
+period is complete and a separate change is approved. While they are retained,
+their pods duplicate about 666 MiB of measured memory and can prevent the node
+autoscaler from settling at the final two-node cost baseline.
+
 ## Migration sequence
 
 1. Deploy this application and verify PostgreSQL, roles, databases, extensions,
@@ -80,26 +128,24 @@ container. Do not treat those stale PVC objects as recoverable databases.
    PostgreSQL StatefulSets to zero.
 6. Keep every legacy StatefulSet definition and PVC intact as rollback state.
 
-### Copy-only preload
+### Copy-only preload (completed)
 
-The temporary `shared-postgres-preload-*-20260901` Jobs take consistent custom-
-format dumps from the six live source databases, validate each archive, upload
-it to `pg-backups/consolidation/preload/20260901T054603Z/`, and only then restore
-it into the empty shared target. Argo CD sync waves serialize the Jobs from the
-smallest database to the largest so they do not compete for source I/O, target
+The `shared-postgres-preload-*-20260901` Jobs took consistent custom-format dumps
+from the six live source databases, validated each archive, uploaded it to
+`pg-backups/consolidation/preload/20260901T054603Z/`, and only then restored it
+into the empty shared target. Argo CD sync waves serialized the Jobs from the
+smallest database to the largest so they did not compete for source I/O, target
 I/O, or node memory.
 
-Preload dumps use `--no-owner --no-acl`; restores run as each database's
-non-superuser owner in one transaction. Every restore refuses to run if the
-target already contains user relations, and it fails on any restore error or
-invalid index. The source databases remain authoritative and writable during
-this preload, so these copies are validation candidates only—not cutover copies.
+Preload dumps used `--no-owner --no-acl`; restores ran as each database's
+non-superuser owner in one transaction. These archives remain validation
+copies—not cutover copies.
 
-`migration-secrets.yaml` is a temporary SOPS-encrypted copy of the active source
-backup and Azure credentials. Remove it, the migration ConfigMap, and completed
-preload Jobs from Git after the preload evidence has been collected. Final
-cutover dumps use a separate immutable prefix and are taken only after stopping
-the corresponding writers.
+After final evidence was collected, the temporary SOPS migration credential
+copy, migration ConfigMap, and completed preload/final Job manifests were
+removed from the active Kustomization. Their immutable Azure archives and Git
+history remain available; the shared database and legacy rollback resources are
+not part of that cleanup.
 
 ## Rollback
 

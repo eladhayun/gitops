@@ -21,7 +21,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: uptime-check
-            image: prodacr1234.azurecr.io/slack-notifications:main-aeda0d4
+            image: prodacr1234.azurecr.io/slack-notifications:main-3de7add
             command: ["/root/slack-notifications"]
             args: ["uptime-check"]
             env:

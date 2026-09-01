@@ -5,8 +5,7 @@ metadata:
   labels:
     app: dirtbike-specialist
 spec:
-  # Temporarily paused for the frozen shared-PostgreSQL cutover.
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 1
   selector:
     matchLabels:
@@ -70,14 +69,11 @@ spec:
             - name: AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME
               value: "text-embedding-3-large"
             - name: POSTGRES_HOST
-              value: dirtbike-postgres
+              value: shared-postgres.postgres.svc.cluster.local
             - name: POSTGRES_DB
               value: dirtbike
             - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: dirtbike-postgres-secret
-                  key: postgres-user
+              value: dirtbike
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:

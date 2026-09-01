@@ -8,6 +8,8 @@ metadata:
 spec:
   # Run daily at midnight UTC to check for product changes
   schedule: "0 0 * * *"
+  # Temporarily suspended so the final database dump has no background writer.
+  suspend: true
   # Keep last 3 successful jobs and 1 failed job
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1

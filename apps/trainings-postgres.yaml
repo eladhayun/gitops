@@ -13,7 +13,7 @@ spec:
     path: trainings-postgres
   destination:
     server: https://kubernetes.default.svc
-    namespace: trainings
+    namespace: drc
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

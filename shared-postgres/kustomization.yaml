@@ -13,6 +13,7 @@ resources:
   - migration-final-hasadnaa-job.yaml
   - migration-final-anpr-job.yaml
   - migration-final-blutag-job.yaml
+  - migration-final-dirtbike-job.yaml
 
 generators:
   - secrets-generator.yaml

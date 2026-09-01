@@ -110,10 +110,15 @@ cross-database CONNECT privilege audit returned zero violations.
 After application verification and explicit approval on 2026-09-01, the five
 legacy PostgreSQL StatefulSets were first scaled to zero with
 `persistentVolumeClaimRetentionPolicy` set to `Retain`, then their StatefulSets
-and Services were pruned from the active Kustomizations. All five original 5 GiB
-PVCs remain Bound. The stopped StatefulSet and Service manifests remain in Git
-but are intentionally unreferenced so rollback does not require reconstructing
-them.
+and Services were pruned from the active Kustomizations. After separately
+confirming the five Azure snapshots and all six content-addressed logical dumps,
+the five original 5 GiB PVCs, PVs, and Azure managed disks were permanently
+deleted with explicit approval. The stopped StatefulSet and Service manifests
+remain in Git as restore scaffolding but are intentionally unreferenced.
+
+Recovery now depends on the retained `pg-consolidation-20260901-*` snapshots or
+the immutable logical archives under `pg-backups/consolidation/final/`. The
+deleted legacy disks are not an available rollback path.
 
 The legacy Argo applications remain because several of them own connection
 Secrets still consumed by live workloads. They are Secret-only applications;
@@ -133,7 +138,9 @@ applications.
 4. Update and manually test every PostgreSQL backup CronJob against this service.
 5. Observe all applications and a full backup window before scaling legacy
    PostgreSQL StatefulSets to zero.
-6. Keep every legacy StatefulSet definition and PVC intact as rollback state.
+6. Prune legacy runtimes first, then delete their PVCs only after separately
+   verifying snapshots and immutable logical backups and receiving explicit
+   approval.
 
 ### Copy-only preload (completed)
 
@@ -156,9 +163,10 @@ not part of that cleanup.
 
 ## Rollback
 
-To roll back, stop the affected application first. Re-add `statefulset.yaml` and
-`service.yaml` to that legacy directory's `kustomization.yaml`, change the
-StatefulSet replica count to one, and sync through GitOps. Wait for the original
-PVC to attach and PostgreSQL to become ready before reverting the consumer's
-connection settings. Never write to both copies during rollback; choose one
-authoritative database before resuming the application.
+To roll back, stop the affected application first. Provision a replacement disk
+from the corresponding Azure snapshot, or deploy an empty PostgreSQL server and
+restore the final logical archive. The unreferenced legacy StatefulSet and
+Service manifests can be adapted as restore scaffolding, but must not be
+expected to attach the deleted PVC. Validate the restored database before
+reverting the consumer's connection settings. Never write to both copies during
+rollback; choose one authoritative database before resuming the application.

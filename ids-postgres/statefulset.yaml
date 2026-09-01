@@ -6,7 +6,10 @@ metadata:
     app: ids-postgres
 spec:
   serviceName: ids-postgres
-  replicas: 1
+  replicas: 0
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   selector:
     matchLabels:
       app: ids-postgres
@@ -74,4 +77,3 @@ spec:
       resources:
         requests:
           storage: 5Gi
-

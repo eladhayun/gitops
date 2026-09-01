@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: alloy
+  namespace: loki
+  labels:
+    app: alloy
+    app.kubernetes.io/name: alloy
+    app.kubernetes.io/component: log-collector
+spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: alloy
+  template:
+    metadata:
+      labels:
+        app: alloy
+        app.kubernetes.io/name: alloy
+        app.kubernetes.io/component: log-collector
+      annotations:
+        kubectl.kubernetes.io/default-container: alloy
+    spec:
+      serviceAccountName: alloy
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: alloy
+        image: grafana/alloy:v1.18.1
+        imagePullPolicy: IfNotPresent
+        args:
+          - run
+          - --disable-reporting
+          - --server.http.listen-addr=0.0.0.0:12345
+          - --storage.path=/var/lib/alloy/data
+          - /etc/alloy/config.alloy
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        ports:
+        - containerPort: 12345
+          name: http-metrics
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: http-metrics
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alloy/config.alloy
+          subPath: config.alloy
+          readOnly: true
+        - name: storage
+          mountPath: /var/lib/alloy
+        - name: pod-logs
+          mountPath: /var/log/pods
+          readOnly: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 96Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 0
+          runAsNonRoot: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+      volumes:
+      - name: config
+        configMap:
+          name: alloy-config
+      - name: storage
+        emptyDir: {}
+      - name: pod-logs
+        hostPath:
+          path: /var/log/pods
+          type: Directory
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists

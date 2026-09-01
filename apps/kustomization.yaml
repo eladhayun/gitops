@@ -27,7 +27,6 @@ resources:
   - dirtbike-specialist.yaml
   - dirtbike-postgres.yaml
   - loki.yaml
-  - grafana.yaml
   - hasadnaa.yaml
   - trainings.yaml
   - trainings-postgres.yaml

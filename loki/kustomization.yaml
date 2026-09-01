@@ -1,16 +1,22 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: loki
+
 resources:
   - namespace.yaml
   - configmap.yaml
   - statefulset.yaml
   - service.yaml
-  - promtail-configmap.yaml
-  - promtail-daemonset.yaml
+  - alloy-daemonset.yaml
   - serviceaccount.yaml
   # secrets-storage-generator.yaml - Managed manually via setup-storage.sh (not in GitOps)
-  # ingress.yaml - Removed: Loki is accessed via Grafana UI, no external ingress needed
+  # ingress.yaml - Disabled: use kubectl port-forward or the Kubernetes API proxy
+
+configMapGenerator:
+  - name: alloy-config
+    files:
+      - config.alloy
 
 generators:
   - secrets-auth-generator.yaml  # SOPS-encrypted secrets (loki-auth and loki-azure-storage)

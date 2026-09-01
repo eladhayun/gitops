@@ -66,8 +66,19 @@ data:
         --name "${blob}" \
         --file "${archive}" \
         --overwrite false \
-        --validate-content true \
+        --validate-content \
         --only-show-errors
+    fi
+
+    checksum_exists="$(az storage blob exists \
+      --account-name "${AZURE_STORAGE_ACCOUNT}" \
+      --account-key "${AZURE_STORAGE_KEY}" \
+      --container-name pg-backups \
+      --name "${blob}.sha256" \
+      --query exists \
+      --output tsv)"
+
+    if [ "${checksum_exists}" != "true" ]; then
       az storage blob upload \
         --account-name "${AZURE_STORAGE_ACCOUNT}" \
         --account-key "${AZURE_STORAGE_KEY}" \
@@ -75,7 +86,7 @@ data:
         --name "${blob}.sha256" \
         --file "${checksum}" \
         --overwrite false \
-        --validate-content true \
+        --validate-content \
         --only-show-errors
     fi
 

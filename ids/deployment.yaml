@@ -160,7 +160,7 @@ spec:
         - name: ENABLE_EMAIL_CONTEXT
           value: "true"  # Toggle email history in chat responses (true/false)
         - name: QDRANT_ENABLED
-          value: "true"  # Qdrant search enabled - verified data exists
+          value: "false"  # Use PostgreSQL pgvector for all vector searches
         - name: EMBEDDINGS_DATABASE_URL
           valueFrom:
             secretKeyRef:
@@ -234,4 +234,3 @@ spec:
           defaultMode: 0600
       - name: shared-data
         emptyDir: {}
-

@@ -9,6 +9,7 @@ resources:
   - service.yaml
   - bootstrap-job.yaml
   - migration-preload-jobs.yaml
+  - migration-final-trainings-job.yaml
 
 generators:
   - secrets-generator.yaml

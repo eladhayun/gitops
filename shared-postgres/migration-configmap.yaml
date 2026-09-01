@@ -150,3 +150,85 @@ data:
       --dbname="${DATABASE}" \
       --analyze-in-stages
     echo "Restore and index validation completed for ${DATABASE}"
+
+  final-restore.sh: |
+    #!/bin/sh
+    set -eu
+
+    target_host="shared-postgres.postgres.svc.cluster.local"
+    archive="/migration/${DATABASE}.dump"
+    restore_list="/migration/${DATABASE}.restore.list"
+
+    echo "Replacing the validation-only ${DATABASE} preload with its frozen final copy"
+    PGPASSWORD="${TARGET_ADMIN_PASSWORD}" psql -X \
+      --host="${target_host}" \
+      --port=5432 \
+      --username=postgres \
+      --dbname=postgres \
+      --set=ON_ERROR_STOP=1 \
+      --set=database="${DATABASE}" \
+      --set=owner="${TARGET_USER}" <<-'EOSQL'
+    SELECT pg_terminate_backend(pid)
+      FROM pg_stat_activity
+      WHERE datname = :'database' AND pid <> pg_backend_pid();
+    DROP DATABASE :"database" WITH (FORCE);
+    CREATE DATABASE :"database" OWNER :"owner";
+    REVOKE ALL ON DATABASE :"database" FROM PUBLIC;
+    GRANT CONNECT, TEMPORARY ON DATABASE :"database" TO :"owner";
+    EOSQL
+
+    if [ "${VECTOR_REQUIRED}" = "true" ]; then
+      PGPASSWORD="${TARGET_ADMIN_PASSWORD}" psql -X \
+        --host="${target_host}" \
+        --port=5432 \
+        --username=postgres \
+        --dbname="${DATABASE}" \
+        --set=ON_ERROR_STOP=1 \
+        --command='CREATE EXTENSION IF NOT EXISTS vector;'
+    fi
+
+    echo "Restoring the frozen ${DATABASE} archive as ${TARGET_USER}"
+    PGPASSWORD="${TARGET_PASSWORD}" pg_restore \
+      --host="${target_host}" \
+      --port=5432 \
+      --username="${TARGET_USER}" \
+      --dbname="${DATABASE}" \
+      --no-owner \
+      --no-acl \
+      --exit-on-error \
+      --single-transaction \
+      --use-list="${restore_list}" \
+      "${archive}"
+
+    invalid_indexes="$(PGPASSWORD="${TARGET_PASSWORD}" psql -X -A -t \
+      --host="${target_host}" \
+      --port=5432 \
+      --username="${TARGET_USER}" \
+      --dbname="${DATABASE}" \
+      --set=ON_ERROR_STOP=1 \
+      --command="SELECT count(*) FROM pg_index WHERE NOT indisvalid OR NOT indisready;")"
+    unvalidated_constraints="$(PGPASSWORD="${TARGET_PASSWORD}" psql -X -A -t \
+      --host="${target_host}" \
+      --port=5432 \
+      --username="${TARGET_USER}" \
+      --dbname="${DATABASE}" \
+      --set=ON_ERROR_STOP=1 \
+      --command="SELECT count(*) FROM pg_constraint WHERE conrelid <> 0 AND NOT convalidated;")"
+    unexpected_owners="$(PGPASSWORD="${TARGET_PASSWORD}" psql -X -A -t \
+      --host="${target_host}" \
+      --port=5432 \
+      --username="${TARGET_USER}" \
+      --dbname="${DATABASE}" \
+      --set=ON_ERROR_STOP=1 \
+      --command="SELECT count(*) FROM pg_tables WHERE schemaname='public' AND tableowner <> current_user;")"
+    test "${invalid_indexes}" = "0"
+    test "${unvalidated_constraints}" = "0"
+    test "${unexpected_owners}" = "0"
+
+    PGPASSWORD="${TARGET_PASSWORD}" vacuumdb \
+      --host="${target_host}" \
+      --port=5432 \
+      --username="${TARGET_USER}" \
+      --dbname="${DATABASE}" \
+      --analyze-in-stages
+    echo "Frozen restore and integrity validation completed for ${DATABASE}"

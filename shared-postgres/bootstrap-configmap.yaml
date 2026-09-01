@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-postgres-bootstrap
+  namespace: postgres
+data:
+  bootstrap.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    until pg_isready -h shared-postgres -U postgres -d postgres; do
+      sleep 2
+    done
+
+    psql --set=ON_ERROR_STOP=1 \
+      --host shared-postgres \
+      --username postgres \
+      --dbname postgres \
+      --set=anpr_password="${ANPR_PASSWORD}" \
+      --set=anpr_backup_password="${ANPR_BACKUP_PASSWORD}" \
+      --set=anpr_reporter_password="${ANPR_REPORTER_PASSWORD_HASH}" \
+      --set=blutag_password="${BLUTAG_PASSWORD}" \
+      --set=dirtbike_password="${DIRTBIKE_PASSWORD}" \
+      --set=hasadnaa_password="${HASADNAA_PASSWORD}" \
+      --set=ids_password="${IDS_PASSWORD}" \
+      --set=trainings_password="${TRAININGS_PASSWORD}" <<-'EOSQL'
+    SELECT 'CREATE ROLE anpr LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'anpr') \gexec
+    SELECT 'CREATE ROLE anpr_backup LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'anpr_backup') \gexec
+    SELECT 'CREATE ROLE anpr_reporter LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'anpr_reporter') \gexec
+    SELECT 'CREATE ROLE blutag LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'blutag') \gexec
+    SELECT 'CREATE ROLE dirtbike LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'dirtbike') \gexec
+    SELECT 'CREATE ROLE hasadnaa LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'hasadnaa') \gexec
+    SELECT 'CREATE ROLE ids_user LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'ids_user') \gexec
+    SELECT 'CREATE ROLE trainings LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'trainings') \gexec
+
+    ALTER ROLE anpr WITH LOGIN PASSWORD :'anpr_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE anpr_backup WITH LOGIN PASSWORD :'anpr_backup_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE anpr_reporter WITH LOGIN PASSWORD :'anpr_reporter_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE blutag WITH LOGIN PASSWORD :'blutag_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE dirtbike WITH LOGIN PASSWORD :'dirtbike_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE hasadnaa WITH LOGIN PASSWORD :'hasadnaa_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE ids_user WITH LOGIN PASSWORD :'ids_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+    ALTER ROLE trainings WITH LOGIN PASSWORD :'trainings_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+
+    SELECT 'CREATE DATABASE anpr OWNER anpr'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'anpr') \gexec
+    SELECT 'CREATE DATABASE blutag OWNER blutag'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'blutag') \gexec
+    SELECT 'CREATE DATABASE dirtbike OWNER dirtbike'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'dirtbike') \gexec
+    SELECT 'CREATE DATABASE hasadnaa OWNER hasadnaa'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'hasadnaa') \gexec
+    SELECT 'CREATE DATABASE ids_embeddings OWNER ids_user'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'ids_embeddings') \gexec
+    SELECT 'CREATE DATABASE trainings OWNER trainings'
+      WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'trainings') \gexec
+
+    ALTER DATABASE anpr OWNER TO anpr;
+    ALTER DATABASE blutag OWNER TO blutag;
+    ALTER DATABASE dirtbike OWNER TO dirtbike;
+    ALTER DATABASE hasadnaa OWNER TO hasadnaa;
+    ALTER DATABASE ids_embeddings OWNER TO ids_user;
+    ALTER DATABASE trainings OWNER TO trainings;
+
+    REVOKE ALL ON DATABASE anpr FROM PUBLIC;
+    REVOKE ALL ON DATABASE blutag FROM PUBLIC;
+    REVOKE ALL ON DATABASE dirtbike FROM PUBLIC;
+    REVOKE ALL ON DATABASE hasadnaa FROM PUBLIC;
+    REVOKE ALL ON DATABASE ids_embeddings FROM PUBLIC;
+    REVOKE ALL ON DATABASE trainings FROM PUBLIC;
+
+    GRANT CONNECT, TEMPORARY ON DATABASE anpr TO anpr;
+    GRANT CONNECT ON DATABASE anpr TO anpr_backup, anpr_reporter;
+    GRANT CONNECT, TEMPORARY ON DATABASE blutag TO blutag;
+    GRANT CONNECT, TEMPORARY ON DATABASE dirtbike TO dirtbike;
+    GRANT CONNECT, TEMPORARY ON DATABASE hasadnaa TO hasadnaa;
+    GRANT CONNECT, TEMPORARY ON DATABASE ids_embeddings TO ids_user;
+    GRANT CONNECT, TEMPORARY ON DATABASE trainings TO trainings;
+
+    GRANT pg_read_all_data TO anpr_backup;
+    EOSQL
+
+    psql --set=ON_ERROR_STOP=1 --host shared-postgres --username postgres \
+      --dbname dirtbike -c 'CREATE EXTENSION IF NOT EXISTS vector;'
+    psql --set=ON_ERROR_STOP=1 --host shared-postgres --username postgres \
+      --dbname ids_embeddings -c 'CREATE EXTENSION IF NOT EXISTS vector;'
+
+    psql --set=ON_ERROR_STOP=1 --host shared-postgres --username postgres \
+      --dbname anpr <<-'EOSQL'
+    GRANT USAGE ON SCHEMA public TO anpr_reporter;
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO anpr_reporter;
+    GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO anpr_reporter;
+    ALTER DEFAULT PRIVILEGES FOR ROLE anpr IN SCHEMA public
+      GRANT SELECT ON TABLES TO anpr_reporter;
+    ALTER DEFAULT PRIVILEGES FOR ROLE anpr IN SCHEMA public
+      GRANT SELECT ON SEQUENCES TO anpr_reporter;
+    EOSQL

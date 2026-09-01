@@ -5,8 +5,7 @@ metadata:
   labels:
     app: hasadnaa
 spec:
-  # Temporarily paused for the frozen shared-PostgreSQL cutover.
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -41,7 +40,7 @@ spec:
             - name: AZURE_STORAGE_CONTAINER_NAME
               value: "hasadnaa-documents"
             - name: POSTGRES_HOST
-              value: "dirtbike-postgres.dirtbike.svc.cluster.local"
+              value: "shared-postgres.postgres.svc.cluster.local"
             - name: POSTGRES_PORT
               value: "5432"
             - name: POSTGRES_DB

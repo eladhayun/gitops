@@ -26,7 +26,7 @@ spec:
             args: ["hasadnaa-weekly-summary"]
             env:
             - name: HASADNAA_DB_HOST
-              value: "dirtbike-postgres.dirtbike.svc.cluster.local"
+              value: "shared-postgres.postgres.svc.cluster.local"
             - name: HASADNAA_DB_PORT
               value: "5432"
             - name: HASADNAA_DB_NAME

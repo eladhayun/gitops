@@ -1,0 +1,84 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-bootstrap
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: shared-postgres-bootstrap
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: bootstrap
+          image: pgvector/pgvector:pg17
+          command:
+            - /bootstrap/bootstrap.sh
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: POSTGRES_ADMIN_PASSWORD
+            - name: ANPR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: ANPR_PASSWORD
+            - name: ANPR_BACKUP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: ANPR_BACKUP_PASSWORD
+            - name: ANPR_REPORTER_PASSWORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: ANPR_REPORTER_PASSWORD_HASH
+            - name: BLUTAG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: BLUTAG_PASSWORD
+            - name: DIRTBIKE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: DIRTBIKE_PASSWORD
+            - name: HASADNAA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: HASADNAA_PASSWORD
+            - name: IDS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: IDS_PASSWORD
+            - name: TRAININGS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-secrets
+                  key: TRAININGS_PASSWORD
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: bootstrap
+              mountPath: /bootstrap
+              readOnly: true
+      volumes:
+        - name: bootstrap
+          configMap:
+            name: shared-postgres-bootstrap
+            defaultMode: 0555

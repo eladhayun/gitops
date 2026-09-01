@@ -4,17 +4,9 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - bootstrap-configmap.yaml
-  - migration-configmap.yaml
   - statefulset.yaml
   - service.yaml
   - bootstrap-job.yaml
-  - migration-preload-jobs.yaml
-  - migration-final-trainings-job.yaml
-  - migration-final-hasadnaa-job.yaml
-  - migration-final-anpr-job.yaml
-  - migration-final-blutag-job.yaml
-  - migration-final-dirtbike-job.yaml
-  - migration-final-ids-job.yaml
 
 generators:
   - secrets-generator.yaml

@@ -80,6 +80,27 @@ container. Do not treat those stale PVC objects as recoverable databases.
    PostgreSQL StatefulSets to zero.
 6. Keep every legacy StatefulSet definition and PVC intact as rollback state.
 
+### Copy-only preload
+
+The temporary `shared-postgres-preload-*-20260901` Jobs take consistent custom-
+format dumps from the six live source databases, validate each archive, upload
+it to `pg-backups/consolidation/preload/20260901T054603Z/`, and only then restore
+it into the empty shared target. Argo CD sync waves serialize the Jobs from the
+smallest database to the largest so they do not compete for source I/O, target
+I/O, or node memory.
+
+Preload dumps use `--no-owner --no-acl`; restores run as each database's
+non-superuser owner in one transaction. Every restore refuses to run if the
+target already contains user relations, and it fails on any restore error or
+invalid index. The source databases remain authoritative and writable during
+this preload, so these copies are validation candidates only—not cutover copies.
+
+`migration-secrets.yaml` is a temporary SOPS-encrypted copy of the active source
+backup and Azure credentials. Remove it, the migration ConfigMap, and completed
+preload Jobs from Git after the preload evidence has been collected. Final
+cutover dumps use a separate immutable prefix and are taken only after stopping
+the corresponding writers.
+
 ## Rollback
 
 Before a legacy server is scaled down, rollback is only a connection-secret

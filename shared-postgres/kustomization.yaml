@@ -4,9 +4,11 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - bootstrap-configmap.yaml
+  - migration-configmap.yaml
   - statefulset.yaml
   - service.yaml
   - bootstrap-job.yaml
+  - migration-preload-jobs.yaml
 
 generators:
   - secrets-generator.yaml

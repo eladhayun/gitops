@@ -28,12 +28,26 @@ spec:
             - |
               set -eu
               TIMESTAMP=$(date +%Y-%m-%d)
-              SQL_FILE="/backups/ids_embeddings-${TIMESTAMP}.sql"
-              ARCHIVE_FILE="${SQL_FILE}.gz"
+              ARCHIVE_FILE="/backups/ids_embeddings-${TIMESTAMP}.sql.gz"
+              DUMP_PIPE="/backups/.ids-${TIMESTAMP}.pipe"
               echo "Backing up ids_embeddings..."
-              pg_dump -h shared-postgres.postgres.svc.cluster.local -p 5432 -U "${PGUSER}" -d ids_embeddings --no-password --file "${SQL_FILE}"
-              test -s "${SQL_FILE}"
-              gzip "${SQL_FILE}"
+              mkfifo "${DUMP_PIPE}"
+              gzip -c < "${DUMP_PIPE}" > "${ARCHIVE_FILE}" &
+              GZIP_PID=$!
+              if pg_dump -h shared-postgres.postgres.svc.cluster.local -p 5432 -U "${PGUSER}" -d ids_embeddings --no-password --file "${DUMP_PIPE}"; then
+                DUMP_STATUS=0
+              else
+                DUMP_STATUS=$?
+              fi
+              if wait "${GZIP_PID}"; then
+                GZIP_STATUS=0
+              else
+                GZIP_STATUS=$?
+              fi
+              rm -f "${DUMP_PIPE}"
+              test "${DUMP_STATUS}" -eq 0
+              test "${GZIP_STATUS}" -eq 0
+              test -s "${ARCHIVE_FILE}"
               gzip -t "${ARCHIVE_FILE}"
               gzip -cd "${ARCHIVE_FILE}" | tail -20 | grep -q '^-- PostgreSQL database dump complete'
               echo "Backup validated: $(du -h "${ARCHIVE_FILE}" | cut -f1)"

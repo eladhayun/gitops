@@ -31,7 +31,7 @@ spec:
               SQL_FILE="/backups/anpr-${TIMESTAMP}.sql"
               ARCHIVE_FILE="${SQL_FILE}.gz"
               echo "Backing up anpr..."
-              pg_dump -h anpr-postgres.anpr.svc.cluster.local -p 5432 -U "${PGUSER}" -d anpr --no-password --file "${SQL_FILE}"
+              pg_dump -h shared-postgres.postgres.svc.cluster.local -p 5432 -U "${PGUSER}" -d anpr --no-password --file "${SQL_FILE}"
               test -s "${SQL_FILE}"
               gzip "${SQL_FILE}"
               gzip -t "${ARCHIVE_FILE}"

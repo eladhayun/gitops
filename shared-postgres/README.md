@@ -107,12 +107,19 @@ cross-database CONNECT privilege audit returned zero violations.
 
 ## Legacy rollback state
 
-The five legacy PostgreSQL StatefulSets and all of their PVCs remain running at
-one replica with zero application clients. They are deliberately retained as
-rollback state and must not be scaled down or deleted until the observation
-period is complete and a separate change is approved. While they are retained,
-their pods duplicate about 666 MiB of measured memory and can prevent the node
-autoscaler from settling at the final two-node cost baseline.
+After application verification and explicit approval on 2026-09-01, the five
+legacy PostgreSQL StatefulSets were first scaled to zero with
+`persistentVolumeClaimRetentionPolicy` set to `Retain`, then their StatefulSets
+and Services were pruned from the active Kustomizations. All five original 5 GiB
+PVCs remain Bound. The stopped StatefulSet and Service manifests remain in Git
+but are intentionally unreferenced so rollback does not require reconstructing
+them.
+
+The legacy Argo applications remain because several of them own connection
+Secrets still consumed by live workloads. They are Secret-only applications;
+their presence does not run a legacy database pod. Do not delete these Argo
+applications until those Secrets have been transferred to the consuming
+applications.
 
 ## Migration sequence
 
@@ -149,9 +156,9 @@ not part of that cleanup.
 
 ## Rollback
 
-Before a legacy server is scaled down, rollback is only a connection-secret
-revert followed by an application restart. After a legacy server is scaled to
-zero, first restore its StatefulSet replica to one through GitOps, wait for the
-original PVC to attach and PostgreSQL to become ready, then revert the consumer's
-connection settings. Never write to both copies during rollback; stop the
-application first and choose one authoritative database.
+To roll back, stop the affected application first. Re-add `statefulset.yaml` and
+`service.yaml` to that legacy directory's `kustomization.yaml`, change the
+StatefulSet replica count to one, and sync through GitOps. Wait for the original
+PVC to attach and PostgreSQL to become ready before reverting the consumer's
+connection settings. Never write to both copies during rollback; choose one
+authoritative database before resuming the application.

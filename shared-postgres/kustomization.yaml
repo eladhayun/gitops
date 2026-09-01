@@ -14,6 +14,7 @@ resources:
   - migration-final-anpr-job.yaml
   - migration-final-blutag-job.yaml
   - migration-final-dirtbike-job.yaml
+  - migration-final-ids-job.yaml
 
 generators:
   - secrets-generator.yaml

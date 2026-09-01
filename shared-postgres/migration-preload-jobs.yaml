@@ -1,0 +1,416 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-preload-trainings-20260901
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels:
+        app: shared-postgres-migration
+        database: trainings
+        phase: preload
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: dump
+          image: postgres:17-alpine
+          command: [/scripts/dump.sh]
+          env:
+            - {name: DATABASE, value: trainings}
+            - {name: SOURCE_HOST, value: trainings-postgres.trainings.svc.cluster.local}
+            - name: SOURCE_USER
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: TRAININGS_PGUSER}}
+            - name: SOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: TRAININGS_PGPASSWORD}}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+        - name: upload
+          image: mcr.microsoft.com/azure-cli:latest
+          command: [/scripts/upload.sh]
+          env:
+            - {name: DATABASE, value: trainings}
+            - {name: MIGRATION_PREFIX, value: consolidation/preload/20260901T054603Z}
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_ACCOUNT}}
+            - name: AZURE_STORAGE_KEY
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_KEY}}
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      containers:
+        - name: restore
+          image: pgvector/pgvector:pg17
+          command: [/scripts/restore.sh]
+          env:
+            - {name: DATABASE, value: trainings}
+            - {name: TARGET_USER, value: trainings}
+            - name: TARGET_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-secrets, key: TRAININGS_PASSWORD}}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      volumes:
+        - name: scripts
+          configMap: {name: shared-postgres-migration, defaultMode: 0555}
+        - name: migration
+          emptyDir: {sizeLimit: 2Gi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-preload-hasadnaa-20260901
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels: {app: shared-postgres-migration, database: hasadnaa, phase: preload}
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: dump
+          image: postgres:17-alpine
+          command: [/scripts/dump.sh]
+          env:
+            - {name: DATABASE, value: hasadnaa}
+            - {name: SOURCE_HOST, value: dirtbike-postgres.dirtbike.svc.cluster.local}
+            - name: SOURCE_USER
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: HASADNAA_PGUSER}}
+            - name: SOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: HASADNAA_PGPASSWORD}}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+        - name: upload
+          image: mcr.microsoft.com/azure-cli:latest
+          command: [/scripts/upload.sh]
+          env:
+            - {name: DATABASE, value: hasadnaa}
+            - {name: MIGRATION_PREFIX, value: consolidation/preload/20260901T054603Z}
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_ACCOUNT}}
+            - name: AZURE_STORAGE_KEY
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_KEY}}
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      containers:
+        - name: restore
+          image: pgvector/pgvector:pg17
+          command: [/scripts/restore.sh]
+          env:
+            - {name: DATABASE, value: hasadnaa}
+            - {name: TARGET_USER, value: hasadnaa}
+            - name: TARGET_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-secrets, key: HASADNAA_PASSWORD}}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      volumes:
+        - name: scripts
+          configMap: {name: shared-postgres-migration, defaultMode: 0555}
+        - name: migration
+          emptyDir: {sizeLimit: 2Gi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-preload-anpr-20260901
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "30"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels: {app: shared-postgres-migration, database: anpr, phase: preload}
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: dump
+          image: postgres:17-alpine
+          command: [/scripts/dump.sh]
+          env:
+            - {name: DATABASE, value: anpr}
+            - {name: SOURCE_HOST, value: anpr-postgres.anpr.svc.cluster.local}
+            - name: SOURCE_USER
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: ANPR_PGUSER}}
+            - name: SOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: ANPR_PGPASSWORD}}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+        - name: upload
+          image: mcr.microsoft.com/azure-cli:latest
+          command: [/scripts/upload.sh]
+          env:
+            - {name: DATABASE, value: anpr}
+            - {name: MIGRATION_PREFIX, value: consolidation/preload/20260901T054603Z}
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_ACCOUNT}}
+            - name: AZURE_STORAGE_KEY
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_KEY}}
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      containers:
+        - name: restore
+          image: pgvector/pgvector:pg17
+          command: [/scripts/restore.sh]
+          env:
+            - {name: DATABASE, value: anpr}
+            - {name: TARGET_USER, value: anpr}
+            - name: TARGET_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-secrets, key: ANPR_PASSWORD}}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      volumes:
+        - name: scripts
+          configMap: {name: shared-postgres-migration, defaultMode: 0555}
+        - name: migration
+          emptyDir: {sizeLimit: 2Gi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-preload-blutag-20260901
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels: {app: shared-postgres-migration, database: blutag, phase: preload}
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: dump
+          image: postgres:17-alpine
+          command: [/scripts/dump.sh]
+          env:
+            - {name: DATABASE, value: blutag}
+            - {name: SOURCE_HOST, value: blutag-postgres.blutag.svc.cluster.local}
+            - name: SOURCE_USER
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: BLUTAG_PGUSER}}
+            - name: SOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: BLUTAG_PGPASSWORD}}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+        - name: upload
+          image: mcr.microsoft.com/azure-cli:latest
+          command: [/scripts/upload.sh]
+          env:
+            - {name: DATABASE, value: blutag}
+            - {name: MIGRATION_PREFIX, value: consolidation/preload/20260901T054603Z}
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_ACCOUNT}}
+            - name: AZURE_STORAGE_KEY
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_KEY}}
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      containers:
+        - name: restore
+          image: pgvector/pgvector:pg17
+          command: [/scripts/restore.sh]
+          env:
+            - {name: DATABASE, value: blutag}
+            - {name: TARGET_USER, value: blutag}
+            - name: TARGET_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-secrets, key: BLUTAG_PASSWORD}}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      volumes:
+        - name: scripts
+          configMap: {name: shared-postgres-migration, defaultMode: 0555}
+        - name: migration
+          emptyDir: {sizeLimit: 2Gi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-preload-dirtbike-20260901
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "50"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels: {app: shared-postgres-migration, database: dirtbike, phase: preload}
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: dump
+          image: postgres:17-alpine
+          command: [/scripts/dump.sh]
+          env:
+            - {name: DATABASE, value: dirtbike}
+            - {name: SOURCE_HOST, value: dirtbike-postgres.dirtbike.svc.cluster.local}
+            - name: SOURCE_USER
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: DIRTBIKE_PGUSER}}
+            - name: SOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: DIRTBIKE_PGPASSWORD}}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+        - name: upload
+          image: mcr.microsoft.com/azure-cli:latest
+          command: [/scripts/upload.sh]
+          env:
+            - {name: DATABASE, value: dirtbike}
+            - {name: MIGRATION_PREFIX, value: consolidation/preload/20260901T054603Z}
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_ACCOUNT}}
+            - name: AZURE_STORAGE_KEY
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_KEY}}
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      containers:
+        - name: restore
+          image: pgvector/pgvector:pg17
+          command: [/scripts/restore.sh]
+          env:
+            - {name: DATABASE, value: dirtbike}
+            - {name: TARGET_USER, value: dirtbike}
+            - name: TARGET_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-secrets, key: DIRTBIKE_PASSWORD}}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      volumes:
+        - name: scripts
+          configMap: {name: shared-postgres-migration, defaultMode: 0555}
+        - name: migration
+          emptyDir: {sizeLimit: 2Gi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shared-postgres-preload-ids-20260901
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "60"
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 7200
+  template:
+    metadata:
+      labels: {app: shared-postgres-migration, database: ids_embeddings, phase: preload}
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: dump
+          image: postgres:17-alpine
+          command: [/scripts/dump.sh]
+          env:
+            - {name: DATABASE, value: ids_embeddings}
+            - {name: SOURCE_HOST, value: ids-postgres.ids.svc.cluster.local}
+            - name: SOURCE_USER
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: IDS_PGUSER}}
+            - name: SOURCE_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: IDS_PGPASSWORD}}
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+        - name: upload
+          image: mcr.microsoft.com/azure-cli:latest
+          command: [/scripts/upload.sh]
+          env:
+            - {name: DATABASE, value: ids_embeddings}
+            - {name: MIGRATION_PREFIX, value: consolidation/preload/20260901T054603Z}
+            - name: AZURE_STORAGE_ACCOUNT
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_ACCOUNT}}
+            - name: AZURE_STORAGE_KEY
+              valueFrom: {secretKeyRef: {name: shared-postgres-migration-secrets, key: AZURE_STORAGE_KEY}}
+          resources:
+            requests: {cpu: 20m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 512Mi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      containers:
+        - name: restore
+          image: pgvector/pgvector:pg17
+          command: [/scripts/restore.sh]
+          env:
+            - {name: DATABASE, value: ids_embeddings}
+            - {name: TARGET_USER, value: ids_user}
+            - name: TARGET_PASSWORD
+              valueFrom: {secretKeyRef: {name: shared-postgres-secrets, key: IDS_PASSWORD}}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          volumeMounts:
+            - {name: scripts, mountPath: /scripts, readOnly: true}
+            - {name: migration, mountPath: /migration}
+      volumes:
+        - name: scripts
+          configMap: {name: shared-postgres-migration, defaultMode: 0555}
+        - name: migration
+          emptyDir: {sizeLimit: 2Gi}

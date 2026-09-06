@@ -3,6 +3,12 @@ kind: Application
 metadata:
   name: trips
   namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-created.slack: C0BV8LGEWDU
+    notifications.argoproj.io/subscribe.on-deleted.slack: C0BV8LGEWDU
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: C0BV8LGEWDU
+    notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: C0BV8LGEWDU
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: C0BV8LGEWDU
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:

@@ -34,6 +34,12 @@ spec:
             secretKeyRef:
               name: trips-auth
               key: password-sha256
+        - name: TRIPS_SLACK_NOTIFICATIONS_URL
+          value: "http://slack-notifications.jshipster.svc.cluster.local:8080/notify"
+        - name: TRIPS_SLACK_CHANNEL
+          value: "C0BV8LGEWDU"
+        - name: TRIPS_SIGNIN_NOTIFY_COOLDOWN
+          value: "30m"
         resources:
           requests:
             memory: "12Mi"

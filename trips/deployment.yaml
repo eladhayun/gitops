@@ -24,6 +24,16 @@ spec:
         env:
         - name: PORT
           value: "8080"
+        - name: TRIPS_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: username
+        - name: TRIPS_PASSWORD_SHA256
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: password-sha256
         resources:
           requests:
             memory: "12Mi"

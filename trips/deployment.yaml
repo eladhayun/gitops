@@ -34,6 +34,11 @@ spec:
             secretKeyRef:
               name: trips-auth
               key: password-sha256
+        - name: TRIPS_GOOGLE_MAPS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: google-maps-api-key
         - name: TRIPS_SLACK_NOTIFICATIONS_URL
           value: "http://slack-notifications.jshipster.svc.cluster.local:8080/notify"
         - name: TRIPS_SLACK_CHANNEL

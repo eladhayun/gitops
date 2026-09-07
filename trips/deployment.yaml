@@ -24,6 +24,7 @@ spec:
         env:
         - name: PORT
           value: "8080"
+        # Keep Basic Auth configured until CI deploys the Google-login image.
         - name: TRIPS_USERNAME
           valueFrom:
             secretKeyRef:
@@ -34,6 +35,25 @@ spec:
             secretKeyRef:
               name: trips-auth
               key: password-sha256
+        - name: TRIPS_BASE_URL
+          value: "https://trips.jshipster.io"
+        - name: TRIPS_ALLOWED_EMAILS
+          value: "elad.hayun@gmail.com,osnat.fried@gmail.com"
+        - name: TRIPS_GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: google-client-id
+        - name: TRIPS_GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: google-client-secret
+        - name: TRIPS_SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: session-secret
         - name: TRIPS_GOOGLE_MAPS_API_KEY
           valueFrom:
             secretKeyRef:

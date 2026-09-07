@@ -6,8 +6,9 @@ metadata:
     app: ids
     component: init-embeddings
 spec:
-  # Run daily at midnight UTC to check for product changes
-  schedule: "0 0 * * *"
+  # Check for product changes weekly on Sunday at 03:00 Israel time.
+  schedule: "0 3 * * 0"
+  timeZone: "Asia/Jerusalem"
   suspend: false
   # Keep last 3 successful jobs and 1 failed job
   successfulJobsHistoryLimit: 3

@@ -38,7 +38,10 @@ spec:
         - name: TRIPS_BASE_URL
           value: "https://trips.jshipster.io"
         - name: TRIPS_ALLOWED_EMAILS
-          value: "elad.hayun@gmail.com,osnat.fried@gmail.com,hayun.nofar@gmail.com,dorhayun7@gmail.com,moty.hayun@gmail.com,vsavir1@gmail.com"
+          valueFrom:
+            secretKeyRef:
+              name: trips-auth
+              key: allowed-emails
         - name: TRIPS_GOOGLE_CLIENT_ID
           valueFrom:
             secretKeyRef:

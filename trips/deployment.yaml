@@ -12,6 +12,8 @@ spec:
       app: trips
   template:
     metadata:
+      annotations:
+        trips.jshipster.io/allowlist-revision: "2026-09-12-romi-update"
       labels:
         app: trips
     spec:

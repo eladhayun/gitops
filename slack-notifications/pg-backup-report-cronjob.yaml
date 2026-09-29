@@ -21,7 +21,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: pg-backup-report
-            image: prodacr1234.azurecr.io/slack-notifications:main-f061fae
+            image: prodacr1234.azurecr.io/slack-notifications:main-e01aec3
             command: ["/root/slack-notifications"]
             args: ["pg-backup-report"]
             env:

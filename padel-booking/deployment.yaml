@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: padel-booking
+spec:
+  # Commission at zero; activate only after the Mac worker has drained and stopped.
+  replicas: 0
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: padel-booking
+  template:
+    metadata:
+      labels:
+        app: padel-booking
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 600
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: prepare-private-state
+          image: padel-booking
+          command: ["/bin/sh", "-ec"]
+          args:
+            - |
+              umask 077
+              mkdir -p /private/state /private/state/watchdog /private/state/backups /private/state/tmp
+              chmod 0700 /private/state /private/state/watchdog /private/state/backups /private/state/tmp
+              for required in runtime.json booking-dsn whatsapp-dsn native-account-hmac.key; do
+                test -f "/source/$required"
+              done
+              if test -f /private/state/native-account-hmac.key; then
+                cmp -s /source/native-account-hmac.key /private/state/native-account-hmac.key || exit 1
+              fi
+              for source in /source/*; do
+                test -f "$source" || continue
+                name="${source##*/}"
+                case "$name" in
+                  runtime.json|booking-dsn|whatsapp-dsn|native-account-hmac.key|*.json|slack-token|google-token|google-credentials|azure-sas|postgres-ca.crt) ;;
+                  *) exit 1 ;;
+                esac
+                cp "$source" "/private/state/.$name.new"
+                chmod 0600 "/private/state/.$name.new"
+                mv "/private/state/.$name.new" "/private/state/$name"
+              done
+          securityContext: &containerSecurity
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: {cpu: 10m, memory: 32Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+          volumeMounts:
+            - {name: private-state, mountPath: /private}
+            - {name: private-source, mountPath: /source, readOnly: true}
+      containers:
+        - name: api
+          image: padel-booking
+          args: ["--config", "/private/state/runtime.json", "serve"]
+          env: &disabledPurchasing
+            - {name: PADEL_LAZUZ_ALLOW_LIVE_PURCHASES, value: "false"}
+            - {name: HOME, value: /private/state}
+            - {name: TMPDIR, value: /private/state/tmp}
+          securityContext: *containerSecurity
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          readinessProbe:
+            exec:
+              command: ["padel", "--config", "/private/state/runtime.json", "health", "api"]
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          volumeMounts: &runtimeMounts
+            - {name: private-state, mountPath: /private}
+            - {name: temporary, mountPath: /tmp}
+        - name: worker
+          image: padel-booking
+          args: ["--config", "/private/state/runtime.json", "worker"]
+          env: *disabledPurchasing
+          securityContext: *containerSecurity
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          readinessProbe:
+            exec:
+              command: ["padel", "--config", "/private/state/runtime.json", "health", "worker"]
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          # No liveness probe: restarting an in-flight financial write is unsafe.
+          volumeMounts: *runtimeMounts
+        - name: mcp-http
+          image: padel-booking
+          args: ["--config", "/private/state/runtime.json", "mcp", "--http"]
+          env: *disabledPurchasing
+          securityContext: *containerSecurity
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          readinessProbe:
+            exec:
+              command: ["padel", "--config", "/private/state/runtime.json", "health", "mcp"]
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          volumeMounts: *runtimeMounts
+        - name: whatsapp
+          image: padel-booking
+          args: ["--config", "/private/state/runtime.json", "whatsapp"]
+          env: *disabledPurchasing
+          securityContext: *containerSecurity
+          resources:
+            requests: {cpu: 25m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          readinessProbe:
+            exec:
+              command: ["padel", "--config", "/private/state/runtime.json", "health", "whatsapp"]
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+          volumeMounts: *runtimeMounts
+        - name: watchdog
+          image: padel-booking
+          args: ["--config", "/private/state/runtime.json", "watchdog"]
+          env: *disabledPurchasing
+          securityContext: *containerSecurity
+          resources:
+            requests: {cpu: 10m, memory: 64Mi}
+            limits: {cpu: 250m, memory: 256Mi}
+          volumeMounts: *runtimeMounts
+      volumes:
+        - name: private-state
+          persistentVolumeClaim:
+            claimName: padel-private-state
+        - name: private-source
+          secret:
+            secretName: padel-private-source
+            defaultMode: 0440
+        - name: temporary
+          emptyDir:
+            sizeLimit: 256Mi

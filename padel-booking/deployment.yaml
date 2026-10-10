@@ -13,6 +13,8 @@ spec:
       app: padel-booking
   template:
     metadata:
+      annotations:
+        padel.jshipster.io/private-config-revision: slack-20261010
       labels:
         app: padel-booking
     spec:

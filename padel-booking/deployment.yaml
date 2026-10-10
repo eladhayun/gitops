@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       annotations:
-        padel.jshipster.io/private-config-revision: slack-20261010
+        padel.jshipster.io/private-config-revision: calendar-20261011
       labels:
         app: padel-booking
     spec:
@@ -50,9 +50,24 @@ spec:
                   runtime.json|booking-dsn|whatsapp-dsn|native-account-hmac.key|*.json|slack-token|google-token|google-credentials|azure-sas|postgres-ca.crt) ;;
                   *) exit 1 ;;
                 esac
+                case "$name" in
+                  google-token|google-token.json)
+                    if test -f "/private/state/$name" && test -f "/private/state/.$name.seed" && cmp -s "$source" "/private/state/.$name.seed"; then
+                      chmod 0600 "/private/state/$name"
+                      continue
+                    fi
+                    ;;
+                esac
                 cp "$source" "/private/state/.$name.new"
                 chmod 0600 "/private/state/.$name.new"
                 mv "/private/state/.$name.new" "/private/state/$name"
+                case "$name" in
+                  google-token|google-token.json)
+                    cp "$source" "/private/state/.$name.seed.new"
+                    chmod 0600 "/private/state/.$name.seed.new"
+                    mv "/private/state/.$name.seed.new" "/private/state/.$name.seed"
+                    ;;
+                esac
               done
           securityContext: &containerSecurity
             readOnlyRootFilesystem: true

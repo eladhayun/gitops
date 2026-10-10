@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wednesday-club-public
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/eladhayun/gitops
+    targetRevision: main
+    path: wednesday-club-public
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: wednesday-club-public
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions: [CreateNamespace=true]

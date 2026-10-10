@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: wednesday-club-public
+resources:
+  - resources.yaml
+configMapGenerator:
+  - name: wednesday-club-pages
+    files:
+      - site/index.html
+      - site/privacy.html
+      - site/terms.html
+      - site/site.css
+  - name: wednesday-club-nginx
+    files:
+      - nginx.conf

@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wednesday-club-public
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wednesday-club-public
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels: {app: wednesday-club-public}
+  template:
+    metadata:
+      labels: {app: wednesday-club-public}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: pages
+          image: ghcr.io/nginx/nginx-unprivileged:1.30.5-alpine@sha256:15c994d10d6d78658721c3bcafff14cb281fba2a4bdf9d5ba92c416a472516e3
+          command: [nginx, -g, "daemon off;"]
+          ports: [{name: http, containerPort: 8080}]
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 5m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 30
+          volumeMounts:
+            - {name: pages, mountPath: /srv/wednesday-club, readOnly: true}
+            - {name: nginx, mountPath: /etc/nginx/nginx.conf, subPath: nginx.conf, readOnly: true}
+            - {name: temporary, mountPath: /tmp}
+      volumes:
+        - name: pages
+          configMap: {name: wednesday-club-pages}
+        - name: nginx
+          configMap: {name: wednesday-club-nginx}
+        - name: temporary
+          emptyDir: {sizeLimit: 16Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wednesday-club-public
+spec:
+  selector: {app: wednesday-club-public}
+  ports: [{name: http, port: 80, targetPort: http}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: documentation-only
+spec:
+  podSelector: {matchLabels: {app: wednesday-club-public}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ingress-nginx}
+      ports: [{protocol: TCP, port: 8080}]
+  egress: []
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wednesday-club-public
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [jshipster.io]
+      secretName: wednesday-club-public-tls
+  rules:
+    - host: jshipster.io
+      http:
+        paths:
+          - path: /wednesday-club
+            pathType: Prefix
+            backend:
+              service:
+                name: wednesday-club-public
+                port: {number: 80}

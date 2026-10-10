@@ -1,30 +1,39 @@
----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 resources:
-- anpr.yaml
-- anpr-postgres.yaml
-- nginx-ingress-controller.yaml
-- cert-manager.yaml
-- external-dns.yaml
-- jshipster-bastion.yaml
-- argocd-tunnel.yaml
-- ids.yaml
-- ids-postgres.yaml
-- shared-postgres.yaml
-- slack-notifications.yaml
-- blutag-website.yaml
-- blutag-app.yaml
-- blutag-postgres.yaml
-- blutag-findmy.yaml
-- blutag-pointer-push.yaml
-- blutag-omnisette.yaml
-- trips.yaml
-- dirtbike-specialist.yaml
-- dirtbike-postgres.yaml
-- loki.yaml
-- hasadnaa.yaml
-- trainings.yaml
-- trainings-postgres.yaml
-- pg-backups.yaml
-- padel-booking.yaml
+  - anpr.yaml
+  - anpr-postgres.yaml
+  - nginx-ingress-controller.yaml
+  - cert-manager.yaml
+  - external-dns.yaml
+  # - johnson.yaml
+  # - johnson-postgres.yaml
+  - jshipster-bastion.yaml
+  - argocd-tunnel.yaml
+  - ids.yaml
+  - ids-postgres.yaml
+  - shared-postgres.yaml
+  - slack-notifications.yaml
+  # - argo-rollouts-demo-fe.yaml
+  # - argo-rollouts-demo-be.yaml
+  # - argo-rollouts-demo-redis.yaml
+  - blutag-website.yaml
+  - blutag-app.yaml
+  - blutag-postgres.yaml
+  - blutag-findmy.yaml
+  - blutag-pointer-push.yaml
+  - blutag-omnisette.yaml
+  - trips.yaml
+  - dirtbike-specialist.yaml
+  - dirtbike-postgres.yaml
+  - loki.yaml
+  - hasadnaa.yaml
+  - trainings.yaml
+  - trainings-postgres.yaml
+  # - gen-rag.yaml
+  # - gen-rag-postgres.yaml
+  # - gen-rag-qdrant.yaml
+  - pg-backups.yaml
+  # - openclaw.yaml
+  - padel-booking.yaml

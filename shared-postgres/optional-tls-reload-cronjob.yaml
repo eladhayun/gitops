@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shared-postgres-tls-reload
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  schedule: "17 3 * * *"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 60
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: reload
+              image: pgvector/pgvector:pg17
+              command: ["psql", "--no-psqlrc", "-X", "--set", "ON_ERROR_STOP=1", "--command"]
+              args:
+                - "DO $$ BEGIN IF NOT pg_reload_conf() THEN RAISE EXCEPTION 'configuration reload failed'; END IF; END $$;"
+              env:
+                - {name: PGHOST, value: shared-postgres.postgres.svc.cluster.local}
+                - {name: PGPORT, value: "5432"}
+                - {name: PGDATABASE, value: postgres}
+                - {name: PGUSER, value: shared_postgres_tls_reload}
+                - {name: PGSSLMODE, value: verify-full}
+                - {name: PGSSLROOTCERT, value: /tls/ca.crt}
+                - {name: PGCONNECT_TIMEOUT, value: "10"}
+                - {name: PGOPTIONS, value: "-c statement_timeout=10000 -c lock_timeout=5000"}
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: shared-postgres-tls-reload
+                      key: password
+              securityContext:
+                readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests: {cpu: 10m, memory: 32Mi}
+                limits: {cpu: 100m, memory: 64Mi}
+              volumeMounts:
+                - {name: public-ca, mountPath: /tls, readOnly: true}
+          volumes:
+            - name: public-ca
+              secret:
+                secretName: shared-postgres-server-tls
+                items:
+                  - {key: ca.crt, path: ca.crt, mode: 0444}

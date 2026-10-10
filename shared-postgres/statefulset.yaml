@@ -19,6 +19,9 @@ spec:
       labels:
         app: shared-postgres
     spec:
+      securityContext:
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
       terminationGracePeriodSeconds: 60
       containers:
         - name: postgres
@@ -39,6 +42,14 @@ spec:
             - wal_compression=on
             - -c
             - log_min_duration_statement=1000
+            - -c
+            - ssl=on
+            - -c
+            - ssl_cert_file=/etc/postgresql/tls/tls.crt
+            - -c
+            - ssl_key_file=/etc/postgresql/tls/tls.key
+            - -c
+            - ssl_min_protocol_version=TLSv1.2
           ports:
             - name: postgres
               containerPort: 5432
@@ -87,6 +98,20 @@ spec:
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+            - name: postgres-tls
+              mountPath: /etc/postgresql/tls
+              readOnly: true
+      volumes:
+        - name: postgres-tls
+          secret:
+            secretName: shared-postgres-server-tls
+            items:
+              - key: tls.crt
+                path: tls.crt
+                mode: 0444
+              - key: tls.key
+                path: tls.key
+                mode: 0440
   volumeClaimTemplates:
     - metadata:
         name: postgres-data

@@ -4,9 +4,11 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - bootstrap-configmap.yaml
+  - tls-certificates.yaml
   - statefulset.yaml
   - service.yaml
   - bootstrap-job.yaml
+  - optional-tls-reload-cronjob.yaml
 
 generators:
   - secrets-generator.yaml

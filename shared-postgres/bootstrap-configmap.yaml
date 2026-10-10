@@ -23,7 +23,14 @@ data:
       --set=dirtbike_password="${DIRTBIKE_PASSWORD}" \
       --set=hasadnaa_password="${HASADNAA_PASSWORD}" \
       --set=ids_password="${IDS_PASSWORD}" \
-      --set=trainings_password="${TRAININGS_PASSWORD}" <<-'EOSQL'
+      --set=trainings_password="${TRAININGS_PASSWORD}" \
+      --set=tls_reload_password="${TLS_RELOAD_PASSWORD}" <<-'EOSQL'
+    SELECT 'CREATE ROLE shared_postgres_tls_reload LOGIN'
+      WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'shared_postgres_tls_reload') \gexec
+    ALTER ROLE shared_postgres_tls_reload WITH LOGIN PASSWORD :'tls_reload_password'
+      NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT CONNECTION LIMIT 2;
+    GRANT CONNECT ON DATABASE postgres TO shared_postgres_tls_reload;
+    GRANT EXECUTE ON FUNCTION pg_catalog.pg_reload_conf() TO shared_postgres_tls_reload;
     SELECT 'CREATE ROLE anpr LOGIN'
       WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'anpr') \gexec
     SELECT 'CREATE ROLE anpr_backup LOGIN'

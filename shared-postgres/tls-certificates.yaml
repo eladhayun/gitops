@@ -1,0 +1,89 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: shared-postgres-selfsigned
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "-4"
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: shared-postgres-root-ca
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  isCA: true
+  commonName: shared-postgres-private-ca
+  subject:
+    organizations:
+      - jshipster
+  duration: 87600h
+  renewBefore: 8760h
+  secretName: shared-postgres-root-ca
+  secretTemplate:
+    annotations:
+      argocd.argoproj.io/sync-options: Prune=false,Delete=false
+  privateKey:
+    algorithm: RSA
+    size: 3072
+    rotationPolicy: Never
+  usages:
+    - cert sign
+    - crl sign
+    - digital signature
+  issuerRef:
+    name: shared-postgres-selfsigned
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: shared-postgres-ca
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  ca:
+    secretName: shared-postgres-root-ca
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: shared-postgres-server
+  namespace: postgres
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  secretName: shared-postgres-server-tls
+  duration: 2160h
+  renewBefore: 720h
+  secretTemplate:
+    annotations:
+      argocd.argoproj.io/sync-options: Prune=false,Delete=false
+  privateKey:
+    algorithm: RSA
+    size: 3072
+    rotationPolicy: Always
+  usages:
+    - server auth
+    - digital signature
+    - key encipherment
+  dnsNames:
+    - shared-postgres.postgres.svc.cluster.local
+    - shared-postgres.postgres.svc
+    - shared-postgres
+    - localhost
+  ipAddresses:
+    - 127.0.0.1
+  issuerRef:
+    name: shared-postgres-ca
+    kind: Issuer
+    group: cert-manager.io

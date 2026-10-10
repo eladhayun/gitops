@@ -21,6 +21,11 @@ spec:
           command:
             - /bootstrap/bootstrap.sh
           env:
+            - name: TLS_RELOAD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-postgres-tls-reload
+                  key: password
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:

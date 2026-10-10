@@ -31,7 +31,7 @@ spec:
               image: pgvector/pgvector:pg17
               command: ["psql", "--no-psqlrc", "-X", "--set", "ON_ERROR_STOP=1", "--command"]
               args:
-                - "DO $$ BEGIN IF NOT pg_reload_conf() THEN RAISE EXCEPTION 'configuration reload failed'; END IF; END $$;"
+                - "DO $reload$ BEGIN IF NOT pg_reload_conf() THEN RAISE EXCEPTION 'configuration reload failed'; END IF; END $reload$;"
               env:
                 - {name: PGHOST, value: shared-postgres.postgres.svc.cluster.local}
                 - {name: PGPORT, value: "5432"}

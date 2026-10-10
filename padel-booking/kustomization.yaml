@@ -1,14 +1,16 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: padel-booking
 resources:
-  - namespace.yaml
-  - pvc.yaml
-  - deployment.yaml
-  - network-policy.yaml
+- namespace.yaml
+- pvc.yaml
+- deployment.yaml
+- network-policy.yaml
 generators:
-  - secrets-generator.yaml
+- secrets-generator.yaml
 images:
-  - name: padel-booking
-    newName: prodacr1234.azurecr.io/padel-booking
-    newTag: awaiting-build
+- name: padel-booking
+  newName: prodacr1234.azurecr.io/padel-booking
+  newTag: main-f5664f640fd610bb3181d39032d099071770d0da
+  digest: sha256:8a90acfe8d63ad32bf78bfef29e93c54d44b3677ce5e1e2766b5bcd5105202cf

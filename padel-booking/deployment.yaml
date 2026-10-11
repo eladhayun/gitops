@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       annotations:
-        padel.jshipster.io/private-config-revision: live-owner-20261011
+        padel.jshipster.io/private-config-revision: stdio-only-20261011-v108
       labels:
         app: padel-booking
     spec:
@@ -94,10 +94,10 @@ spec:
             limits: {cpu: 500m, memory: 256Mi}
           readinessProbe:
             exec:
-              command: ["padel", "--config", "/private/state/runtime.json", "health", "api"]
+              command: ["/bin/sh", "-ec", "padel --config /private/state/runtime.json health api && padel --config /private/state/runtime.json health mcp"]
             initialDelaySeconds: 120
             periodSeconds: 30
-            timeoutSeconds: 10
+            timeoutSeconds: 20
           volumeMounts: &runtimeMounts
             - {name: private-state, mountPath: /private}
             - {name: temporary, mountPath: /tmp}
@@ -116,21 +116,6 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 10
           # No liveness probe: restarting an in-flight financial write is unsafe.
-          volumeMounts: *runtimeMounts
-        - name: mcp-http
-          image: padel-booking
-          args: ["--config", "/private/state/runtime.json", "mcp", "--http"]
-          env: *disabledPurchasing
-          securityContext: *containerSecurity
-          resources:
-            requests: {cpu: 25m, memory: 64Mi}
-            limits: {cpu: 500m, memory: 256Mi}
-          readinessProbe:
-            exec:
-              command: ["padel", "--config", "/private/state/runtime.json", "health", "mcp"]
-            initialDelaySeconds: 120
-            periodSeconds: 30
-            timeoutSeconds: 10
           volumeMounts: *runtimeMounts
         - name: whatsapp
           image: padel-booking

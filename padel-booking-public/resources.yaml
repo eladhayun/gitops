@@ -103,3 +103,10 @@ spec:
               service:
                 name: padel-booking-public
                 port: {number: 80}
+---
+# Adopt metadata only so the retired certificate secret is pruned with this app.
+# Existing cert-manager data and type are preserved; no private key enters Git.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: padel-booking-public-tls

@@ -13,6 +13,10 @@ spec:
     server: https://kubernetes.default.svc
     namespace: padel-booking
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
     syncOptions:
       - CreateNamespace=true
     retry:

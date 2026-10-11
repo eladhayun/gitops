@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: padel-booking
 spec:
-  # Source writers drained; migrated evidence verified. Purchasing stays paused.
+  # Source writers drained; verified migration. Owner-approved pilot activation.
   replicas: 1
   revisionHistoryLimit: 3
   strategy:
@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       annotations:
-        padel.jshipster.io/private-config-revision: calendar-20261011
+        padel.jshipster.io/private-config-revision: live-owner-20261011
       labels:
         app: padel-booking
     spec:
@@ -85,7 +85,7 @@ spec:
           image: padel-booking
           args: ["--config", "/private/state/runtime.json", "serve"]
           env: &disabledPurchasing
-            - {name: PADEL_LAZUZ_ALLOW_LIVE_PURCHASES, value: "false"}
+            - {name: PADEL_LAZUZ_ALLOW_LIVE_PURCHASES, value: "true"}
             - {name: HOME, value: /private/state}
             - {name: TMPDIR, value: /private/state/tmp}
           securityContext: *containerSecurity

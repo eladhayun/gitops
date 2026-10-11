@@ -97,26 +97,8 @@ spec:
     - host: jshipster.io
       http:
         paths:
-          - path: /wednesday-club/
-            pathType: Exact
-            backend:
-              service:
-                name: padel-booking-public
-                port: {number: 80}
-          - path: /wednesday-club/privacy.html
-            pathType: Exact
-            backend:
-              service:
-                name: padel-booking-public
-                port: {number: 80}
-          - path: /wednesday-club/terms.html
-            pathType: Exact
-            backend:
-              service:
-                name: padel-booking-public
-                port: {number: 80}
-          - path: /wednesday-club/site.css
-            pathType: Exact
+          - path: /wednesday-club
+            pathType: Prefix
             backend:
               service:
                 name: padel-booking-public

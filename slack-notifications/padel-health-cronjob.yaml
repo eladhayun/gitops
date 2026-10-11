@@ -42,7 +42,7 @@ metadata:
   name: padel-health-monitor
 spec:
   schedule: '*/2 * * * *'
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 60
   successfulJobsHistoryLimit: 1

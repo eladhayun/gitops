@@ -19,9 +19,18 @@ spec:
     server: https://kubernetes.default.svc
     namespace: jshipster
 
+  ignoreDifferences:
+    - group: ''
+      kind: ConfigMap
+      name: padel-health-state
+      namespace: jshipster
+      jsonPointers:
+        - /data/state.json
+
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
 
     automated:
       selfHeal: true

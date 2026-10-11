@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: padel-booking-public
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels: {app: padel-booking-public}
+  template:
+    metadata:
+      labels: {app: padel-booking-public}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: pages
+          image: ghcr.io/nginx/nginx-unprivileged:1.30.5-alpine@sha256:15c994d10d6d78658721c3bcafff14cb281fba2a4bdf9d5ba92c416a472516e3
+          command: [nginx, -g, "daemon off;"]
+          ports: [{name: http, containerPort: 8080}]
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 5m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 30
+          volumeMounts:
+            - {name: pages, mountPath: /srv/wednesday-club, readOnly: true}
+            - {name: nginx, mountPath: /etc/nginx/nginx.conf, subPath: nginx.conf, readOnly: true}
+            - {name: temporary, mountPath: /tmp}
+      volumes:
+        - name: pages
+          configMap: {name: padel-booking-public-pages}
+        - name: nginx
+          configMap: {name: padel-booking-public-nginx}
+        - name: temporary
+          emptyDir: {sizeLimit: 16Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: padel-booking-public
+spec:
+  selector: {app: padel-booking-public}
+  ports: [{name: http, port: 80, targetPort: http}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: padel-booking-public
+spec:
+  podSelector: {matchLabels: {app: padel-booking-public}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ingress-nginx}
+      ports: [{protocol: TCP, port: 8080}]
+  egress: []
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: padel-booking-public
+spec:
+  secretName: padel-booking-public-tls
+  dnsNames: [jshipster.io]
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer

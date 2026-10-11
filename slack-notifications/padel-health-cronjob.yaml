@@ -60,7 +60,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: monitor
-              image: prodacr1234.azurecr.io/slack-notifications:main-d597b70
+              image: prodacr1234.azurecr.io/slack-notifications:main-4862f7f
               command: [/root/slack-notifications]
               args: [padel-health-check]
               securityContext:

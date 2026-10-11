@@ -37,5 +37,4 @@ resources:
   - pg-backups.yaml
   # - openclaw.yaml
   - padel-booking.yaml
-  - wednesday-club-public.yaml
   - padel-booking-public.yaml

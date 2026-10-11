@@ -37,4 +37,3 @@ resources:
   - pg-backups.yaml
   # - openclaw.yaml
   - padel-booking.yaml
-  - padel-booking-public.yaml

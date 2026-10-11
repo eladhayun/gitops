@@ -16,11 +16,15 @@ reach its HTTP port. It uses a digest-pinned upstream stable unprivileged NGINX
 image, read-only root filesystem and ConfigMap-generated content. Page changes
 change the ConfigMap hash and roll the public pod, not the booking pod.
 
-Copy this directory to `wednesday-club-public` in the GitOps repo and register
-`deploy/gitops/apps/wednesday-club-public.yaml` in its app-of-apps list. ArgoCD,
+The Argo application and workload are named `padel-booking-public` and share the
+`padel-booking` namespace with the private app. The private app alone owns the
+namespace resource; this static application must never manage its lifecycle.
+
+Copy this directory to `padel-booking-public` in the GitOps repo and register
+`deploy/gitops/apps/padel-booking-public.yaml` in its app-of-apps list. ArgoCD,
 external-dns and the existing Let's Encrypt issuer manage deployment, DNS and TLS.
 Do not apply an ingress or service to the private booking application.
 
-Validate with `kubectl kustomize deploy/gitops/wednesday-club-public`, HTML/link
+Validate with `kubectl kustomize deploy/gitops/padel-booking-public`, HTML/link
 checks, HTTPS checks for all three pages and responsive browser layout checks.
 The pages contain only public information and the owner's approved contact email.

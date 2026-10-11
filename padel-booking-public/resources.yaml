@@ -80,3 +80,44 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: padel-booking-public
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [jshipster.io]
+      secretName: padel-booking-public-tls
+  rules:
+    - host: jshipster.io
+      http:
+        paths:
+          - path: /wednesday-club/
+            pathType: Exact
+            backend:
+              service:
+                name: padel-booking-public
+                port: {number: 80}
+          - path: /wednesday-club/privacy.html
+            pathType: Exact
+            backend:
+              service:
+                name: padel-booking-public
+                port: {number: 80}
+          - path: /wednesday-club/terms.html
+            pathType: Exact
+            backend:
+              service:
+                name: padel-booking-public
+                port: {number: 80}
+          - path: /wednesday-club/site.css
+            pathType: Exact
+            backend:
+              service:
+                name: padel-booking-public
+                port: {number: 80}

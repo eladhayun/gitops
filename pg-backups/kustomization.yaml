@@ -9,6 +9,8 @@ resources:
   - cronjob-blutag.yaml
   - cronjob-trainings.yaml
   - cronjob-anpr.yaml
+  - cronjob-wednesday-club.yaml
+  - cronjob-wednesday-whatsapp.yaml
 
 generators:
   - secrets-generator.yaml

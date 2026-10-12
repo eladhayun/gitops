@@ -51,6 +51,8 @@ spec:
               value: "C0BD40N45UY"
             - name: ANPR_REPORT_CHANNEL
               value: "C0BTGPSF7RR"
+            - name: PADEL_REPORT_CHANNEL
+              value: "C0C34DTFYET"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:

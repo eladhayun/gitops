@@ -31,7 +31,7 @@ changes, existing database changes or client DSN changes are included. TLS and e
 non-TLS clients negotiate independently on the same port. Verify both connection
 modes after rollout, plus `SHOW ssl`, certificate identity and pg_stat_ssl.
 
-Only the public CA certificate is exported to Wednesday Club. Keep the CA private
+Only the public CA certificate is exported to Padel Bookings. Keep the CA private
 key in its generated Secret; protect/back up that Secret separately. CA resources
 and generated Secrets have Argo prune/delete protection. Do not enable cert-manager
 Certificate owner-reference garbage collection without considering CA retention.

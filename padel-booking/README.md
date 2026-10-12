@@ -1,4 +1,4 @@
-# Wednesday Club GitOps
+# Padel Bookings GitOps
 
 These artifacts are promoted into the existing `eladhayun/gitops` repository.
 GitHub Actions alone changes the immutable application image tag. Argo CD reconciles

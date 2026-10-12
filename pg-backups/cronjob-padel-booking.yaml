@@ -1,12 +1,12 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: pg-backup-wednesday-whatsapp
+  name: pg-backup-padel-booking
   labels:
     app: pg-backup
-    database: wednesday-whatsapp
+    database: wednesday-club
 spec:
-  schedule: "45 3 * * *"
+  schedule: "45 2 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
@@ -17,7 +17,7 @@ spec:
         metadata:
           labels:
             app: pg-backup
-            database: wednesday-whatsapp
+            database: wednesday-club
         spec:
           restartPolicy: OnFailure
           initContainers:
@@ -28,10 +28,10 @@ spec:
             - |
               set -eu
               TIMESTAMP=$(date +%Y-%m-%d)
-              SQL_FILE="/backups/wednesday_whatsapp-${TIMESTAMP}.sql"
+              SQL_FILE="/backups/wednesday_club-${TIMESTAMP}.sql"
               ARCHIVE_FILE="${SQL_FILE}.gz"
-              echo "Backing up wednesday_whatsapp..."
-              pg_dump -h shared-postgres.postgres.svc.cluster.local -p 5432 -U "${PGUSER}" -d wednesday_whatsapp --no-password --file "${SQL_FILE}"
+              echo "Backing up wednesday_club..."
+              pg_dump -h shared-postgres.postgres.svc.cluster.local -p 5432 -U "${PGUSER}" -d wednesday_club --no-password --file "${SQL_FILE}"
               test -s "${SQL_FILE}"
               gzip "${SQL_FILE}"
               gzip -t "${ARCHIVE_FILE}"
@@ -42,12 +42,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: padel-backup-secrets
-                  key: WEDNESDAY_WHATSAPP_PGUSER
+                  key: WEDNESDAY_CLUB_PGUSER
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
                   name: padel-backup-secrets
-                  key: WEDNESDAY_WHATSAPP_PGPASSWORD
+                  key: WEDNESDAY_CLUB_PGPASSWORD
             volumeMounts:
             - name: backup-data
               mountPath: /backups
@@ -66,13 +66,13 @@ spec:
             - |
               set -eu
               TIMESTAMP=$(date +%Y-%m-%d)
-              FILENAME="wednesday_whatsapp-${TIMESTAMP}.sql.gz"
-              echo "Uploading to pg-backups/wednesday_whatsapp/${TIMESTAMP}.sql.gz..."
+              FILENAME="wednesday_club-${TIMESTAMP}.sql.gz"
+              echo "Uploading to pg-backups/wednesday_club/${TIMESTAMP}.sql.gz..."
               az storage blob upload \
                 --account-name "${AZURE_STORAGE_ACCOUNT}" \
                 --account-key "${AZURE_STORAGE_KEY}" \
                 --container-name pg-backups \
-                --name "wednesday_whatsapp/${TIMESTAMP}.sql.gz" \
+                --name "wednesday_club/${TIMESTAMP}.sql.gz" \
                 --file "/backups/${FILENAME}" \
                 --overwrite true
               echo "Upload complete."

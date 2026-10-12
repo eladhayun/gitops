@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: padel-booking
 spec:
-  # Audited pause and drain for the additive Tuesday/Saturday migration.
-  replicas: 0
+  # Schema 3 migrated and verified; purchasing stays audited-paused for commissioning.
+  replicas: 1
   revisionHistoryLimit: 3
   strategy:
     type: Recreate

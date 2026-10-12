@@ -12,5 +12,5 @@ generators:
 images:
 - name: padel-booking
   newName: prodacr1234.azurecr.io/padel-booking
-  newTag: main-0b500748ef6b6345a6cb0d73aa00650c7adb87e0
-  digest: sha256:d84c5b55eb0288565b4df8ecb001b858cfef3ae70fc6e7f2a1fefd26255f33fa
+  newTag: main-f377866e33ad63c833bae97f934842f320cf8a33
+  digest: sha256:08ac25b4e6293a84c2008c9add9e7be818ae9c14698b81af8e7f8c31fd1b7221

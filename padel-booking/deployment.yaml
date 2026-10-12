@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: padel-booking
 spec:
-  # Audited pause v113; drain while the verified invitation-format release builds.
-  replicas: 0
+  # Verified invitation-format release; commission at audited-paused version 113.
+  replicas: 1
   revisionHistoryLimit: 3
   strategy:
     type: Recreate

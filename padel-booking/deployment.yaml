@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: padel-booking
 spec:
-  # Source writers drained; verified migration. Owner-approved pilot activation.
-  replicas: 1
+  # Audited pause and drain for the additive Tuesday/Saturday migration.
+  replicas: 0
   revisionHistoryLimit: 3
   strategy:
     type: Recreate

@@ -4,7 +4,7 @@ metadata:
   name: padel-booking
 spec:
   # Verified redacted evidence diagnostics; commission at audited-paused version 123.
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   strategy:
     type: Recreate

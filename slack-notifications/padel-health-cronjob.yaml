@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: padel-health-monitor
+spec:
+  suspend: true
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -12,6 +14,8 @@ metadata:
     argocd.argoproj.io/sync-options: RespectIgnoreDifferences=true
 data:
   state.json: '{}'
+spec:
+  suspend: true
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -22,6 +26,8 @@ rules:
     resources: [configmaps]
     resourceNames: [padel-health-state]
     verbs: [get, update]
+spec:
+  suspend: true
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -35,6 +41,8 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: padel-health-state
+spec:
+  suspend: true
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -42,7 +50,7 @@ metadata:
   name: padel-health-monitor
 spec:
   schedule: '*/2 * * * *'
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 60
   successfulJobsHistoryLimit: 1

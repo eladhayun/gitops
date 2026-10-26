@@ -28,16 +28,6 @@ spec:
         - protocol: TCP
           port: 5432
     - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: multi-whatsapp
-          podSelector:
-            matchLabels:
-              app.kubernetes.io/name: multi-whatsapp-manager
-      ports:
-        - protocol: TCP
-          port: 8080
-    - to:
         - ipBlock:
             cidr: 0.0.0.0/0
             except:

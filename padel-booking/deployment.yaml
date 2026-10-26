@@ -37,7 +37,7 @@ spec:
               umask 077
               mkdir -p /private/state /private/state/watchdog /private/state/backups /private/state/tmp
               chmod 0700 /private/state /private/state/watchdog /private/state/backups /private/state/tmp
-              for required in runtime.json booking-dsn whatsapp-dsn multi-whatsapp-token native-account-hmac.key; do
+              for required in runtime.json booking-dsn whatsapp-dsn native-account-hmac.key; do
                 test -f "/source/$required"
               done
               if test -f /private/state/native-account-hmac.key; then
@@ -47,7 +47,7 @@ spec:
                 test -f "$source" || continue
                 name="${source##*/}"
                 case "$name" in
-                  runtime.json|booking-dsn|whatsapp-dsn|multi-whatsapp-token|native-account-hmac.key|*.json|slack-token|google-token|google-credentials|azure-sas|postgres-ca.crt) ;;
+                  runtime.json|booking-dsn|whatsapp-dsn|native-account-hmac.key|*.json|slack-token|google-token|google-credentials|azure-sas|postgres-ca.crt) ;;
                   *) exit 1 ;;
                 esac
                 case "$name" in

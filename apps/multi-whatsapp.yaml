@@ -14,6 +14,12 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: multi-whatsapp
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      name: multi-whatsapp-monitor-state
+      namespace: multi-whatsapp
+      jsonPointers: [/data/state.json]
   syncPolicy:
     automated:
       prune: true
@@ -21,6 +27,7 @@ spec:
       allowEmpty: false
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
     retry:
       limit: 5
       backoff: {duration: 5s, factor: 2, maxDuration: 3m}

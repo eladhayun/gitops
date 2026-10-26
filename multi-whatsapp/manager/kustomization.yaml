@@ -9,6 +9,7 @@ resources:
 - migration-job.yaml
 - service.yaml
 - network-policy.yaml
+- monitor.yaml
 generators:
 - secrets-generator.yaml
 images:

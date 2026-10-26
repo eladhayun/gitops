@@ -60,3 +60,57 @@ spec:
             matchLabels: {app.kubernetes.io/name: multi-whatsapp-manager}
       ports:
         - {protocol: TCP, port: 8081}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: multi-whatsapp-slack-relay
+spec:
+  podSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values: [multi-whatsapp-manager, multi-whatsapp-monitor]
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: jshipster}
+          podSelector:
+            matchLabels: {app: slack-notifications}
+      ports:
+        - {protocol: TCP, port: 8080}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: multi-whatsapp-monitor
+spec:
+  podSelector:
+    matchLabels: {app.kubernetes.io/name: multi-whatsapp-monitor}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: {app.kubernetes.io/name: multi-whatsapp-manager}
+      ports:
+        - {protocol: TCP, port: 8080}
+    - to:
+        - ipBlock: {cidr: 10.0.0.1/32}
+      ports:
+        - {protocol: TCP, port: 443}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: multi-whatsapp-monitor-readiness
+spec:
+  podSelector:
+    matchLabels: {app.kubernetes.io/name: multi-whatsapp-manager}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {app.kubernetes.io/name: multi-whatsapp-monitor}
+      ports:
+        - {protocol: TCP, port: 8080}

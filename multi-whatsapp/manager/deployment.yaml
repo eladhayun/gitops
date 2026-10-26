@@ -11,6 +11,8 @@ spec:
       app.kubernetes.io/name: multi-whatsapp-manager
   template:
     metadata:
+      annotations:
+        multi-whatsapp/config-generation: slack-monitoring-v1
       labels:
         app.kubernetes.io/name: multi-whatsapp-manager
         app.kubernetes.io/part-of: multi-whatsapp

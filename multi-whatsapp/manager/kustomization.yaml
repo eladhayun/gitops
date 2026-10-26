@@ -2,16 +2,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: multi-whatsapp
 resources:
-  - namespace.yaml
-  - configmap.yaml
-  - service-account.yaml
-  - deployment.yaml
-  - migration-job.yaml
-  - service.yaml
-  - network-policy.yaml
+- namespace.yaml
+- configmap.yaml
+- service-account.yaml
+- deployment.yaml
+- migration-job.yaml
+- service.yaml
+- network-policy.yaml
 generators:
-  - secrets-generator.yaml
+- secrets-generator.yaml
 images:
-  - name: multi-whatsapp
-    newName: prodacr1234.azurecr.io/multi-whatsapp
-    newTag: unconfigured-ci-must-promote
+- name: multi-whatsapp
+  newName: prodacr1234.azurecr.io/multi-whatsapp
+  newTag: main-b9a1bc4510478a030aef74b3dc2708318837bc76
+  digest: sha256:669027b856dad6b39f430611af5100f32aede138564e1ac68b88fd3917047cc0

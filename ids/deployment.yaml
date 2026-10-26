@@ -5,7 +5,8 @@ metadata:
   labels:
     app: ids
 spec:
-  replicas: 1
+  # Keep IDS offline until explicitly re-enabled.
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:

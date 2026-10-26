@@ -7,6 +7,8 @@ metadata:
 spec:
   # Run every Monday at 8:00 AM UTC
   schedule: "0 8 * * 1"
+  # The weekly report depends on the IDS API, which is offline.
+  suspend: true
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid

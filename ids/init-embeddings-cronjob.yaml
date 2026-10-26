@@ -9,7 +9,8 @@ spec:
   # Check for product changes weekly on Sunday at 03:00 Israel time.
   schedule: "0 3 * * 0"
   timeZone: "Asia/Jerusalem"
-  suspend: false
+  # Pause background work while IDS is offline.
+  suspend: true
   # Keep last 3 successful jobs and 1 failed job
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1

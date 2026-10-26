@@ -1,0 +1,6 @@
+apiVersion: v2
+name: multi-whatsapp-worker
+description: One ArgoCD-managed WhatsApp account worker
+type: application
+version: 0.1.0
+appVersion: '0.1.0'

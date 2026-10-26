@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: multi-whatsapp-accounts
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: [missingkey=error]
+  generators:
+    - git:
+        repoURL: https://github.com/eladhayun/gitops.git
+        revision: main
+        requeueAfterSeconds: 60
+        files:
+          - path: multi-whatsapp/accounts/*.json
+  template:
+    metadata:
+      name: 'mw-account-{{ .account_id }}'
+      labels:
+        app.kubernetes.io/part-of: multi-whatsapp
+        multi-whatsapp/account-id: '{{ .account_id }}'
+      annotations:
+        argocd.argoproj.io/manifest-generate-paths: .
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/eladhayun/gitops.git
+        targetRevision: main
+        path: multi-whatsapp/worker-chart
+        helm:
+          releaseName: 'mw-account-{{ .account_id }}'
+          parameters:
+            - name: accountID
+              value: '{{ .account_id }}'
+              forceString: true
+            - name: enabled
+              value: '{{ .enabled }}'
+            - name: generation
+              value: '{{ .generation }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: multi-whatsapp
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        retry:
+          limit: 5
+          backoff: {duration: 5s, factor: 2, maxDuration: 3m}
+  syncPolicy:
+    preserveResourcesOnDeletion: false

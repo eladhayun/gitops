@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["accountID", "enabled", "generation", "image"],
+  "properties": {
+    "accountID": {"type": "string", "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"},
+    "enabled": {"type": "boolean"},
+    "generation": {"type": "integer", "minimum": 1},
+    "image": {
+      "type": "object",
+      "required": ["repository", "tag", "digest"],
+      "properties": {
+        "repository": {"const": "prodacr1234.azurecr.io/multi-whatsapp"},
+        "tag": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^(|sha256:[a-f0-9]{64})$"}
+      }
+    }
+  }
+}

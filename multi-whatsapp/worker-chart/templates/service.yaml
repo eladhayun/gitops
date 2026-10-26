@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mw-account-{{ .Values.accountID }}
+  labels:
+    app.kubernetes.io/part-of: multi-whatsapp
+    multi-whatsapp/account-id: {{ .Values.accountID | quote }}
+spec:
+  selector:
+    app.kubernetes.io/name: multi-whatsapp-worker
+    multi-whatsapp/account-id: {{ .Values.accountID | quote }}
+  ports:
+    - {name: private, port: 8081, targetPort: private}

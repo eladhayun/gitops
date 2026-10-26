@@ -1,0 +1,10 @@
+accountID: ''
+enabled: true
+generation: 1
+image:
+  repository: prodacr1234.azurecr.io/multi-whatsapp
+  tag: unconfigured-ci-must-promote
+  digest: ''
+resources:
+  requests: {cpu: 50m, memory: 128Mi}
+  limits: {cpu: '1', memory: 512Mi}

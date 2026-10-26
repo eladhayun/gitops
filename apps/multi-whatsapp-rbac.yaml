@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: multi-whatsapp-refresh
+  namespace: argocd
+rules:
+  - apiGroups: [argoproj.io]
+    resources: [applicationsets]
+    resourceNames: [multi-whatsapp-accounts]
+    verbs: [get, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: multi-whatsapp-refresh
+  namespace: argocd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: multi-whatsapp-refresh
+subjects:
+  - kind: ServiceAccount
+    name: multi-whatsapp-manager
+    namespace: multi-whatsapp

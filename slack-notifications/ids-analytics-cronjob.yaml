@@ -23,7 +23,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: ids-analytics-reporter
-            image: prodacr1234.azurecr.io/slack-notifications:main-f77c764
+            image: prodacr1234.azurecr.io/slack-notifications:main-c9ed95e
             command: ["/root/slack-notifications"]
             args: ["ids-analytics-report"]
             env:

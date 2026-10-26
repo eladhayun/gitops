@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - cronjob-multi-whatsapp.yaml
   - cronjob-ids.yaml
   - cronjob-dirtbike.yaml
   - cronjob-hasadnaa.yaml
@@ -13,4 +14,5 @@ resources:
   - cronjob-padel-whatsapp.yaml
 
 generators:
+  - multi-whatsapp-secrets-generator.yaml
   - secrets-generator.yaml

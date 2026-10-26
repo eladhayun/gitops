@@ -2,6 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - multi-whatsapp-rbac.yaml
+  - multi-whatsapp-accounts.yaml
+  - multi-whatsapp.yaml
   - anpr.yaml
   - anpr-postgres.yaml
   - nginx-ingress-controller.yaml

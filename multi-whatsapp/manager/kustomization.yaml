@@ -15,5 +15,5 @@ generators:
 images:
 - name: multi-whatsapp
   newName: prodacr1234.azurecr.io/multi-whatsapp
-  newTag: main-6b058e6
-  digest: sha256:95300deca46d7dda4c1096181ff00d6aac8dc2e97a1485bc985921e235080b98
+  newTag: main-5d1f6d8
+  digest: sha256:d76efdf634ef4326c236223a29871f1db2f2cb4a0cc1ee1c9cb77cc1a09b7cc0

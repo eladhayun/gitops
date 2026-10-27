@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       annotations:
-        padel.jshipster.io/private-config-revision: stdio-only-20261011-v108
+        padel.jshipster.io/private-config-revision: multi-whatsapp-active-20261027-v207
       labels:
         app: padel-booking
     spec:

@@ -30,6 +30,7 @@ spec:
           envFrom:
             - configMapRef: {name: webtop-mcp-config}
             - secretRef: {name: webtop-mcp-secrets}
+            - secretRef: {name: cyberghost-egress-proxy}
           startupProbe:
             httpGet: {path: /healthz, port: api}
             periodSeconds: 2

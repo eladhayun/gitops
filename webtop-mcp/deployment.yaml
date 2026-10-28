@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: webtop-mcp}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
+  selector:
+    matchLabels: {app: webtop-mcp}
+  template:
+    metadata:
+      labels: {app: webtop-mcp}
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: server
+          image: prodacr1234.azurecr.io/webtop-mcp:validation-only
+          ports:
+            - {name: api, containerPort: 8080}
+            - {name: mcp, containerPort: 8081}
+          envFrom:
+            - configMapRef: {name: webtop-mcp-config}
+            - secretRef: {name: webtop-mcp-secrets}
+          startupProbe:
+            httpGet: {path: /healthz, port: api}
+            periodSeconds: 2
+            failureThreshold: 45
+          livenessProbe:
+            httpGet: {path: /healthz, port: api}
+            periodSeconds: 20
+          readinessProbe:
+            httpGet: {path: /readyz, port: api}
+            periodSeconds: 5
+            timeoutSeconds: 2
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 500m, memory: 256Mi}
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: postgres-ca, mountPath: /private/postgres, readOnly: true}
+            - {name: webtop-session, mountPath: /private/webtop, readOnly: true}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 32Mi}
+        - name: postgres-ca
+          secret:
+            secretName: webtop-mcp-secrets
+            defaultMode: 0440
+            items: [{key: postgres-ca.crt, path: ca.crt}]
+        - name: webtop-session
+          secret:
+            secretName: webtop-session
+            optional: true
+            defaultMode: 0440

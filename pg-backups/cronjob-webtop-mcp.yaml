@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-backup-webtop-mcp
+  labels: {app: pg-backup, database: webtop-mcp}
+spec:
+  schedule: '5 3 * * *'
+  timeZone: Etc/UTC
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 1800
+      template:
+        metadata:
+          labels: {app: pg-backup, database: webtop-mcp}
+        spec:
+          restartPolicy: OnFailure
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            seccompProfile: {type: RuntimeDefault}
+          initContainers:
+            - name: pg-dump
+              image: postgres:17-alpine
+              command: [/bin/sh, -ec]
+              args:
+                - |
+                  umask 077
+                  date -u +%Y-%m-%d > /backups/date
+                  pg_dump --no-password --no-owner --no-privileges --file /backups/webtop_mcp.sql
+                  test -s /backups/webtop_mcp.sql
+                  gzip /backups/webtop_mcp.sql
+                  gzip -t /backups/webtop_mcp.sql.gz
+                  gzip -cd /backups/webtop_mcp.sql.gz | tail -20 | grep -q '^-- PostgreSQL database dump complete'
+                  echo 'Database dump completed and gzip validated.'
+              env:
+                - {name: PGHOST, value: shared-postgres.postgres.svc.cluster.local}
+                - {name: PGPORT, value: '5432'}
+                - {name: PGDATABASE, value: webtop_mcp}
+                - {name: PGSSLMODE, value: verify-full}
+                - {name: PGSSLROOTCERT, value: /private/postgres-ca.crt}
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef: {name: webtop-mcp-backup-secrets, key: PGUSER}
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef: {name: webtop-mcp-backup-secrets, key: PGPASSWORD}
+              securityContext:
+                readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+                capabilities: {drop: [ALL]}
+              volumeMounts:
+                - {name: backup-data, mountPath: /backups}
+                - {name: postgres-ca, mountPath: /private, readOnly: true}
+              resources:
+                requests: {memory: 64Mi, cpu: 10m}
+                limits: {memory: 256Mi, cpu: 200m}
+          containers:
+            - name: upload
+              image: mcr.microsoft.com/azure-cli:latest
+              command: [/bin/sh, -ec]
+              args:
+                - |
+                  BACKUP_DATE=$(cat /backups/date)
+                  az storage blob upload --container-name pg-backups \
+                    --name "webtop_mcp/${BACKUP_DATE}.sql.gz" \
+                    --file /backups/webtop_mcp.sql.gz --overwrite true --only-show-errors --output none
+                  echo 'Uploaded database backup.'
+              env:
+                - {name: AZURE_CONFIG_DIR, value: /tmp/azure}
+                - {name: HOME, value: /tmp}
+                - name: AZURE_STORAGE_ACCOUNT
+                  valueFrom:
+                    secretKeyRef: {name: pg-backup-secrets, key: AZURE_STORAGE_ACCOUNT}
+                - name: AZURE_STORAGE_KEY
+                  valueFrom:
+                    secretKeyRef: {name: pg-backup-secrets, key: AZURE_STORAGE_KEY}
+              securityContext:
+                readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+                capabilities: {drop: [ALL]}
+              volumeMounts:
+                - {name: backup-data, mountPath: /backups, readOnly: true}
+                - {name: tmp, mountPath: /tmp}
+              resources:
+                requests: {memory: 64Mi, cpu: 10m}
+                limits: {memory: 512Mi, cpu: 200m}
+          volumes:
+            - name: backup-data
+              emptyDir: {sizeLimit: 2Gi}
+            - name: tmp
+              emptyDir: {sizeLimit: 128Mi}
+            - name: postgres-ca
+              secret:
+                secretName: webtop-mcp-backup-secrets
+                defaultMode: 0440
+                items:
+                  - {key: postgres-ca.crt, path: postgres-ca.crt}

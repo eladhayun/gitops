@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: webtop-mcp
+resources: [deployment.yaml, service.yaml, configmap.yaml]
+generators: [secrets-generator.yaml]
+# CI owns the image digest; application is registered only after first promotion.
+images:
+- name: prodacr1234.azurecr.io/webtop-mcp
+  digest: pending-first-ci-promotion

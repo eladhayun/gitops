@@ -17,9 +17,10 @@ resources:
   # - johnson-postgres.yaml
   - jshipster-bastion.yaml
   - argocd-tunnel.yaml
-  - ids.yaml
+  # - ids.yaml
   - ids-postgres.yaml
   - shared-postgres.yaml
+  # - ids-qdrant.yaml
   - slack-notifications.yaml
   # - argo-rollouts-demo-fe.yaml
   # - argo-rollouts-demo-be.yaml
@@ -31,7 +32,7 @@ resources:
   - blutag-pointer-push.yaml
   - blutag-omnisette.yaml
   - trips.yaml
-  - dirtbike-specialist.yaml
+  # - dirtbike-specialist.yaml
   - dirtbike-postgres.yaml
   - loki.yaml
   - hasadnaa.yaml
@@ -42,4 +43,4 @@ resources:
   # - gen-rag-qdrant.yaml
   - pg-backups.yaml
   # - openclaw.yaml
-  - padel-booking.yaml
+  # - padel-booking.yaml

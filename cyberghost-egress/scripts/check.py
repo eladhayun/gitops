@@ -54,6 +54,14 @@ with tempfile.TemporaryDirectory(prefix='cyberghost-egress-check-') as folder:
     assert set(security['capabilities']['add'])=={'NET_ADMIN','MKNOD'}
     assert re.fullmatch(r'ghcr.io/qdm12/gluetun@sha256:[0-9a-f]{64}',container['image'])
     assert container['resources']['requests'] and container['resources']['limits']
+    assert len(pod['initContainers'])==1
+    initializer = pod['initContainers'][0]
+    assert initializer['image']==container['image']
+    assert initializer['securityContext']['capabilities']['drop']==['ALL']
+    assert not initializer['securityContext']['capabilities'].get('add')
+    assert initializer['resources']['requests'] and initializer['resources']['limits']
+    assert 'mknod -m 0600' in container['args'][0]
+    assert any(mount['mountPath']=='/etc/resolv.conf' and mount['subPath']=='resolv.conf' for mount in container['volumeMounts'])
     assert config['VPN_SERVICE_PROVIDER']=='cyberghost' and config['SERVER_COUNTRIES']=='Israel'
     assert config['FIREWALL_ENABLED_DISABLING_IT_SHOOTS_YOU_IN_YOUR_FOOT']=='on'
     assert config['FIREWALL_OUTBOUND_SUBNETS']=='10.1.1.0/24'

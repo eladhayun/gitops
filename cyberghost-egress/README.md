@@ -66,6 +66,9 @@ Gluetun requires root plus NET_ADMIN and MKNOD inside its own pod network namesp
 to configure OpenVPN, firewall and TUN. It is not privileged, uses no host namespaces,
 hostPath mounts or service-account token, and drops other capabilities. Root UID
 avoids modifying the image's /etc/passwd or adding CHOWN/SETUID capabilities.
+A capability-free init container copies the original resolver file into a bounded
+pod-local volume, which allows Gluetun to manage DNS without writing the image.
+The startup wrapper creates TUN with mode 0600, avoiding DAC_OVERRIDE capability.
 The root filesystem is read-only, with bounded temporary mounts for OpenVPN
 credentials/configuration and runtime state. Secret files are read-only, mode 0400.
 Only the current AKS subnet 10.1.1.0/24 is exempted for replies to internal proxy

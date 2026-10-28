@@ -11,8 +11,6 @@ resources:
   - blutag-weekly-summary-cronjob.yaml
   - pg-backup-report-cronjob.yaml
   - uptime-check-cronjob.yaml
-  - padel-health-cronjob.yaml
-  - padel-health-access.yaml
   # DRC (trainings) — backups & uptime are folded into the global per-service
   # fan-out (pg-backup-report / uptime-check); only the business summary is DRC-specific.
   - drc-weekly-summary-cronjob.yaml

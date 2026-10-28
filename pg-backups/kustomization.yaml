@@ -11,8 +11,6 @@ resources:
   - cronjob-blutag.yaml
   - cronjob-trainings.yaml
   - cronjob-anpr.yaml
-  - cronjob-padel-booking.yaml
-  - cronjob-padel-whatsapp.yaml
 
 generators:
   - webtop-mcp-secrets-generator.yaml

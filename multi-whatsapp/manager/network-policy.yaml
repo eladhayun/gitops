@@ -114,20 +114,3 @@ spec:
             matchLabels: {app.kubernetes.io/name: multi-whatsapp-monitor}
       ports:
         - {protocol: TCP, port: 8080}
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: multi-whatsapp-padel-mcp
-spec:
-  podSelector:
-    matchLabels: {app.kubernetes.io/name: multi-whatsapp-manager}
-  policyTypes: [Ingress]
-  ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels: {kubernetes.io/metadata.name: padel-booking}
-          podSelector:
-            matchLabels: {app: padel-booking}
-      ports:
-        - {protocol: TCP, port: 8080}

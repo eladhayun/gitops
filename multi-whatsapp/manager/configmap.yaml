@@ -21,7 +21,6 @@ data:
   MW_DATABASE_DSN_FILE: /private/runtime/database-dsn
   MW_WORKER_SECRET_FILE: /private/runtime/worker-secret
   MW_GITHUB_TOKEN_FILE: /private/manager/github-token
-  MW_PADEL_MCP_TOKEN_FILE: /private/runtime/padel-mcp-token
   MW_AZURE_STORAGE_ACCOUNT: jshipsterprod410479
   MW_AZURE_STORAGE_CONTAINER: multi-whatsapp-media
   MW_AZURE_STORAGE_KEY_FILE: /private/runtime/azure-storage-key

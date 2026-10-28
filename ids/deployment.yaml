@@ -152,7 +152,7 @@ spec:
           failureThreshold: 2
       # Main application container
       - name: ids
-        image: prodacr1234.azurecr.io/ids:main-a8c692e
+        image: prodacr1234.azurecr.io/ids:main-dbace4c
         ports:
         - containerPort: 8080
         env:

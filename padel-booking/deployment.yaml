@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: padel-booking
 spec:
-  # Verified redacted evidence diagnostics; commission at audited-paused version 123.
-  replicas: 1
+  # Owner emergency stop after Lazuz blocked the account; keep all app processes off.
+  replicas: 0
   revisionHistoryLimit: 3
   strategy:
     type: Recreate

@@ -55,7 +55,7 @@ with tempfile.TemporaryDirectory(prefix='cyberghost-egress-check-') as folder:
     assert security['privileged'] is False and security['allowPrivilegeEscalation'] is False
     assert security['readOnlyRootFilesystem'] is True
     assert security['capabilities']['drop']==['ALL']
-    assert set(security['capabilities']['add'])=={'NET_ADMIN','MKNOD'}
+    assert set(security['capabilities']['add'])=={'NET_ADMIN','MKNOD','NET_BIND_SERVICE'}
     assert re.fullmatch(r'ghcr.io/qdm12/gluetun@sha256:[0-9a-f]{64}',container['image'])
     assert container['resources']['requests'] and container['resources']['limits']
     assert len(pod['initContainers'])==1

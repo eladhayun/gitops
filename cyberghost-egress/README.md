@@ -62,8 +62,9 @@ readiness. Gluetun's built-in firewall stays enabled when the tunnel is down, an
 its internal health monitor retries the VPN. There is no direct-egress fallback
 in the proxy. Verify this behavior at runtime before enrolling consumers.
 
-Gluetun requires root plus NET_ADMIN and MKNOD inside its own pod network namespace
-to configure OpenVPN, firewall and TUN. It is not privileged, uses no host namespaces,
+Gluetun requires root plus NET_ADMIN, MKNOD and NET_BIND_SERVICE inside its own
+pod network namespace to configure OpenVPN/firewall/TUN and bind its local DNS
+listener on port 53. It is not privileged, uses no host namespaces,
 hostPath mounts or service-account token, and drops other capabilities. Root UID
 avoids modifying the image's /etc/passwd or adding CHOWN/SETUID capabilities.
 A capability-free init container copies the original resolver file into a bounded

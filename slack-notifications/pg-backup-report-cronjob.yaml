@@ -53,8 +53,6 @@ spec:
               value: "C0BTGPSF7RR"
             - name: MULTI_WHATSAPP_REPORT_CHANNEL
               value: "C0CC57D7Q3D"
-            - name: PADEL_REPORT_CHANNEL
-              value: "C0C34DTFYET"
             - name: SLACK_TOKEN
               valueFrom:
                 secretKeyRef:

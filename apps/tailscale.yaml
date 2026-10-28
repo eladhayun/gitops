@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tailscale
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://pkgs.tailscale.com/helmcharts
+      chart: tailscale-operator
+      targetRevision: 1.104.2
+      helm:
+        releaseName: tailscale-operator
+        valuesObject:
+          installCRDs: true
+          operatorConfig:
+            hostname: jshipster-aks-operator
+            defaultTags:
+              - tag:k8s-operator
+          proxyConfig:
+            defaultTags: tag:k8s
+          ingressClass:
+            enabled: false
+          apiServerProxyConfig:
+            mode: "false"
+    - repoURL: https://github.com/eladhayun/gitops.git
+      targetRevision: main
+      path: tailscale
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tailscale
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

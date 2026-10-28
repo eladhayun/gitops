@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - connector.yaml
+
+# configure-credentials.py enables the KSOPS generator after creating secrets.yaml.
+
+generators:
+  - secrets-generator.yaml

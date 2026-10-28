@@ -13,6 +13,9 @@ spec:
       app: cyberghost-egress
   template:
     metadata:
+      annotations:
+        checksum/config: b995f9f0013352b3c611d23a709863271f6110d41f656141262db400a1240afa
+        checksum/credentials: d98f9d27c26537761ac1fc60c130cec3d89c0b38829f17392bf486a8259e6f60
       labels:
         app: cyberghost-egress
     spec:
@@ -49,7 +52,8 @@ spec:
           command: [/bin/sh, -ec]
           args:
             - |
-              mkdir -p /dev/net
+              mkdir -p /dev/net /tmp/gluetun
+              chmod 0700 /tmp/gluetun
               if [ ! -e /dev/net/tun ]; then
                 mknod -m 0600 /dev/net/tun c 10 200
               fi

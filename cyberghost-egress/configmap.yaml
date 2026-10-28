@@ -24,6 +24,7 @@ data:
   # Only the current AKS subnet is exempted, for replies to proxy clients.
   # Public destinations remain subject to the VPN firewall.
   FIREWALL_OUTBOUND_SUBNETS: '10.1.1.0/24'
+  PUBLICIP_ENABLED: 'off'
   LOG_LEVEL: warn
   VERSION_INFORMATION: 'off'
   TZ: UTC

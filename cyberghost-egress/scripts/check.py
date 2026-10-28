@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render and validate the shared egress manifests without exposing Secret data."""
 import json
+import hashlib
 import os
 import pathlib
 import re
@@ -41,6 +42,9 @@ with tempfile.TemporaryDirectory(prefix='cyberghost-egress-check-') as folder:
     deployment = next(x for x in objects if x['kind']=='Deployment')
     service = next(x for x in objects if x['kind']=='Service')
     config = next(x for x in objects if x['kind']=='ConfigMap')['data']
+    annotations = deployment['spec']['template']['metadata']['annotations']
+    assert annotations['checksum/config']==hashlib.sha256((app/'configmap.yaml').read_bytes()).hexdigest()
+    assert annotations['checksum/credentials']==hashlib.sha256((app/'secrets.yaml').read_bytes()).hexdigest()
     pod = deployment['spec']['template']['spec']
     container = pod['containers'][0]
     assert deployment['spec']['replicas']==1 and deployment['spec']['strategy']['type']=='Recreate'

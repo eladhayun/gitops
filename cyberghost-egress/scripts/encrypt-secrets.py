@@ -83,4 +83,5 @@ decrypted = run(['sops', '--decrypt', '--output-type', 'json', str(target)], env
 if json.loads(decrypted) != secret:
     target.unlink()
     raise SystemExit('Encrypted Secret round-trip verification failed')
+run(['python3', str(app / 'scripts/update-checksums.py')])
 print('Validated certificate/key and encrypted the VPN/proxy credentials. No secret values displayed.')

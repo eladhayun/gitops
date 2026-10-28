@@ -83,7 +83,7 @@ apps/cyberghost-egress.yaml and add that file to apps/kustomization.yaml only wh
 ready. Publish through GitOps; do not deploy with imperative kubectl apply.
 
 Verify Synced/Healthy, VPN readiness, authenticated proxy success from another pod,
-407 for missing/wrong proxy credentials, an Israeli exit country, and Webtop returning
+407 for missing credentials and rejection (401/407) for wrong credentials, an Israeli exit country, and Webtop returning
 401 anonymously or successful owner-authorized data. Test tunnel interruption before
 consumer enrollment and confirm the proxy cannot fall back to the normal AKS egress.
 Do not log public IPs, usernames, keys, passwords, or school response bodies.
@@ -98,3 +98,39 @@ Sources:
 - https://github.com/qdm12/gluetun-wiki/blob/main/setup/options/firewall.md
 - https://github.com/qdm12/gluetun-wiki/blob/main/faq/healthcheck.md
 - https://support.cyberghostvpn.com/hc/en-us/articles/213190009-How-to-Set-Up-OpenVPN-on-Linux-Debian-via-Terminal
+
+## Enroll another workload
+
+Run `scripts/provision-consumer.py --namespace <namespace> --output <gitops-app>/secret-egress.yaml`.
+The helper copies only the dedicated proxy credentials into an encrypted consumer
+Secret with uppercase/lowercase proxy environment variables and cluster NO_PROXY
+exclusions. It does not copy CyberGhost credentials or private keys. Add that
+file to the consumer's KSOPS generator and reference Secret
+`cyberghost-egress-proxy` with envFrom. Publish that app-specific change through
+GitOps. Applications must support HTTP proxy environment variables or be configured
+with an explicit authenticated HTTP CONNECT proxy. Do not assume every application
+automatically reads environment proxy settings.
+
+After editing configmap.yaml, run `scripts/update-checksums.py` before validation
+and publication. Credential encryption updates these annotations automatically.
+They trigger an ArgoCD-managed restart when config or encrypted credentials change.
+
+## Verified on 2026-10-28
+
+The cluster proxy returned an Israeli exit (`IL`) from a different namespace.
+Missing proxy credentials returned 407; wrong credentials were rejected with 401.
+Webtop's anonymous API returned its expected 401 through the VPN rather than the
+CloudFront 403 observed through normal AKS egress.
+
+Before enrolling consumers, a scoped outage test blocked only the CyberGhost
+transport endpoints inside the VPN pod and terminated its OpenVPN child. The
+normal AKS TCP path stayed reachable, while an authenticated CONNECT directly to
+a public IP through the VPN pod failed. This avoided DNS and Service-readiness
+confounding and verified that there was no direct-egress fallback. Every test
+firewall rule was removed afterward. Do not repeat an outage test while workloads
+are using the proxy without scheduling the interruption.
+
+For routine non-disruptive checks, run `python3 scripts/verify.py --webtop` from
+this directory. It reads proxy credentials privately through the Kubernetes API
+and uses the existing Python-capable bastion to check another namespace. The
+output contains only authentication statuses, exit country and success flags.

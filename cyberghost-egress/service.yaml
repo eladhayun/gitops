@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cyberghost-egress
+spec:
+  type: ClusterIP
+  selector:
+    app: cyberghost-egress
+  ports:
+    - name: proxy
+      port: 8888
+      targetPort: proxy
+      protocol: TCP

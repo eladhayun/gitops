@@ -6,4 +6,4 @@ generators: [secrets-generator.yaml]
 # CI owns the image digest; application is registered only after first promotion.
 images:
 - name: prodacr1234.azurecr.io/webtop-mcp
-  digest: sha256:4b6978d26fae9742d9aa33e4101da742620ab1126a0a9477ca54ee1c445ceac9
+  digest: sha256:b3c2353116136327dacc446da231d50ffa35d64ab9d92396708ce44fc4d8756a

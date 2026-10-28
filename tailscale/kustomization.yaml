@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - connector.yaml
+  - cluster-dns-service.yaml
 
 # configure-credentials.py enables the KSOPS generator after creating secrets.yaml.
 

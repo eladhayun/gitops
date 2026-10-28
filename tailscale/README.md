@@ -84,8 +84,11 @@ NetworkPolicy objects must not be treated as an enforced access boundary.
 
 ## Split DNS and clients
 
-In [DNS](https://login.tailscale.com/admin/dns), add **10.0.0.10** as a custom
+In [DNS](https://login.tailscale.com/admin/dns), add **10.0.255.53** as a custom
 nameserver and enable **Restrict to domain / Split DNS**, using **cluster.local**.
+This address belongs to the additional `kube-system/tailscale-cluster-dns` Service,
+which selects the existing CoreDNS pods. It avoids the owner’s local
+`10.0.0.0/24` network; the original cluster DNS Service remains unchanged.
 Do not add it as an unrestricted global resolver. Enable Tailscale DNS on clients.
 This tailnet setting is configured in Tailscale, not by the GitOps manifests.
 
@@ -125,8 +128,8 @@ From the owner's connected Tailscale client:
 
 ```sh
 # Direct DNS queries exercise UDP and TCP through the router.
-dig @10.0.0.10 shared-postgres.postgres.svc.cluster.local A
-dig +tcp @10.0.0.10 shared-postgres.postgres.svc.cluster.local A
+dig @10.0.255.53 shared-postgres.postgres.svc.cluster.local A
+dig +tcp @10.0.255.53 shared-postgres.postgres.svc.cluster.local A
 # Exercise the system resolver (macOS) to verify split DNS.
 dscacheutil -q host -a name shared-postgres.postgres.svc.cluster.local
 # HTTP service and read-only TCP connection; these do not write application data.

@@ -1,4 +1,4 @@
-.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password sops-encrypt sops-decrypt sops-encrypt-all sops-decrypt-all sops-edit sops-setup-argocd openclaw-access
+.PHONY: argocd-install argocd-access argocd-password argocd-uninstall argocd-repo-add get-argo-cd-token tunnel-setup tunnel-credentials tunnel-status postgres-setup postgres-password sops-encrypt sops-decrypt sops-encrypt-all sops-decrypt-all sops-edit sops-setup-argocd openclaw-access kustomize-check
 
 CONTEXT := jshipster
 NAMESPACE := argocd
@@ -352,6 +352,33 @@ sops-setup-argocd:
 	@echo ""
 	@echo "ArgoCD will now automatically decrypt secrets during deployment"
 	@echo ""
+
+# ==========================================
+# Kustomize
+# ==========================================
+
+# Validate that a service builds (incl. KSOPS secret decryption) and show resource kinds.
+# Output is discarded so decrypted secrets are never printed or left on disk.
+# Usage: make kustomize-check SERVICE=slack-notifications
+kustomize-check:
+	@if [ -z "$(SERVICE)" ]; then \
+		echo "❌ Error: SERVICE parameter is required"; \
+		echo "Usage: make kustomize-check SERVICE=slack-notifications"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(SOPS_AGE_KEY_FILE)" ]; then \
+		echo "❌ Error: Key file $(SOPS_AGE_KEY_FILE) not found!"; \
+		exit 1; \
+	fi; \
+	PLUGINS=$$(mktemp -d); \
+	trap 'rm -rf $$PLUGINS' EXIT; \
+	mkdir -p $$PLUGINS/viaduct.ai/v1/ksops; \
+	ln -s "$$(command -v ksops)" $$PLUGINS/viaduct.ai/v1/ksops/ksops; \
+	OUT=$$PLUGINS/out.yaml; \
+	KUSTOMIZE_PLUGIN_HOME=$$PLUGINS SOPS_AGE_KEY_FILE=$(abspath $(SOPS_AGE_KEY_FILE)) \
+		kustomize build --enable-alpha-plugins --enable-exec $(SERVICE) > $$OUT || exit 1; \
+	echo "✅ $(SERVICE) builds. Resources:"; \
+	grep -E '^kind: ' $$OUT | sort | uniq -c
 
 # ==========================================
 # OpenClaw

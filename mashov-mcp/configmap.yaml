@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: mashov-mcp-config}
+data:
+  API_ADDR: ':8080'
+  MCP_ADDR: ':8081'
+  PGHOST: shared-postgres.postgres.svc.cluster.local
+  PGPORT: '5432'
+  PGDATABASE: mashov_mcp
+  PGSSLMODE: verify-full
+  PGSSLROOTCERT: /private/postgres/ca.crt
+  MASHOV_SESSION_FILE: /private/mashov/session.json
+  LOG_LEVEL: info

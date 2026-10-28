@@ -9,5 +9,6 @@ data:
   PGDATABASE: mashov_mcp
   PGSSLMODE: verify-full
   PGSSLROOTCERT: /private/postgres/ca.crt
+  MASHOV_CREDENTIALS_FILE: /private/mashov-login/credentials.json
   MASHOV_SESSION_FILE: /private/mashov/session.json
   LOG_LEVEL: info

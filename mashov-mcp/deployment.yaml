@@ -51,6 +51,7 @@ spec:
           volumeMounts:
             - {name: tmp, mountPath: /tmp}
             - {name: postgres-ca, mountPath: /private/postgres, readOnly: true}
+            - {name: mashov-login, mountPath: /private/mashov-login, readOnly: true}
             - {name: mashov-session, mountPath: /private/mashov, readOnly: true}
       volumes:
         - name: tmp
@@ -63,5 +64,10 @@ spec:
         - name: mashov-session
           secret:
             secretName: mashov-session
+            optional: true
+            defaultMode: 0440
+        - name: mashov-login
+          secret:
+            secretName: mashov-login
             optional: true
             defaultMode: 0440

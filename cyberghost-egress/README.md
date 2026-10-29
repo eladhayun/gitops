@@ -56,7 +56,9 @@ geolocation databases may differ.
 
 ## Runtime and failure behavior
 
-One replica, Recreate rollout: request 100m CPU/128Mi; limit 1 CPU/256Mi.
+One replica, Recreate rollout: request 100m CPU/256Mi; limit 1 CPU/512Mi.
+The memory limit includes the VPN/proxy processes and memory-backed volumes;
+256Mi caused repeated startup OOM kills in the deployed workload.
 Updates and VPN reconnection can briefly interrupt consumers. VPN health gates
 readiness. Gluetun's built-in firewall stays enabled when the tunnel is down, and
 its internal health monitor retries the VPN. There is no direct-egress fallback

@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - cronjob-tivtaam-mcp.yaml
   - cronjob-webtop-mcp.yaml
   - cronjob-multi-whatsapp.yaml
   - cronjob-ids.yaml
@@ -13,6 +14,7 @@ resources:
   - cronjob-anpr.yaml
 
 generators:
+  - tivtaam-mcp-secrets-generator.yaml
   - webtop-mcp-secrets-generator.yaml
   - multi-whatsapp-secrets-generator.yaml
   - secrets-generator.yaml

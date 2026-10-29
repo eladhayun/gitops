@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tivtaam-mcp
+spec:
+  type: ClusterIP
+  selector:
+    app: tivtaam-mcp
+  ports:
+  - name: api
+    port: 8080
+    targetPort: api
+  - name: mcp
+    port: 8081
+    targetPort: mcp

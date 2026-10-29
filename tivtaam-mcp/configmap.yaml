@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tivtaam-mcp-config
+data:
+  API_ADDRESS: :8080
+  MCP_ADDRESS: :8081
+  PGHOST: shared-postgres.postgres.svc.cluster.local
+  PGPORT: '5432'
+  PGDATABASE: tivtaam_mcp
+  PGUSER: tivtaam_mcp
+  PGSSLMODE: verify-full
+  LOG_LEVEL: INFO

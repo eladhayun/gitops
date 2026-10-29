@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tivtaam-mcp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 300
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: tivtaam-mcp
+  template:
+    metadata:
+      labels:
+        app: tivtaam-mcp
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: tivtaam-mcp
+        image: tivtaam-mcp
+        ports:
+        - name: api
+          containerPort: 8080
+        - name: mcp
+          containerPort: 8081
+        envFrom:
+        - configMapRef:
+            name: tivtaam-mcp-config
+        - secretRef:
+            name: tivtaam-mcp-secrets
+        env:
+        - name: PGSSLROOTCERT
+          value: /private/postgres-ca.crt
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        startupProbe:
+          httpGet:
+            path: /readyz
+            port: api
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 18
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: api
+          periodSeconds: 5
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: api
+          periodSeconds: 15
+          timeoutSeconds: 2
+        volumeMounts:
+        - name: private
+          mountPath: /private
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: private
+        secret:
+          secretName: tivtaam-mcp-secrets
+          defaultMode: 288
+          items:
+          - key: postgres-ca.crt
+            path: postgres-ca.crt
+      - name: tmp
+        emptyDir:
+          sizeLimit: 32Mi

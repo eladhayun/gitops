@@ -13,6 +13,7 @@ roles, database ownership, or application credentials.
 
 | Database | Login owner | pgvector |
 |---|---|---|
+| `tivtaam_mcp` | `tivtaam_mcp` | No |
 | `anpr` | `anpr` | No |
 | `blutag` | `blutag` | No |
 | `dirtbike` | `dirtbike` | Yes |
@@ -170,3 +171,9 @@ Service manifests can be adapted as restore scaffolding, but must not be
 expected to attach the deleted PVC. Validate the restored database before
 reverting the consumer's connection settings. Never write to both copies during
 rollback; choose one authoritative database before resuming the application.
+
+## Tiv Taam MCP
+
+`tivtaam_mcp` was provisioned with a dedicated non-superuser owner. Its credentials
+are SOPS encrypted in `tivtaam-mcp/secrets.yaml`; the app uses TLS verify-full.
+Daily logical backups are configured in `pg-backups/cronjob-tivtaam-mcp.yaml`.

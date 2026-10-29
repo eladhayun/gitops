@@ -1,3 +1,4 @@
+# Keep the legacy Application name to preserve resource tracking and the public Service.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -11,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/eladhayun/gitops.git
     targetRevision: HEAD
-    path: nginx-ingress-controller
+    path: ingress-controller
 
   destination:
     server: https://kubernetes.default.svc
@@ -20,6 +21,7 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      - PruneLast=true
 
     automated:
       selfHeal: true

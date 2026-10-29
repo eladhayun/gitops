@@ -57,11 +57,11 @@ kubectl --context jshipster get events -A --field-selector=type=Warning
 
 ## Infrastructure maintenance
 
-Ingress NGINX is pinned to its final patched v1.15.1 release. This addresses the
-known vulnerabilities in the previous v1.11.1 deployment, but the upstream
-project is retired. Migration to a maintained controller remains necessary;
-preserve HTTP/HTTPS routes, certificate integration, forwarded-header handling,
-and the SSH TCP mapping when doing so.
+Traefik v3.7.16 replaces the retired Ingress NGINX controller. Its maintained
+annotation compatibility provider preserves existing Ingress resources and
+cert-manager HTTP-01 routing. Two replicas serve HTTP, HTTPS, and bastion SSH
+through the original public Service/IP. See `ingress-controller/README.md` for
+security settings, retained compatibility names, and migration checks.
 
 Argo CD v3.5.6 retains the upstream nil-list guard for the controller pager
 panic observed on v3.2.0. Resource requests and limits for Argo CD and Tailscale

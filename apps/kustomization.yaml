@@ -11,7 +11,7 @@ resources:
   - multi-whatsapp.yaml
   - anpr.yaml
   - anpr-postgres.yaml
-  - nginx-ingress-controller.yaml
+  - ingress-controller.yaml
   - cert-manager.yaml
   - external-dns.yaml
   # - johnson.yaml

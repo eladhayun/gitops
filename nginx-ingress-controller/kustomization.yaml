@@ -1,28 +1,5 @@
+# Transitional path until the Application switches to ingress-controller.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 resources:
-  - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/cloud/deploy.yaml
-  - tcp-services-configmap.yaml
   - ../ingress-controller
-
-patches:
-  - path: configmap-patch.yaml
-  - path: controller-deployment-patch.yaml
-    target:
-      kind: Deployment
-      name: ingress-nginx-controller
-  - path: controller-service-patch.yaml
-    target:
-      kind: Service
-      name: ingress-nginx-controller
-  # Admission certificate Jobs must be recreated when their image changes.
-  - target:
-      kind: Job
-      name: ingress-nginx-admission-.*
-    patch: |-
-      - op: add
-        path: /metadata/annotations
-        value:
-          argocd.argoproj.io/hook: Sync
-          argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded

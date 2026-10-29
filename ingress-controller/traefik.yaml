@@ -86,6 +86,7 @@ providers:
     proxyConnectTimeout: 5
     proxyReadTimeout: 60
     proxySendTimeout: 60
+    publishService: ingress-nginx/ingress-nginx-controller
   file:
     filename: /etc/traefik/dynamic/routes.yaml
     watch: false

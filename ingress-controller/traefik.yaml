@@ -75,7 +75,7 @@ providers:
     httpEntryPoint: web
     httpsEntryPoint: websecure
     proxyRequestBuffering: true
-    proxyBodySize: 1m
+    proxyBodySize: "1048576"
     proxyConnectTimeout: 5
     proxyReadTimeout: 60
     proxySendTimeout: 60

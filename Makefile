@@ -15,7 +15,7 @@ SOPS_AGE_KEY_FILE := $(SOPS_KEY)
 argocd-upgrade:
 	helm upgrade argocd argo-cd \
 		--repo https://argoproj.github.io/argo-helm \
-		--version 9.5.11 --kube-context $(CONTEXT) -n $(NAMESPACE) \
+		--version 10.11.6 --kube-context $(CONTEXT) -n $(NAMESPACE) \
 		--reset-then-reuse-values -f argocd-ksops-values.yaml \
 		--wait --timeout 10m
 

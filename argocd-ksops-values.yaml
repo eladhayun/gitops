@@ -3,13 +3,13 @@
 # allowing automatic decryption of SOPS-encrypted secrets
 # 
 # Versions:
-# - ArgoCD: v3.3.17 (Helm chart 9.5.11, explicit image tag)
-# - KSOPS: v4.3.2 (v4.4.0 is distroless without shell tools)
+# - ArgoCD: v3.5.6 (Helm chart 10.11.6, explicit image tag)
+# - KSOPS: v4.5.1 (native install command; no shell required)
 
-# Pin the patched 3.3 release; includes the list-pager nil-pointer fix (#25192).
+# Pin the stable release; preserves the list-pager nil-pointer fix (#25192).
 global:
   image:
-    tag: v3.3.17
+    tag: v3.5.6
 
 controller:
   resources:
@@ -69,31 +69,21 @@ repoServer:
       secret:
         secretName: sops-age
   
-  # Add init container to install KSOPS
-  # Using KSOPS v4.3.2 which has shell tools (v4.4.0 is distroless)
+  # Distroless KSOPS installs itself into the writable shared volume.
+  # Keep Argo CD's bundled Kustomize; replace only the decryption plugin.
   initContainers:
     - name: install-ksops
-      image: viaductoss/ksops:v4.3.2
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          echo "Installing KSOPS plugin..."
-          # Create the plugin directory structure that kustomize expects
-          mkdir -p /custom-tools/plugin/viaduct.ai/v1/ksops
-          # Copy ksops binary to the plugin directory
-          cp /usr/local/bin/ksops /custom-tools/plugin/viaduct.ai/v1/ksops/ksops
-          chmod +x /custom-tools/plugin/viaduct.ai/v1/ksops/ksops
-          echo "KSOPS plugin installation complete!"
-          ls -la /custom-tools/plugin/viaduct.ai/v1/ksops/
+      image: viaductoss/ksops:v4.5.1@sha256:4def9fdd4e2f850265740ebe9592c5455d19b76891e88e602df8b52d74b95334
+      command: ["/usr/local/bin/ksops", "install", "/custom-tools"]
       volumeMounts:
         - mountPath: /custom-tools
           name: custom-tools
-  
+
   # Mount custom tools and SOPS key in the main container
   volumeMounts:
-    - mountPath: /home/argocd/.config/kustomize/plugin
+    - mountPath: /home/argocd/.config/kustomize/plugin/viaduct.ai/v1/ksops/ksops
       name: custom-tools
-      subPath: plugin
+      subPath: ksops
     - mountPath: /.config/sops/age
       name: sops-age
       readOnly: true

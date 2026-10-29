@@ -43,6 +43,8 @@ spec:
             name: tivtaam-mcp-config
         - secretRef:
             name: tivtaam-mcp-secrets
+        - secretRef:
+            name: cyberghost-egress-proxy
         env:
         - name: PGSSLROOTCERT
           value: /private/postgres-ca.crt

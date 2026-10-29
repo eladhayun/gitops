@@ -7,7 +7,7 @@ metadata:
     app: loki
 spec:
   serviceName: loki
-  replicas: 1
+  replicas: 0  # WAL recovery maintenance; restored after quarantine
   selector:
     matchLabels:
       app: loki

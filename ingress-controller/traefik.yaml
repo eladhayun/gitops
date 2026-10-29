@@ -39,6 +39,8 @@ entryPoints:
       lifeCycle:
         requestAcceptGraceTimeout: 5s
         graceTimeOut: 60s
+    http:
+      aliasHeadersStrategy: delete
   websecure:
     address: :8443
     forwardedHeaders:
@@ -54,14 +56,19 @@ entryPoints:
     http:
       middlewares:
       - security-headers@file
+      aliasHeadersStrategy: delete
   ssh:
     address: :2222
     transport:
       lifeCycle:
         requestAcceptGraceTimeout: 5s
         graceTimeOut: 60s
+    http:
+      aliasHeadersStrategy: delete
   health:
     address: :8082
+    http:
+      aliasHeadersStrategy: delete
 ping:
   entryPoint: health
 providers:
@@ -75,10 +82,10 @@ providers:
     httpEntryPoint: web
     httpsEntryPoint: websecure
     proxyRequestBuffering: true
-    proxyBodySize: "1048576"
+    proxyBodySize: '1048576'
     proxyConnectTimeout: 5
     proxyReadTimeout: 60
     proxySendTimeout: 60
   file:
-    directory: /etc/traefik/dynamic
-    watch: true
+    filename: /etc/traefik/dynamic/routes.yaml
+    watch: false

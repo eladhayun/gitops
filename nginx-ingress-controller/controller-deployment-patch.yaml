@@ -1,3 +1,19 @@
 - op: add
   path: /spec/template/spec/containers/0/args/-
   value: --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+# Keep a serving controller while its replacement starts.
+- op: add
+  path: /spec/strategy
+  value:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+- op: add
+  path: /spec/template/spec/containers/0/resources
+  value:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi

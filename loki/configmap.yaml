@@ -33,11 +33,22 @@ data:
             prefix: index_
             period: 24h
     
+        # New index format starts at midnight UTC; never rewrite old periods.
+        - from: "2026-10-30"
+          store: tsdb
+          object_store: azure
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+
     storage_config:
       boltdb_shipper:
         active_index_directory: /loki/boltdb-shipper-active
         cache_location: /loki/boltdb-shipper-cache
-        shared_store: azure
+      tsdb_shipper:
+        active_index_directory: /loki/tsdb-index
+        cache_location: /loki/tsdb-cache
       azure:
         account_name: ${AZURE_STORAGE_ACCOUNT}
         account_key: ${AZURE_STORAGE_KEY}
@@ -45,7 +56,8 @@ data:
         endpoint_suffix: blob.core.windows.net
     
     limits_config:
-      enforce_metric_name: false
+      # Legacy v11 data remains readable; keep metadata disabled across cutover.
+      allow_structured_metadata: false
       reject_old_samples: true
       reject_old_samples_max_age: 168h  # 7 days
       ingestion_rate_mb: 16
@@ -58,7 +70,7 @@ data:
     
     compactor:
       working_directory: /loki/compactor
-      shared_store: azure
+      delete_request_store: azure
       compaction_interval: 10m
       retention_enabled: true
       retention_delete_delay: 2h

@@ -28,7 +28,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: alloy
-        image: grafana/alloy:v1.18.1
+        image: grafana/alloy:v1.21.3@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
         imagePullPolicy: IfNotPresent
         args:
           - run

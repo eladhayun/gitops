@@ -25,8 +25,7 @@ file is `ANPR-Shikmim/data/private/mcp-auth-token`; the other services use their
 connecting another host; this installer does not copy credentials between hosts.
 
 WhatsApp's complete owner MCP uses a separate SOPS-encrypted
-`multi-whatsapp-mcp` Secret, mounted only in the manager. Its restricted Padel
-endpoint and worker credentials remain separate. The obsolete stdio adapter and supervised Mac proxy/tunnels are retired. Primary
+`multi-whatsapp-mcp` Secret, mounted only in the manager. The former `/mcp/padel` endpoint is removed; owner and worker credentials remain separate. The obsolete stdio adapter and supervised Mac proxy/tunnels are retired. Primary
 client entries need neither kubectl exec nor an Azure login. Manual loopback
 port-forwards remain available for diagnostics and local development. Public/provider MCPs and local process tools retain their native transports.
 

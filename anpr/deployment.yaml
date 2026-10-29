@@ -12,6 +12,8 @@ spec:
       app: anpr-cloud
   template:
     metadata:
+      annotations:
+        anpr/config-generation: direct-cluster-mcp-v1
       labels:
         app: anpr-cloud
     spec:

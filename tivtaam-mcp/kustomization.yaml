@@ -7,3 +7,8 @@ resources:
 - configmap.yaml
 generators:
 - secrets-generator.yaml
+images:
+- name: tivtaam-mcp
+  newName: prodacr1234.azurecr.io/tivtaam-mcp
+  newTag: main-e23b128
+  digest: sha256:53d0eda80f0836485654f70b6a7f69fa1cb7379b269016159eedf41d63da86ff

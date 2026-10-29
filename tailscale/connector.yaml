@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
+  proxyClass: jshipster-resources
   replicas: 1
   hostnamePrefix: jshipster-aks
   tags:

@@ -9,6 +9,16 @@ SOPS_KEY := keys.txt
 SOPS_AGE_KEY_FILE := $(SOPS_KEY)
 
 # Add ArgoCD Helm repository
+# Helm-managed control plane: explicit chart and patched app image in values.
+# KUBECONFIG can point to a non-default credential file.
+.PHONY: argocd-upgrade
+argocd-upgrade:
+	helm upgrade argocd argo-cd \
+		--repo https://argoproj.github.io/argo-helm \
+		--version 9.5.11 --kube-context $(CONTEXT) -n $(NAMESPACE) \
+		--reset-then-reuse-values -f argocd-ksops-values.yaml \
+		--wait --timeout 10m
+
 argocd-repo-add:
 	@echo "Adding ArgoCD Helm repository..."
 	helm repo add argo https://argoproj.github.io/argo-helm

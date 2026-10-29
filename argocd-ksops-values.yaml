@@ -3,10 +3,64 @@
 # allowing automatic decryption of SOPS-encrypted secrets
 # 
 # Versions:
-# - ArgoCD: v3.2.0 (Helm chart 9.1.3)
+# - ArgoCD: v3.3.17 (Helm chart 9.5.11, explicit image tag)
 # - KSOPS: v4.3.2 (v4.4.0 is distroless without shell tools)
 
+# Pin the patched 3.3 release; includes the list-pager nil-pointer fix (#25192).
+global:
+  image:
+    tag: v3.3.17
+
+controller:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+  env:
+    - name: GOMEMLIMIT
+      value: 768MiB
+
+applicationSet:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 96Mi
+    limits:
+      memory: 256Mi
+
+dex:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+
+server:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 96Mi
+    limits:
+      memory: 256Mi
+
 repoServer:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 192Mi
+    limits:
+      memory: 384Mi
   # Add volumes for custom tools and SOPS age key
   volumes:
     - name: custom-tools
@@ -68,6 +122,12 @@ configs:
 # The Slack credentials already live in the existing argocd-notifications-secret
 # (keys: slack-token, slack-webhook-url), so we do not recreate it here.
 notifications:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
   enabled: true
   secret:
     create: false

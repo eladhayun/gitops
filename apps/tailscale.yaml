@@ -14,6 +14,12 @@ spec:
         valuesObject:
           installCRDs: true
           operatorConfig:
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
             hostname: jshipster-aks-operator
             defaultTags:
               - tag:k8s-operator

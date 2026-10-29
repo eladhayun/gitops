@@ -7,7 +7,10 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: debug.jshipster.io
 spec:
   ports:
-    - name: ssh
-      port: 22
-      protocol: TCP
-      targetPort: 22
+  - name: ssh
+    port: 22
+    protocol: TCP
+    targetPort: ssh
+  selector:
+    $patch: replace
+    app.kubernetes.io/name: traefik

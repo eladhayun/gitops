@@ -123,7 +123,9 @@ Structured metadata remains disabled across the cutover.
 The WAL is explicitly stored on the persistent volume, with a 256MB replay
 ceiling below the 512Mi container limit. Graceful shutdown flushes to object
 storage and has a 120-second termination grace period. The first 3.7.9 startup
-reported one WAL segment recovery error; the pre-upgrade local recovery copy
-was retained outside Git. A fixed 100-entry historical query matched exactly
-and new ingestion succeeded, but those checks do not prove every unflushed
-entry survived.
+reported WAL segment recovery errors. Loki was stopped with graceful flushing
+enabled, and the old WAL was retained on its PVC at `/loki/wal-recovery-20261029`
+before starting with a clean WAL. Do not delete that directory as routine
+cleanup. A pre-upgrade local recovery copy was also retained outside Git.
+Historical query comparisons and new ingestion checks are not proof that
+every entry survived the original WAL recovery error.

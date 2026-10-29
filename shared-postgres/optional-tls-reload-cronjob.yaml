@@ -28,7 +28,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: reload
-              image: pgvector/pgvector:pg17
+              image: pgvector/pgvector:pg17@sha256:cf134a767f474095eeba57e0117be8e568e011a63f33fbf252f14c9b760f8e6f
               command: ["psql", "--no-psqlrc", "-X", "--set", "ON_ERROR_STOP=1", "--command"]
               args:
                 - "DO $reload$ BEGIN IF NOT pg_reload_conf() THEN RAISE EXCEPTION 'configuration reload failed'; END IF; END $reload$;"

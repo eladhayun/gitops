@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tivtaam-mcp
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/eladhayun/gitops.git
+    targetRevision: HEAD
+    path: tivtaam-mcp
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tivtaam-mcp
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

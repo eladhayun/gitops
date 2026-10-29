@@ -12,6 +12,7 @@ data:
   MW_GITHUB_REPOSITORY: eladhayun/gitops
   MW_GITHUB_BRANCH: main
   MW_INVENTORY_PATH: multi-whatsapp/accounts
+  MW_MCP_TOKEN_FILE: /private/mcp/auth-token
   MW_SOCKET_PATH: /run/multi-whatsapp/manager.sock
   MW_LISTEN_ADDRESS: :8080
   MW_WORKER_LISTEN_ADDRESS: :8081

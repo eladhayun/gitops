@@ -55,11 +55,14 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 3
           volumeMounts:
+            - {name: mcp, mountPath: /private/mcp, readOnly: true}
             - {name: runtime, mountPath: /private/runtime, readOnly: true}
             - {name: manager, mountPath: /private/manager, readOnly: true}
             - {name: socket, mountPath: /run/multi-whatsapp}
             - {name: tmp, mountPath: /tmp}
       volumes:
+        - name: mcp
+          secret: {secretName: multi-whatsapp-mcp, defaultMode: 0440}
         - name: runtime
           secret: {secretName: multi-whatsapp-runtime, defaultMode: 0440}
         - name: manager

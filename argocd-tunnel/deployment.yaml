@@ -7,6 +7,11 @@ metadata:
     app: cloudflared
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: cloudflared
@@ -17,12 +22,18 @@ spec:
     spec:
       containers:
       - name: cloudflared
-        image: cloudflare/cloudflared:2024.10.0
+        image: cloudflare/cloudflared:2026.10.5@sha256:1b1d34d0a9c0bfca9de72db8460d328db3f19edd2b96169114e3e893a97bbe53
         args:
         - tunnel
         - --config
         - /etc/cloudflared/config/config.yaml
         - run
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 2000
+          periodSeconds: 5
+          timeoutSeconds: 3
         livenessProbe:
           httpGet:
             path: /ready

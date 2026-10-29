@@ -24,6 +24,9 @@ spec:
             defaultTags:
               - tag:k8s-operator
           proxyConfig:
+            # Security patch is published for proxies; operator/chart remain 1.104.2.
+            image:
+              tag: v1.104.4
             defaultTags: tag:k8s
           ingressClass:
             enabled: false

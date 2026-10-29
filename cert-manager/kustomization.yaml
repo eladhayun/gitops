@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: cert-manager
 
 resources:
-  - https://github.com/cert-manager/cert-manager/releases/download/v1.19.6/cert-manager.yaml
+  - https://github.com/cert-manager/cert-manager/releases/download/v1.20.5/cert-manager.yaml
   - cluster-issuer.yaml
 
 patches:

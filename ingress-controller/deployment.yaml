@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels: &id001
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/component: controller
+    ingress.jshipster.io/public: 'true'
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+  template:
+    metadata:
+      labels: *id001
+    spec:
+      serviceAccountName: traefik
+      terminationGracePeriodSeconds: 90
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: traefik
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: traefik
+        image: traefik:v3.7.16@sha256:1336e85aaed293bd63d005086e0dd013b04078b26aaeb1c18b26a2f928af7e65
+        args:
+        - --configFile=/etc/traefik/traefik.yaml
+        env:
+        - name: GOMEMLIMIT
+          value: 192MiB
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
+        - name: ssh
+          containerPort: 2222
+        - name: health
+          containerPort: 8082
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: health
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: health
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        volumeMounts:
+        - name: config
+          mountPath: /etc/traefik
+          readOnly: true
+        - name: routes
+          mountPath: /etc/traefik/dynamic
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: config
+        configMap:
+          name: traefik-static
+      - name: routes
+        configMap:
+          name: traefik-dynamic
+      - name: tmp
+        emptyDir:
+          sizeLimit: 128Mi

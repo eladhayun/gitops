@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ingress-nginx
+resources:
+- serviceaccount.yaml
+- rbac.yaml
+- deployment.yaml
+- pdb.yaml
+configMapGenerator:
+- name: traefik-static
+  files:
+  - traefik.yaml
+- name: traefik-dynamic
+  files:
+  - routes.yaml

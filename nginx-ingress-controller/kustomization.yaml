@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/cloud/deploy.yaml
   - tcp-services-configmap.yaml
+  - ../ingress-controller
 
 patches:
   - path: configmap-patch.yaml

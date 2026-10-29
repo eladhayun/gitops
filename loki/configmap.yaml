@@ -23,6 +23,13 @@ data:
         kvstore:
           store: inmemory
     
+    ingester:
+      wal:
+        enabled: true
+        dir: /loki/wal
+        flush_on_shutdown: true
+        replay_memory_ceiling: 256MB
+
     schema_config:
       configs:
         - from: 2020-10-24

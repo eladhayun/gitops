@@ -22,7 +22,7 @@ Alloy excludes `kube-system`, `kube-public`, and `kube-node-lease`, matching the
 ## GitOps Resources
 
 - `config.alloy` defines Kubernetes discovery, relabeling, CRI parsing, and the Loki writer.
-- `alloy-daemonset.yaml` deploys Alloy v1.18.1 with one pod per schedulable node.
+- `alloy-daemonset.yaml` deploys Alloy v1.21.3 with one pod per schedulable node.
 - `serviceaccount.yaml` grants read-only pod discovery permissions.
 - `statefulset.yaml`, `configmap.yaml`, and `service.yaml` run Loki.
 - `secrets.yaml` contains the SOPS-encrypted Azure storage credentials.
@@ -112,3 +112,18 @@ References:
 - [Migrate from Promtail to Grafana Alloy](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/)
 - [Loki HTTP API](https://grafana.com/docs/loki/latest/reference/loki-http-api/)
 - [Grafana Alloy HTTP endpoints](https://grafana.com/docs/alloy/latest/reference/http/)
+
+## Loki 3 upgrade (2026-10-29)
+
+Loki 3.7.9 retains the original BoltDB/v11 schema for historical reads. A new
+TSDB/v13 period starts automatically on **2026-10-30 at 00:00 UTC**. Never
+change the existing schema period dates: they identify where old indexes live.
+Structured metadata remains disabled across the cutover.
+
+The WAL is explicitly stored on the persistent volume, with a 256MB replay
+ceiling below the 512Mi container limit. Graceful shutdown flushes to object
+storage and has a 120-second termination grace period. The first 3.7.9 startup
+reported one WAL segment recovery error; the pre-upgrade local recovery copy
+was retained outside Git. A fixed 100-entry historical query matched exactly
+and new ingestion succeeded, but those checks do not prove every unflushed
+entry survived.

@@ -16,6 +16,7 @@ spec:
       labels:
         app: loki
     spec:
+      terminationGracePeriodSeconds: 120
       securityContext:
         fsGroup: 10001  # Loki runs as UID 10001
         runAsUser: 10001

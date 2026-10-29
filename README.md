@@ -46,7 +46,7 @@ is not a substitute for verifying uploaded archives and testing restores.
 3. Push reviewed changes to `main`, then check Argo sync, health, rollout status,
    restart counts, warning events, and the affected service endpoints.
 4. For Helm-managed Argo CD, run `make argocd-upgrade` separately. It pins chart
-   9.5.11 and application v3.3.17, retaining existing release overrides and KSOPS.
+   10.11.6 and application v3.5.6, retaining existing release overrides and KSOPS.
 
 ```sh
 kubectl --context jshipster get applications -n argocd
@@ -63,7 +63,7 @@ project is retired. Migration to a maintained controller remains necessary;
 preserve HTTP/HTTPS routes, certificate integration, forwarded-header handling,
 and the SSH TCP mapping when doing so.
 
-Argo CD v3.3.17 contains the upstream nil-list guard for the controller pager
+Argo CD v3.5.6 retains the upstream nil-list guard for the controller pager
 panic observed on v3.2.0. Resource requests and limits for Argo CD and Tailscale
 are version-controlled. Tailscale Connector resources select the explicit
 `jshipster-resources` ProxyClass.
@@ -71,3 +71,10 @@ are version-controlled. Tailscale Connector resources select the explicit
 AKS version upgrades and node-pool capacity changes require authenticated Azure
 management-plane access and belong in the infrastructure repository. Kubernetes
 API access alone does not verify AKS LTS enrollment or Azure billing resources.
+
+Verified infrastructure versions (2026-10-29): Cloudflared 2026.10.5, cert-manager
+1.20.5 (the latest compatible minor for Kubernetes 1.32), ExternalDNS 0.24.0,
+Loki 3.7.9, Alloy 1.21.3, Tailscale operator 1.104.2 with proxies 1.104.4,
+and KSOPS 4.5.1. PostgreSQL remains 17.11 with pgvector 0.8.6, pinned to the
+verified running image digest; major database upgrades require a separate
+data migration. See `loki/README.md` for the scheduled index-format transition.

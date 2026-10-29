@@ -17,12 +17,15 @@ spec:
       serviceAccountName: external-dns
       containers:
       - name: external-dns
-        image: registry.k8s.io/external-dns/external-dns:v0.14.0
+        image: registry.k8s.io/external-dns/external-dns:v0.24.0
         args:
         - --source=ingress
         - --source=service
         - --domain-filter=jshipster.io  # Only manage DNS records for these domains
         - --domain-filter=blutag.company
+        # Preserve v0.14 ownership and annotation semantics on v0.24.
+        - --policy=sync
+        - --annotation-prefix=external-dns.alpha.kubernetes.io/
         - --provider=cloudflare
         - --txt-owner-id=jshipster-cluster
         - --log-format=text
@@ -38,7 +41,7 @@ spec:
             memory: "32Mi"
             cpu: "5m"
           limits:
-            memory: "64Mi"
+            memory: "128Mi"
             cpu: "50m"
       securityContext:
         fsGroup: 65534

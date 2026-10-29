@@ -1,257 +1,73 @@
-# GitOps Repository for Johnson Application
+# jshipster GitOps
 
-This repository contains Kubernetes manifests for the Johnson application, managed by ArgoCD.
+Kubernetes manifests for the `jshipster` Azure AKS cluster. Argo CD reconciles
+`main` from this repository. Always select `--context jshipster`; set
+`KUBECONFIG` explicitly when using a non-default credential file.
 
-## Structure
+## Layout and ownership
 
-```
-.
-├── apps/                      # ArgoCD Application definitions
-│   ├── apps.yaml             # App-of-apps pattern
-│   ├── johnson-frontend.yaml # Frontend application
-│   ├── johnson-backend.yaml  # Backend application
-│   ├── linux-shell.yaml      # Linux shell example
-│   └── kustomization.yaml    # Kustomize config
-├── johnson-frontend/          # Frontend Kubernetes manifests
-│   ├── deployment.yaml       # Deployment and Service
-│   └── kustomization.yaml
-├── johnson-backend/           # Backend Kubernetes manifests
-│   ├── deployment.yaml       # Deployment and Service
-│   └── kustomization.yaml
-└── linux-shell/               # Example application
-    ├── deployment.yaml
-    └── kustomization.yaml
-```
+- `apps/kustomization.yaml` is the authoritative list of active applications.
+- `apps/apps.yaml` bootstraps the Argo CD app-of-apps.
+- Service directories contain Kustomize resources and KSOPS secret generators.
+- `multi-whatsapp/worker-chart` supplies dynamically generated account workloads.
+- `argocd-ksops-values.yaml` configures the Helm-managed Argo CD installation.
+  Argo CD does not manage its own installation; edit these values and run
+  `make argocd-upgrade` to deploy them.
+- Commented-out applications and unreferenced manifests are retained recovery
+  scaffolding, not proof that a workload is running. Check Kustomize references.
 
-## Applications
+Application CI owns application image tags. Do not manually change those tags.
+Infrastructure versions are pinned in their Kustomizations or Helm values.
 
-### Johnson Frontend
-- **Namespace**: `default`
-- **Service**: `johnson-frontend` (ClusterIP on port 80)
-- **Replicas**: 1
-- **Auto-sync**: Enabled
+## Secrets
 
-### Johnson Backend
-- **Namespace**: `default`
-- **Service**: `johnson-backend` (ClusterIP on port 8000)
-- **Replicas**: 1
-- **Auto-sync**: Enabled
-- **Health checks**: Liveness and readiness probes on `/health`
+Secrets are encrypted with SOPS and age, and decrypted by KSOPS in Argo CD's
+repo-server. The local `keys.txt` is ignored by Git; never commit or print it.
+Use `make sops-edit FILE=<service>/secrets.yaml` for secret changes. Do not commit
+rendered manifests containing decrypted Secrets.
 
-## Prerequisites
+## Databases and backups
 
-1. Kubernetes cluster with ArgoCD installed
-2. Azure Container Registry credentials configured
-3. Kubernetes secrets created manually (see below)
+The active application databases share PostgreSQL in the `postgres` namespace.
+Several legacy `*-postgres` Argo applications retain connection Secrets and do
+not deploy database servers. See `shared-postgres/README.md` before changing
+ownership or removing any database resources. Recovery artifacts and PVCs must
+not be deleted as routine cleanup.
 
-## Setup
+`pg-backups` manages scheduled backups. Successful Job status is necessary but
+is not a substitute for verifying uploaded archives and testing restores.
 
-### 1. Create Kubernetes Secrets
+## Validation and deployment
 
-⚠️ **Important**: Secrets are NOT stored in git due to GitHub push protection. You must create them manually.
+1. Review `git diff` and render changed Kustomizations. KSOPS-based directories
+   require the configured plugin and age key; keep decrypted output private.
+2. Use server-side dry runs for changed resources. Existing Job pod templates
+   are immutable; admission Jobs use Argo hooks with recreation policies.
+3. Push reviewed changes to `main`, then check Argo sync, health, rollout status,
+   restart counts, warning events, and the affected service endpoints.
+4. For Helm-managed Argo CD, run `make argocd-upgrade` separately. It pins chart
+   9.5.11 and application v3.3.17, retaining existing release overrides and KSOPS.
 
-See [`johnson-backend/CREATE-SECRETS.md`](johnson-backend/CREATE-SECRETS.md) for detailed instructions.
-
-Quick command:
-
-```bash
-kubectl create secret generic johnson-backend-secrets \
-  --from-literal=JOHNSON_DATABASE_URL='your-database-url' \
-  --from-literal=JOHNSON_AUTH_SECRET='your-auth-secret' \
-  --from-literal=JOHNSON_RESET_SECRET='your-reset-secret' \
-  --from-literal=WHATSAPP_TWILIO_ACCOUNT_SID='your-twilio-sid' \
-  --from-literal=WHATSAPP_TWILIO_AUTH_TOKEN='your-twilio-token' \
-  --namespace default
+```sh
+kubectl --context jshipster get applications -n argocd
+kubectl --context jshipster get pods -A
+kubectl --context jshipster top nodes
+kubectl --context jshipster get events -A --field-selector=type=Warning
 ```
 
-### 2. Configure Image Pull Secrets
+## Infrastructure maintenance
 
-```bash
-# Create image pull secret for Azure Container Registry
-kubectl create secret docker-registry acr-secret \
-  --docker-server=<registry>.azurecr.io \
-  --docker-username=<username> \
-  --docker-password=<password> \
-  -n default
+Ingress NGINX is pinned to its final patched v1.15.1 release. This addresses the
+known vulnerabilities in the previous v1.11.1 deployment, but the upstream
+project is retired. Migration to a maintained controller remains necessary;
+preserve HTTP/HTTPS routes, certificate integration, forwarded-header handling,
+and the SSH TCP mapping when doing so.
 
-# Update deployments to use the secret (if needed)
-# Add to spec.template.spec in deployment.yaml:
-#   imagePullSecrets:
-#   - name: acr-secret
-```
+Argo CD v3.3.17 contains the upstream nil-list guard for the controller pager
+panic observed on v3.2.0. Resource requests and limits for Argo CD and Tailscale
+are version-controlled. Tailscale Connector resources select the explicit
+`jshipster-resources` ProxyClass.
 
-### 3. Deploy ArgoCD Applications
-
-```bash
-# Apply app-of-apps (will create all applications)
-kubectl apply -f apps/apps.yaml
-
-# Or apply individual applications
-kubectl apply -f apps/johnson-frontend.yaml
-kubectl apply -f apps/johnson-backend.yaml
-```
-
-### 4. Verify Deployment
-
-```bash
-# Check ArgoCD applications
-kubectl get applications -n argocd
-
-# Check pods
-kubectl get pods -n default
-
-# Check services
-kubectl get services -n default
-```
-
-## Automated Updates
-
-This repository is automatically updated by GitHub Actions workflows in the [johnson repository](https://github.com/eladhayun/johnson).
-
-When code is pushed to the `main` branch:
-1. GitHub Actions builds and pushes Docker images to Azure Container Registry
-2. The workflow updates `deployment.yaml` files with new image tags
-3. ArgoCD detects the changes and syncs them to the cluster
-
-**Do not manually edit `image:` lines in deployment files** - they will be overwritten by automation.
-
-## Manual Operations
-
-### Sync Applications
-
-```bash
-# Sync all applications
-argocd app sync --async johnson-frontend johnson-backend
-
-# Sync specific application
-argocd app sync johnson-frontend
-```
-
-### View Application Status
-
-```bash
-# List all applications
-argocd app list
-
-# Get application details
-argocd app get johnson-frontend
-
-# View sync history
-argocd app history johnson-frontend
-```
-
-### Rollback
-
-```bash
-# Rollback to previous version
-argocd app rollback johnson-frontend <history-id>
-
-# View history to get history-id
-argocd app history johnson-frontend
-```
-
-## Making Changes
-
-### Updating Resources
-
-1. Create a new branch
-2. Edit the manifest files (deployment.yaml, etc.)
-3. Test locally: `kubectl apply --dry-run=client -f <file>`
-4. Commit and push
-5. Create a pull request
-6. After merge, ArgoCD will automatically sync the changes
-
-### Adding New Services
-
-1. Create a new directory (e.g., `johnson-api/`)
-2. Add `deployment.yaml` and `kustomization.yaml`
-3. Create ArgoCD application in `apps/<service-name>.yaml`
-4. Add to `apps/kustomization.yaml`
-5. Commit and push
-
-## Troubleshooting
-
-### Application Out of Sync
-
-```bash
-# Check diff
-argocd app diff johnson-frontend
-
-# Force sync
-argocd app sync johnson-frontend --force
-```
-
-### Pods Not Starting
-
-```bash
-# Check pod status
-kubectl get pods -n default
-
-# View pod logs
-kubectl logs <pod-name> -n default
-
-# Describe pod for events
-kubectl describe pod <pod-name> -n default
-```
-
-### Image Pull Errors
-
-```bash
-# Check if image exists in registry
-docker pull <registry>/<image>:<tag>
-
-# Verify image pull secrets
-kubectl get secrets -n default
-kubectl describe secret acr-secret -n default
-```
-
-## Security Notes
-
-✅ **Secrets are NOT stored in git** - GitHub push protection prevents committing secrets, which is good!
-
-### Current Approach
-- ✅ Secrets are created manually in the cluster
-- ✅ GitHub push protection prevents accidental commits
-- ✅ Secrets never appear in git history
-- ⚠️ Requires manual creation on each cluster
-
-### Secret Management Options
-
-#### 1. Manual Creation (Current)
-- Create secrets with `kubectl create secret`
-- See `johnson-backend/CREATE-SECRETS.md` for instructions
-- Pros: Simple, secure
-- Cons: Manual process for each cluster
-
-#### 2. Sealed Secrets (Recommended for GitOps)
-- Encrypts secrets so they can be stored in git
-- ArgoCD decrypts automatically in cluster
-- Pros: True GitOps, version controlled
-- Cons: Requires Sealed Secrets controller
-
-```bash
-# Install and use Sealed Secrets
-brew install kubeseal
-kubectl create secret generic johnson-backend-secrets ... \
-  --dry-run=client -o yaml | kubeseal -o yaml > sealed-secrets.yaml
-git add sealed-secrets.yaml
-```
-
-#### 3. External Secrets Operator
-- Syncs secrets from Azure Key Vault, AWS Secrets Manager, etc.
-- Pros: Centralized secret management
-- Cons: Requires external secret storage setup
-
-### Best Practices
-- ✅ Never commit plain text secrets to git
-- ✅ Use different secrets for each environment
-- ✅ Rotate secrets regularly
-- ✅ Implement RBAC for secret access
-- ✅ Use Sealed Secrets for proper GitOps workflow
-
-## Related Documentation
-
-- [Johnson Application Repository](https://github.com/eladhayun/johnson)
-- [GitOps CI/CD Documentation](https://github.com/eladhayun/johnson/blob/main/docs/gitops-cicd.md)
-- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
-
+AKS version upgrades and node-pool capacity changes require authenticated Azure
+management-plane access and belong in the infrastructure repository. Kubernetes
+API access alone does not verify AKS LTS enrollment or Azure billing resources.

@@ -1,5 +1,0 @@
-# Transitional path until the Application switches to ingress-controller.
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - ../ingress-controller

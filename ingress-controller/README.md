@@ -75,3 +75,16 @@ References:
 - [Traefik's supported migration path](https://doc.traefik.io/traefik/migrate/nginx-to-traefik/)
 - [Ingress annotation compatibility](https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/ingress-nginx/)
 - [Cloudflare IP ranges](https://www.cloudflare.com/ips/)
+
+## Migration verification (2026-10-29)
+
+Both candidate replicas passed checks before cutover. After the Service
+selected only Traefik and NGINX was pruned, all 10 production hostnames passed
+27 HTTP/HTTPS checks against the original baseline, including redirects and
+origin certificate validation. The SSH ED25519 host key matched before and
+after cutover. A temporary backend verified WebSocket upgrade and data,
+unbuffered SSE, accepted/rejected upload sizes, legacy-class HTTP-01 routing,
+and rejection of spoofed forwarded/alias headers through the public IP.
+The temporary backend was removed after validation. These are routing and
+protocol checks, not authenticated application workflows or an authenticated
+SSH session.

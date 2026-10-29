@@ -86,6 +86,9 @@ spec:
           readOnly: true
         - name: tmp
           mountPath: /tmp
+        - name: tivtaam-session
+          mountPath: /run/tivtaam
+          readOnly: true
       volumes:
       - name: private
         secret:
@@ -97,3 +100,10 @@ spec:
       - name: tmp
         emptyDir:
           sizeLimit: 32Mi
+      - name: tivtaam-session
+        secret:
+          secretName: tivtaam-session
+          defaultMode: 288
+          items:
+          - key: session.json
+            path: session.json

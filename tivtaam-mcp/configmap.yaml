@@ -11,3 +11,4 @@ data:
   PGUSER: tivtaam_mcp
   PGSSLMODE: verify-full
   LOG_LEVEL: INFO
+  TIVTAAM_SESSION_FILE: /run/tivtaam/session.json

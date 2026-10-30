@@ -35,7 +35,8 @@ def main():
         restrictions = previous.get('mcp_servers', {}).get(name, {})
         preserved = ''.join(f'{key} = {json.dumps(restrictions[key])}\n' for key in ('enabled_tools', 'disabled_tools', 'enabled') if key in restrictions)
         command = f'{helper} {name}'
-        output = output.rstrip() + f'\n\n[mcp_servers.{name}]\nurl = {json.dumps(URLS[name])}\nhttp_headers_helper = {json.dumps(command)}\nstartup_timeout_sec = 30\ntool_timeout_sec = 90\n' + preserved
+        tool_timeout = max(360, restrictions.get('tool_timeout_sec', 90)) if name == 'tivtaam-mcp' else 90
+        output = output.rstrip() + f'\n\n[mcp_servers.{name}]\nurl = {json.dumps(URLS[name])}\nhttp_headers_helper = {json.dumps(command)}\nstartup_timeout_sec = 30\ntool_timeout_sec = {tool_timeout}\n' + preserved
     updated = tomllib.loads(output)
     for name, value in previous.get('mcp_servers', {}).items():
         if name not in names and updated['mcp_servers'].get(name) != value:

@@ -10,8 +10,10 @@ resources:
   - multi-whatsapp-rbac.yaml
   - multi-whatsapp-accounts.yaml
   - multi-whatsapp.yaml
-  - anpr.yaml
-  - anpr-postgres.yaml
+  # ANPR retired 2026-10-30. Keep the manifests for recovery/history while
+  # removing both Applications so Argo CD prunes their managed resources.
+  # - anpr.yaml
+  # - anpr-postgres.yaml
   - ingress-controller.yaml
   - cert-manager.yaml
   - external-dns.yaml

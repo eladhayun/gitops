@@ -14,7 +14,8 @@ resources:
   # DRC (trainings) — backups & uptime are folded into the global per-service
   # fan-out (pg-backup-report / uptime-check); only the business summary is DRC-specific.
   - drc-weekly-summary-cronjob.yaml
-  - anpr-weekly-summary-cronjob.yaml
+  # ANPR retired 2026-10-30; retain the manifest but prune the CronJob.
+  # - anpr-weekly-summary-cronjob.yaml
   - serviceaccount.yaml
   # GCP Billing
   - gcp-billing-cronjob.yaml

@@ -43,10 +43,12 @@ spec:
               value: "https://drc-trainings.jshipster.io/api/healthz"
             - name: DIRTBIKE_REPORT_CHANNEL
               value: "C0BD40N45UY"
-            - name: ANPR_REPORT_CHANNEL
-              value: "C0BTGPSF7RR"
-            - name: ANPR_HEALTH_URL
-              value: "https://anpr.jshipster.io/healthz"
+            # ANPR retired 2026-10-30. Keep the former target documented while
+            # removing it from the shared uptime fan-out.
+            # - name: ANPR_REPORT_CHANNEL
+            #   value: "C0BTGPSF7RR"
+            # - name: ANPR_HEALTH_URL
+            #   value: "https://anpr.jshipster.io/healthz"
             resources:
               requests:
                 memory: "16Mi"

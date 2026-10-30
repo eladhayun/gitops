@@ -49,8 +49,6 @@ spec:
               value: "C0B93ML2RJQ"
             - name: DIRTBIKE_REPORT_CHANNEL
               value: "C0BD40N45UY"
-            - name: ANPR_REPORT_CHANNEL
-              value: "C0BTGPSF7RR"
             - name: MULTI_WHATSAPP_REPORT_CHANNEL
               value: "C0CC57D7Q3D"
             - name: SLACK_TOKEN

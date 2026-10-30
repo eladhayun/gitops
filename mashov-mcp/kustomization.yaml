@@ -5,4 +5,4 @@ resources: [deployment.yaml, service.yaml, configmap.yaml]
 generators: [secrets-generator.yaml]
 images:
 - name: prodacr1234.azurecr.io/mashov-mcp
-  digest: sha256:a64cb4fd8e7416f9d619b4796bb9b9c94751f24abdc28428ef6f1bc39be2f896
+  digest: sha256:e0a23b86e8e7a5853d029b431aa5ee429af88cad247fdba7ec1970c0c32bdcf6

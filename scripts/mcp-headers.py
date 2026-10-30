@@ -9,7 +9,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 FILES = {
     'anpr': ROOT / 'ANPR-Shikmim/data/private/mcp-auth-token',
-    'tivtaam-mcp': ROOT / 'tivtaam-mcp/private/auth-token',
+    'tivtaam': ROOT / 'tivtaam-mcp/private/auth-token',
     'mashov': ROOT / 'mashov-mcp/private/auth-token',
     'webtop': ROOT / 'webtop-mcp/private/auth-token',
     'multi-whatsapp': ROOT / 'multi-whatsapp/private/auth-token',

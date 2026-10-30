@@ -11,7 +11,7 @@ import tomllib
 
 URLS = {
     'anpr': 'http://anpr-cloud.anpr.svc.cluster.local/mcp',
-    'tivtaam-mcp': 'http://tivtaam-mcp.tivtaam-mcp.svc.cluster.local:8081/mcp',
+    'tivtaam': 'http://tivtaam-mcp.tivtaam-mcp.svc.cluster.local:8081/mcp',
     'mashov': 'http://mashov-mcp.mashov-mcp.svc.cluster.local:8081/mcp',
     'webtop': 'http://webtop-mcp.webtop-mcp.svc.cluster.local:8081/mcp',
     'multi-whatsapp': 'http://multi-whatsapp-manager.multi-whatsapp.svc.cluster.local:8080/mcp',
@@ -28,18 +28,30 @@ def main():
     names = [args.server] if args.server else list(URLS)
     helper = Path(__file__).resolve().with_name('mcp-headers.py')
     output = source
+    replaced_names = set(names)
+    if 'tivtaam' in names:
+        servers = previous.get('mcp_servers', {})
+        legacy = servers.get('tivtaam-mcp')
+        current = servers.get('tivtaam')
+        if legacy is not None and current is not None and legacy != current:
+            raise ValueError('Both TivTaam names exist with different settings; reconcile them before installing')
+        output = re.sub(r'(?ms)^\[mcp_servers\.tivtaam-mcp(?:\.[^\]]+)?\][^\n]*\n.*?(?=^\[|\Z)', '', output)
+        replaced_names.add('tivtaam-mcp')
     for name in names:
         pattern = r'(?ms)^\[mcp_servers\.' + re.escape(name) + r'(?:\.[^\]]+)?\][^\n]*\n.*?(?=^\[|\Z)'
         output = re.sub(pattern, '', output)
         # Keep explicit tool allow/deny lists when replacing the transport.
-        restrictions = previous.get('mcp_servers', {}).get(name, {})
+        servers = previous.get('mcp_servers', {})
+        restrictions = servers.get(name, servers.get('tivtaam-mcp', {}) if name == 'tivtaam' else {})
         preserved = ''.join(f'{key} = {json.dumps(restrictions[key])}\n' for key in ('enabled_tools', 'disabled_tools', 'enabled') if key in restrictions)
         command = f'{helper} {name}'
-        tool_timeout = max(360, restrictions.get('tool_timeout_sec', 90)) if name == 'tivtaam-mcp' else 90
+        tool_timeout = max(360, restrictions.get('tool_timeout_sec', 90)) if name == 'tivtaam' else 90
         output = output.rstrip() + f'\n\n[mcp_servers.{name}]\nurl = {json.dumps(URLS[name])}\nhttp_headers_helper = {json.dumps(command)}\nstartup_timeout_sec = 30\ntool_timeout_sec = {tool_timeout}\n' + preserved
     updated = tomllib.loads(output)
+    if 'tivtaam' in names and 'tivtaam-mcp' in updated['mcp_servers']:
+        raise ValueError('Legacy TivTaam entry was not migrated')
     for name, value in previous.get('mcp_servers', {}).items():
-        if name not in names and updated['mcp_servers'].get(name) != value:
+        if name not in replaced_names and updated['mcp_servers'].get(name) != value:
             raise ValueError('Unrelated MCP configuration changed')
     if {k:v for k,v in previous.items() if k != 'mcp_servers'} != {k:v for k,v in updated.items() if k != 'mcp_servers'}:
         raise ValueError('Unrelated configuration changed')

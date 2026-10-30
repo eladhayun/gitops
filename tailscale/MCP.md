@@ -6,7 +6,7 @@ Codex uses private Streamable HTTP through the Tailscale Service-CIDR router and
 | Codex name | URL |
 | --- | --- |
 | anpr | http://anpr-cloud.anpr.svc.cluster.local/mcp |
-| tivtaam-mcp | http://tivtaam-mcp.tivtaam-mcp.svc.cluster.local:8081/mcp |
+| tivtaam | http://tivtaam-mcp.tivtaam-mcp.svc.cluster.local:8081/mcp |
 | mashov | http://mashov-mcp.mashov-mcp.svc.cluster.local:8081/mcp |
 | webtop | http://webtop-mcp.webtop-mcp.svc.cluster.local:8081/mcp |
 | multi-whatsapp | http://multi-whatsapp-manager.multi-whatsapp.svc.cluster.local:8080/mcp |
@@ -14,7 +14,9 @@ Codex uses private Streamable HTTP through the Tailscale Service-CIDR router and
 Run `python3 scripts/configure-mcps.py` from the GitOps checkout to install these
 entries in the current owner's `~/.codex/config.toml`. It validates TOML, preserves
 unrelated configuration and tool restrictions, and creates a mode-0600 backup.
-Use `--server NAME` to update one entry. Reload Codex afterward.
+Use `--server NAME` to update one entry (`--server tivtaam` for TivTaam).
+Installing TivTaam migrates a legacy `tivtaam-mcp` entry to `tivtaam`; conflicting
+duplicate entries are rejected for review. Reload Codex afterward.
 
 Every entry uses `scripts/mcp-headers.py NAME`, a 30-second startup timeout and a
 90-second tool timeout. The helper reads a mode-0600 owner-owned token file from

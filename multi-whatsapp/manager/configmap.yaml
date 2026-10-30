@@ -9,7 +9,7 @@ data:
   MW_SLACK_CHANNEL: C0CC57D7Q3D
   MW_MONITOR_HEALTH_URL: http://multi-whatsapp-manager.multi-whatsapp.svc.cluster.local:8080/readyz
   MW_MONITOR_NAMESPACE: multi-whatsapp
-  MW_GITHUB_REPOSITORY: eladhayun/gitops
+  MW_GITHUB_REPOSITORY: jshipster-io/gitops
   MW_GITHUB_BRANCH: main
   MW_INVENTORY_PATH: multi-whatsapp/accounts
   MW_MCP_TOKEN_FILE: /private/mcp/auth-token

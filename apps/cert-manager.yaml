@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/eladhayun/gitops
+    repoURL: https://github.com/jshipster-io/gitops
     targetRevision: main
     path: cert-manager
   destination:

@@ -9,7 +9,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/eladhayun/gitops.git
+    repoURL: https://github.com/jshipster-io/gitops.git
     targetRevision: HEAD
     path: argo-rollouts-demo-redis
 

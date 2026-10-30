@@ -8,7 +8,7 @@ spec:
   goTemplateOptions: [missingkey=error]
   generators:
     - git:
-        repoURL: https://github.com/eladhayun/gitops.git
+        repoURL: https://github.com/jshipster-io/gitops.git
         revision: main
         requeueAfterSeconds: 60
         files:
@@ -24,7 +24,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/eladhayun/gitops.git
+        repoURL: https://github.com/jshipster-io/gitops.git
         targetRevision: main
         path: multi-whatsapp/worker-chart
         helm:

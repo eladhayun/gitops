@@ -32,7 +32,7 @@ spec:
             enabled: false
           apiServerProxyConfig:
             mode: "false"
-    - repoURL: https://github.com/eladhayun/gitops.git
+    - repoURL: https://github.com/jshipster-io/gitops.git
       targetRevision: main
       path: tailscale
   destination:

@@ -22,7 +22,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: drc-weekly-summary
-            image: prodacr1234.azurecr.io/slack-notifications:main-90ee3bc
+            image: prodacr1234.azurecr.io/slack-notifications:main-d4cc63e
             command: ["/root/slack-notifications"]
             args: ["drc-weekly-summary"]
             env:

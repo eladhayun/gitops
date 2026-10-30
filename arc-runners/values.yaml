@@ -1,0 +1,116 @@
+githubConfigSecret: arc-github-auth
+minRunners: 0
+maxRunners: 1
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-controller
+listenerTemplate:
+  spec:
+    containers:
+    - name: listener
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          memory: 128Mi
+template:
+  metadata:
+    labels:
+      app.kubernetes.io/component: arc-runner
+  spec:
+    automountServiceAccountToken: false
+    priorityClassName: arc-build
+    nodeSelector:
+      workload: github-actions
+      kubernetes.io/arch: amd64
+    tolerations:
+    - key: workload
+      operator: Equal
+      value: github-actions
+      effect: NoSchedule
+    initContainers:
+    - name: init-dind-externals
+      image: ghcr.io/actions/actions-runner:2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232
+      command:
+      - cp
+      - -r
+      - /home/runner/externals/.
+      - /home/runner/tmpDir/
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+      volumeMounts:
+      - name: dind-externals
+        mountPath: /home/runner/tmpDir
+    - name: dind
+      image: docker:29.9.2-dind@sha256:9e79b879b177fbd72c34376a3dd3d91747da5db49e1f560f76aea59561471977
+      args:
+      - dockerd
+      - --host=unix:///var/run/docker.sock
+      - --group=$(DOCKER_GROUP_GID)
+      env:
+      - name: DOCKER_GROUP_GID
+        value: '123'
+      securityContext:
+        privileged: true
+      restartPolicy: Always
+      startupProbe:
+        exec:
+          command:
+          - docker
+          - info
+        failureThreshold: 24
+        periodSeconds: 5
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          memory: 3Gi
+      volumeMounts:
+      - &id001
+        name: work
+        mountPath: /home/runner/_work
+      - &id002
+        name: dind-sock
+        mountPath: /var/run
+      - name: dind-externals
+        mountPath: /home/runner/externals
+      - name: docker-data
+        mountPath: /var/lib/docker
+    containers:
+    - name: runner
+      image: ghcr.io/actions/actions-runner:2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232
+      command:
+      - /home/runner/run.sh
+      env:
+      - name: DOCKER_HOST
+        value: unix:///var/run/docker.sock
+      - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+        value: '120'
+      resources:
+        requests:
+          cpu: '1'
+          memory: 2Gi
+        limits:
+          memory: 3Gi
+      volumeMounts:
+      - *id001
+      - *id002
+    volumes:
+    - name: work
+      emptyDir:
+        sizeLimit: 10Gi
+    - name: dind-sock
+      emptyDir:
+        sizeLimit: 1Mi
+    - name: dind-externals
+      emptyDir:
+        sizeLimit: 1Gi
+    - name: docker-data
+      emptyDir:
+        sizeLimit: 20Gi

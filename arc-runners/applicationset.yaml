@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: arc-runners
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+  - missingkey=error
+  generators:
+  - list:
+      elements:
+      - repository: ANPR-Shikmim
+        name: anpr-shikmim
+      - repository: blutag-app
+        name: blutag-app
+      - repository: blutag-findmy
+        name: blutag-findmy
+      - repository: blutag-pointer-push
+        name: blutag-pointer-push
+      - repository: blutag-website
+        name: blutag-website
+      - repository: drc
+        name: drc
+      - repository: hasadnaa
+        name: hasadnaa
+      - repository: ids
+        name: ids
+      - repository: mashov-mcp
+        name: mashov-mcp
+      - repository: multi-whatsapp
+        name: multi-whatsapp
+      - repository: padel-booking
+        name: padel-booking
+      - repository: slack-notifications
+        name: slack-notifications
+      - repository: tivtaam-mcp
+        name: tivtaam-mcp
+      - repository: trips
+        name: trips
+      - repository: webtop-mcp
+        name: webtop-mcp
+      - repository: FindMy.py
+        name: findmy-py
+      - repository: openhaystack
+        name: openhaystack
+      - repository: codex-widget
+        name: codex-widget
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      name: arc-{{.name}}
+    spec:
+      project: default
+      sources:
+      - repoURL: ghcr.io/actions/actions-runner-controller-charts
+        chart: gha-runner-scale-set
+        targetRevision: 0.15.1
+        helm:
+          releaseName: arc-{{.name}}
+          valueFiles:
+          - $values/arc-runners/values.yaml
+          valuesObject:
+            githubConfigUrl: https://github.com/eladhayun/{{.repository}}
+            runnerScaleSetName: jshipster-{{.name}}
+      - repoURL: https://github.com/eladhayun/gitops.git
+        targetRevision: main
+        ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: arc-runners
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+        - ServerSideApply=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m

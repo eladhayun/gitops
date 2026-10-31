@@ -9,6 +9,10 @@ spec.loader.exec_module(validator)
 
 
 class ValidationGateTests(unittest.TestCase):
+    def test_public_ssh_is_rejected(self):
+        with self.assertRaises(AssertionError):
+            validator.validate_rendered('apiVersion: v1\nkind: Service\nmetadata: {name: test}\nspec:\n  type: LoadBalancer\n  ports: [{port: 22, targetPort: ssh}]\n')
+
     def test_direct_intake_deployment_is_rejected(self):
         with self.assertRaises(AssertionError):
             validator.check_source({"repoURL": "https://github.com/jshipster-io/gitops.git", "targetRevision": "main"})

@@ -50,8 +50,6 @@ spec:
           containerPort: 8080
         - name: https
           containerPort: 8443
-        - name: ssh
-          containerPort: 2222
         - name: health
           containerPort: 8082
         resources:

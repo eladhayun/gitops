@@ -1,15 +1,3 @@
-tcp:
-  routers:
-    bastion:
-      entryPoints:
-      - ssh
-      rule: HostSNI(`*`)
-      service: bastion
-  services:
-    bastion:
-      loadBalancer:
-        servers:
-        - address: jshipster-bastion.default.svc.cluster.local:22
 http:
   middlewares:
     security-headers:

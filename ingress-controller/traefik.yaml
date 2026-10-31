@@ -57,14 +57,6 @@ entryPoints:
       middlewares:
       - security-headers@file
       aliasHeadersStrategy: delete
-  ssh:
-    address: :2222
-    transport:
-      lifeCycle:
-        requestAcceptGraceTimeout: 5s
-        graceTimeOut: 60s
-    http:
-      aliasHeadersStrategy: delete
   health:
     address: :8082
     http:

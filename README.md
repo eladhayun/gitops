@@ -43,7 +43,9 @@ is not a substitute for verifying uploaded archives and testing restores.
    require the configured plugin and age key; keep decrypted output private.
 2. Use server-side dry runs for changed resources. Existing Job pod templates
    are immutable; admission Jobs use Argo hooks with recreation policies.
-3. Push reviewed changes to `main`, then check Argo sync, health, rollout status,
+3. Push changes to `main`; automatic validation promotes passing commits to the
+   protected `production` branch without human approval. See
+   [deployment gate](docs/deployment-gate.md). Then check Argo sync, health, rollout status,
    restart counts, warning events, and the affected service endpoints.
 4. For Helm-managed Argo CD, run `make argocd-upgrade` separately. It pins chart
    10.11.6 and application v3.5.6, retaining existing release overrides and KSOPS.
@@ -59,8 +61,10 @@ kubectl --context jshipster get events -A --field-selector=type=Warning
 
 Traefik v3.7.16 replaces the retired Ingress NGINX controller. Its maintained
 annotation compatibility provider preserves existing Ingress resources and
-cert-manager HTTP-01 routing. Two replicas serve HTTP, HTTPS, and bastion SSH
-through the original public Service/IP. See `ingress-controller/README.md` for
+cert-manager HTTP-01 routing. Two replicas serve HTTP and HTTPS
+through the original public Service/IP. Bastion SSH uses the existing Tailscale
+subnet route; see [private SSH](jshipster-bastion/README.md).
+See `ingress-controller/README.md` for
 security settings, retained compatibility names, and migration checks.
 
 Argo CD v3.5.6 retains the upstream nil-list guard for the controller pager

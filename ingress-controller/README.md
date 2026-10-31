@@ -13,14 +13,14 @@ resource ownership. The namespace and LoadBalancer Service retain the names
 `ingress-nginx` and `ingress-nginx-controller`. These are compatibility names,
 not the running controller implementation. **Do not delete or recreate the
 Service or namespace during upgrades:** that could release the public IP and
-break DNS and SSH.
+break public HTTP/HTTPS routing.
 
 The Service preserves `externalTrafficPolicy: Local`, its existing Azure public
-IP, and ports 80, 443, and 22. Named target ports send HTTP/HTTPS to Traefik's
-unprivileged ports 8080/8443 and SSH to 2222. The TCP router in `routes.yaml`
-forwards SSH directly to `jshipster-bastion.default.svc.cluster.local:22` without
-TLS interception or PROXY protocol. `debug.jshipster.io` remains managed from
-the Service's ExternalDNS annotation.
+IP, and ports 80 and 443. Named target ports send HTTP/HTTPS to Traefik's
+unprivileged ports 8080/8443. Public port 22 and the SSH TCP router have been
+removed. Bastion access now uses Tailscale directly to its ClusterIP Service;
+see [private SSH](../jshipster-bastion/README.md). The legacy public SSH DNS
+annotation is removed. HTTP/HTTPS hostnames remain managed by their Ingresses.
 
 ## Routing and security
 

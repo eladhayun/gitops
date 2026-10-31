@@ -106,6 +106,9 @@ def validate_rendered(rendered):
         assert doc.get("apiVersion") and doc.get("kind") and doc.get("metadata", {}).get("name"), "Incomplete resource"
         if doc["kind"] == "Secret":
             assert not (doc.get("data") or doc.get("stringData")), "Plaintext Secret in rendered manifests"
+        if doc["kind"] == "Service" and doc.get("spec", {}).get("type") in {"LoadBalancer", "NodePort"}:
+            assert all(p.get("port") != 22 and p.get("targetPort") not in {22, "ssh"}
+                       for p in doc["spec"].get("ports", [])), "SSH must stay private behind Tailscale"
         if doc["kind"] not in CUSTOM:
             standard.append(doc)
     result = subprocess.run(["kubeconform", "-strict", "-summary", "-kubernetes-version", "1.35.0"],

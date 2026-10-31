@@ -1,0 +1,165 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: postgres
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress: []
+  egress: []
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-clients
+  namespace: postgres
+spec:
+  podSelector:
+    matchLabels:
+      app: shared-postgres
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: blutag
+      podSelector:
+        matchLabels:
+          app: blutag-app
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: hasadnaa
+      podSelector:
+        matchLabels:
+          app: hasadnaa
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: drc
+      podSelector:
+        matchLabels:
+          app: trainings
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: mashov-mcp
+      podSelector:
+        matchLabels:
+          app: mashov-mcp
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: webtop-mcp
+      podSelector:
+        matchLabels:
+          app: webtop-mcp
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: tivtaam-mcp
+      podSelector:
+        matchLabels:
+          app: tivtaam-mcp
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: pg-backups
+      podSelector:
+        matchLabels:
+          app: pg-backup
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: default
+      podSelector:
+        matchLabels:
+          app: jshipster-bastion
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: jshipster
+      podSelector:
+        matchLabels:
+          app: blutag-weekly-summary
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: jshipster
+      podSelector:
+        matchLabels:
+          app: hasadnaa-weekly-summary
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: jshipster
+      podSelector:
+        matchLabels:
+          app: drc-weekly-summary
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: postgres
+      podSelector:
+        matchLabels:
+          app: shared-postgres-bootstrap
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: postgres
+      podSelector:
+        matchLabels:
+          app: shared-postgres-tls-reload
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: tailscale
+      podSelector:
+        matchLabels:
+          tailscale.com/parent-resource: jshipster-aks
+          tailscale.com/parent-resource-type: connector
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: multi-whatsapp
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: multi-whatsapp-manager
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: multi-whatsapp
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: multi-whatsapp-worker
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: multi-whatsapp
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: multi-whatsapp-migrate
+    ports:
+    - protocol: TCP
+      port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-maintenance-egress
+  namespace: postgres
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: postgres
+      podSelector:
+        matchLabels:
+          app: shared-postgres
+    ports:
+    - protocol: TCP
+      port: 5432

@@ -8,6 +8,10 @@
 
 # Pin the stable release; preserves the list-pager nil-pointer fix (#25192).
 global:
+  # Fine-grained ingress and egress policies are managed by GitOps instead.
+  # Helm's server ingress rule otherwise permits every source additively.
+  networkPolicy:
+    create: false
   image:
     tag: v3.5.6
 

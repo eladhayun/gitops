@@ -10,6 +10,8 @@ spec:
     - to:
         - namespaceSelector:
             matchLabels: {kubernetes.io/metadata.name: kube-system}
+          podSelector:
+            matchLabels: {k8s-app: kube-dns}
       ports:
         - {protocol: UDP, port: 53}
         - {protocol: TCP, port: 53}
@@ -43,6 +45,7 @@ spec:
         - {protocol: TCP, port: 8081}
     - to:
         - ipBlock: {cidr: 10.0.0.1/32}
+        - ipBlock: {cidr: 172.212.23.43/32}
       ports:
         - {protocol: TCP, port: 443}
 ---
@@ -97,6 +100,7 @@ spec:
         - {protocol: TCP, port: 8080}
     - to:
         - ipBlock: {cidr: 10.0.0.1/32}
+        - ipBlock: {cidr: 172.212.23.43/32}
       ports:
         - {protocol: TCP, port: 443}
 ---
@@ -127,5 +131,9 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels: {kubernetes.io/metadata.name: tailscale}
+          podSelector:
+            matchLabels:
+              tailscale.com/parent-resource: jshipster-aks
+              tailscale.com/parent-resource-type: connector
       ports:
         - {protocol: TCP, port: 8080}

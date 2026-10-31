@@ -27,6 +27,7 @@ jobs:
           bash scripts/install-validation-tools.sh "$RUNNER_TEMP/gitops-tools"
           echo "$RUNNER_TEMP/gitops-tools" >> "$GITHUB_PATH"
       - run: python scripts/test-validate-gitops.py
+      - run: python scripts/test-network-policy.py
       - run: python scripts/validate-gitops.py
   promote:
     name: Promote validated production

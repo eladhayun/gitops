@@ -33,7 +33,7 @@ spec:
           apiServerProxyConfig:
             mode: "false"
     - repoURL: https://github.com/jshipster-io/gitops.git
-      targetRevision: main
+      targetRevision: production
       path: tailscale
   destination:
     server: https://kubernetes.default.svc

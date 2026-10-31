@@ -10,7 +10,7 @@ spec:
 
   source:
     repoURL: https://github.com/jshipster-io/gitops.git
-    targetRevision: HEAD
+    targetRevision: production
     path: ids
 
   destination:

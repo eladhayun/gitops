@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/jshipster-io/gitops.git
-    targetRevision: main
+    targetRevision: production
     path: multi-whatsapp/manager
   destination:
     server: https://kubernetes.default.svc

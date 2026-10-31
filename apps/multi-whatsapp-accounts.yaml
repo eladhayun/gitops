@@ -9,7 +9,7 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/jshipster-io/gitops.git
-        revision: main
+        revision: production
         requeueAfterSeconds: 60
         files:
           - path: multi-whatsapp/accounts/*.json
@@ -25,7 +25,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/jshipster-io/gitops.git
-        targetRevision: main
+        targetRevision: production
         path: multi-whatsapp/worker-chart
         helm:
           releaseName: 'mw-account-{{ .account_id }}'

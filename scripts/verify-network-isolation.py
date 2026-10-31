@@ -7,6 +7,7 @@ or send application messages. Authenticated service checks are performed separat
 """
 import argparse
 import json
+import shlex
 import subprocess
 import time
 
@@ -35,32 +36,28 @@ def main():
         checks.append({"name": ns + "/" + service, "host": svc["spec"]["clusterIP"], "port": port, "allowed": False})
     created = []
     stamp = str(int(time.time()))
-    code = '''import json,socket,sys,time
-time.sleep(5)
-failed=False
-for check in json.loads(sys.argv[1]):
-    try:
-        with socket.create_connection((check['host'],check['port']),timeout=4): pass
-        connected=True
-    except (TimeoutError,OSError): connected=False
-    ok=connected==check['allowed']
-    failed=failed or not ok
-    print(json.dumps({'target':check['name'],'connected':connected,'expected':check['allowed'],'pass':ok}),flush=True)
-sys.exit(1 if failed else 0)
-'''
     specs = [("default", "deny-" + str(i), n["metadata"]["name"], {}, checks) for i, n in enumerate(nodes)]
     specs.append(("pg-backups", "backup", None, {"app": "pg-backup"}, [{**checks[0], "allowed": True}]))
     try:
         for ns, suffix, node, labels, tests in specs:
             name = "network-policy-probe-" + stamp + "-" + suffix
+            commands = ["sleep 5", "failed=0"]
+            for check in tests:
+                expected = str(check["allowed"]).lower()
+                commands.extend([
+                    f"if nc -z -w 4 {shlex.quote(check['host'])} {check['port']}; then connected=true; else connected=false; fi",
+                    f"printf '%s connected=%s expected=%s\\n' {shlex.quote(check['name'])} \"$connected\" {expected}",
+                    f'[ "$connected" = "{expected}" ] || failed=1',
+                ])
+            commands.append('exit "$failed"')
             pod = {"apiVersion": "v1", "kind": "Pod", "metadata": {"name": name, "namespace": ns, "labels": labels},
                    "spec": {"restartPolicy": "Never", "activeDeadlineSeconds": 240,
                             "automountServiceAccountToken": False,
                             "securityContext": {"runAsNonRoot": True, "runAsUser": 1000, "seccompProfile": {"type": "RuntimeDefault"}},
-                            "containers": [{"name": "probe", "image": "python:3.12-alpine",
-                                            "command": ["python3", "-u", "-c", code, json.dumps(tests)],
+                            "containers": [{"name": "probe", "image": "alpine:3.23",
+                                            "command": ["sh", "-c", "\n".join(commands)],
                                             "securityContext": {"allowPrivilegeEscalation": False, "readOnlyRootFilesystem": True, "capabilities": {"drop": ["ALL"]}},
-                                            "resources": {"requests": {"cpu": "5m", "memory": "24Mi"}, "limits": {"cpu": "100m", "memory": "64Mi"}}}]}}
+                                            "resources": {"requests": {"cpu": "5m", "memory": "2Mi"}, "limits": {"cpu": "100m", "memory": "16Mi"}}}]}}
             if node:
                 pod["spec"]["nodeName"] = node
             kubectl("create", "-f", "-", input=json.dumps(pod))
@@ -74,7 +71,9 @@ sys.exit(1 if failed else 0)
                 phase = pod["status"]["phase"]
                 if phase in {"Succeeded", "Failed"}:
                     print(ns + "/" + name, phase, flush=True)
-                    print(kubectl("logs", name, "-n", ns), flush=True)
+                    print(pod["status"].get("message", ""), flush=True)
+                    if any(s.get("state", {}).get("terminated") for s in pod["status"].get("containerStatuses", [])):
+                        print(kubectl("logs", name, "-n", ns), flush=True)
                     if phase != "Succeeded":
                         failed.append(name)
                     pending.remove((ns, name))

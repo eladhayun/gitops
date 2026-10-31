@@ -11,4 +11,4 @@ images:
 - name: tivtaam-mcp
   newName: prodacr1234.azurecr.io/tivtaam-mcp
   newTag: main-545758e
-  digest: sha256:f68d954973b8585fb62595092afea297597c81a2a5285b44764e185bfe1b2db3
+  digest: sha256:570b50ee7a4f98fc3d30e769f7846ba02f15fc4ea1609c0805abc30bbe71c0ee
